@@ -13,7 +13,7 @@ org runtime_start
 ; ================================
 
 .copy_current_score_to_best_if_not_lower
-    LDX      #&4
+    LDX      #SCORE_DIGIT_COUNT
 
 .compare_score_digit_loop_0d80
     DEX
@@ -25,7 +25,7 @@ org runtime_start
     RTS
 
 .copy_current_score_to_best_digits_0d80
-    LDX      #&3
+    LDX      #SCORE_LAST_DIGIT_INDEX
 
 .copy_current_score_to_best_loop_0d80
     LDA      score_counter_chars,X
@@ -35,17 +35,17 @@ org runtime_start
     RTS
 
 .update_title_score_glyph_tables
-    LDX      #&3
-    LDY      #&0
+    LDX      #SCORE_LAST_DIGIT_INDEX
+    LDY      #SCORE_FIRST_TITLE_GLYPH_INDEX
 
 .update_title_score_glyph_loop_0d9c
     LDA      best_score_counter_chars,X
     SEC
-    SBC      #&10
+    SBC      #SCORE_GLYPH_CODE_OFFSET
     STA      best_score_title_digits,Y
     LDA      score_counter_chars,X
     SEC
-    SBC      #&10
+    SBC      #SCORE_GLYPH_CODE_OFFSET
     STA      current_score_title_digits,Y
     INY
     DEX
@@ -54,12 +54,12 @@ org runtime_start
 
 .oswrch_wrapper_from_a
     JSR      clear_all_palette_entries
-    LDA      #&c
+    LDA      #VDU_CLEAR_SCREEN
     JMP      MOS_OSWRCH
 
 .copy_level_modulo_24byte_fill_pattern
     LDA      level_units_digit
-    AND      #&3
+    AND      #LEVEL_FILL_PATTERN_SELECTOR_MASK
     STA      zp_scratch_76
     CLC
     ADC      zp_scratch_76
@@ -68,14 +68,14 @@ org runtime_start
     ASL      A
     ASL      A
     TAX
-    LDY      #&0
+    LDY      #LEVEL_FILL_PATTERN_FIRST_BYTE_INDEX
 
 .copy_level_fill_pattern_loop_0dbf
     LDA      initial_screen_level_modulo_fill_patterns_0dbf,X
     STA      (zp_screen_ptr_70_low),Y
     INY
     INX
-    CPY      #&18
+    CPY      #LEVEL_FILL_PATTERN_BYTE_COUNT
     BNE      copy_level_fill_pattern_loop_0dbf
     RTS
 
@@ -86,7 +86,7 @@ org runtime_start
     BEQ      wait_for_0224_tick_change
 
 .wait_vsync_with_osbyte19
-    LDA      #&13
+    LDA      #OSBYTE_WAIT_FOR_VSYNC
     JMP      MOS_OSBYTE
 
 .wait_for_0224_tick_change
@@ -110,9 +110,9 @@ org runtime_start
     JSR      early_init_sub_13b4
 
 .menu_attract_entry_loop_0e05
-    LDA      #&c
+    LDA      #SOUND_ID_ATTRACT_FIRST
     JSR      play_sound_id_if_enabled
-    LDA      #&10
+    LDA      #SOUND_ID_ATTRACT_SECOND
     JSR      play_sound_id_if_enabled
     JSR      oswrch_wrapper_from_a
     JSR      show_controls_and_start_prompt_screen
@@ -129,49 +129,49 @@ org runtime_start
     JMP      menu_attract_entry_loop_0e05
 
 .wait_for_start_escape_fire_or_timeout
-    LDA      #&4
+    LDA      #ATTRACT_TEXT_COLOUR
     STA      text_render_colour_value
     LDA      #&0
     STA      zp_scratch_76
     STA      zp_scratch_79
     STA      zp_scratch_78
     STA      zp_scratch_77
-    LDA      #&2
+    LDA      #ATTRACT_TIMEOUT_OUTER_COUNT
     STA      zp_indirect_74_high
     LDA      bootstrap_osbyte81_x_result_flag
     BEQ      attract_wait_poll_loop_0e2e
     SEI
 
 .attract_wait_poll_loop_0e2e
-    LDA      #&2
+    LDA      #ATTRACT_POLL_DELAY_FRAMES
     JSR      wait_frames_count_a
     JSR      draw_rotating_wait_text_strip
-    LDX      #&9d
+    LDX      #INKEY_SPACE
     JSR      scan_inkey_x
     BEQ      attract_wait_check_escape_0e2e
-    LDA      #&0
+    LDA      #INPUT_MODE_KEYBOARD
     STA      input_mode_keyboard_or_joystick
     CLI
     SEC
     RTS
 
 .attract_wait_check_escape_0e2e
-    LDX      #&8f
+    LDX      #INKEY_ESCAPE
     JSR      scan_inkey_x
     BEQ      attract_wait_check_joystick_fire_0e2e
     CLC
     RTS
 
 .attract_wait_check_joystick_fire_0e2e
-    LDA      #&80
-    LDX      #&0
+    LDA      #OSBYTE_READ_ADC_CHANNEL
+    LDX      #JOYSTICK_FIRE_ADC_CHANNEL
     JSR      MOS_OSBYTE
     TXA
-    AND      #&1
+    AND      #JOYSTICK_FIRE_RESULT_MASK
     BEQ      attract_wait_countdown_0e2e
 
 .mark_status_and_return_carry_set
-    LDA      #&1
+    LDA      #INPUT_MODE_JOYSTICK
     STA      input_mode_keyboard_or_joystick
     CLI
     SEC
@@ -186,17 +186,17 @@ org runtime_start
     RTS
 
 .start_level_or_round
-    LDA      #&4
+    LDA      #INITIAL_LIVES_STATUS_COUNT
     STA      lives_status_count
     LDA      #&0
     STA      room_area
     LDA      #&0
     STA      level_index_and_hazard_gate
     STA      level_tens_digit
-    LDA      #&1
+    LDA      #INITIAL_LEVEL_UNITS_DIGIT
     STA      level_units_digit
-    LDA      #&20
-    LDX      #&3
+    LDA      #SCORE_BLANK_CHARACTER
+    LDX      #SCORE_LAST_DIGIT_INDEX
 
 .clear_score_counter_loop_0e85
     STA      score_counter_chars,X
@@ -212,7 +212,7 @@ org runtime_start
     LDA      level_tens_digit
     BNE      level_active_loop
     LDA      level_units_digit
-    CMP      #&6
+    CMP      #INDEXED_DIFFICULTY_LEVEL_COUNT
     BPL      level_active_loop
     STA      level_index_and_hazard_gate
     DEC      level_index_and_hazard_gate
@@ -220,7 +220,7 @@ org runtime_start
 .level_active_loop
     LDA      level_loop_seed_or_status
     STA      saved_level_loop_seed_or_status
-    LDA      #&1
+    LDA      #INITIAL_REMAINING_ACTIVE_OBJECT_COUNT
     STA      remaining_active_object_count
     JSR      start_or_reset_player_and_level_objects
     LDA      #&0
@@ -234,13 +234,13 @@ org runtime_start
     LDA      lives_status_count
     BPL      level_active_loop
     JSR      apply_level_palette
-    LDX      #&e5
-    LDA      #&0
-    LDY      #&53
+    LDX      #END_OF_GAME_TEXT_STREAM_OFFSET
+    LDA      #END_OF_GAME_SCREEN_LOW
+    LDY      #END_OF_GAME_SCREEN_HIGH
     JSR      draw_encoded_text_stream_to_screen
-    LDA      #&13
+    LDA      #SOUND_ID_END_OF_GAME
     JSR      play_sound_id_if_enabled
-    LDA      #&50
+    LDA      #END_OF_GAME_DELAY_FRAMES
     JSR      wait_frames_count_a
     JMP      menu_attract_entry_loop_0e05
 
