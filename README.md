@@ -67,6 +67,8 @@ edges, and every previous/current fire-latch transition.
 Object validation covers every setup-count row, all 41 render slots in the
 overlapping lifecycle windows, all six hit-animation states, and all 256
 projectile expiry input bytes.
+The actual assembled score routine is CPU-replayed across all 10,000 valid
+four-character score states, including every carry and extra-life boundary.
 
 ## Layout and provenance
 
@@ -103,6 +105,10 @@ The [object-slot contract](analysis/reconstruction/runtime_object_slot_contract.
 and [projectile lifecycle reference](analysis/reconstruction/runtime_projectile_lifecycle.txt)
 preserve the deliberately different scheduler, collision, animation, target,
 and shot/hazard ownership windows.
+The [score/status contract](analysis/reconstruction/runtime_score_status_contract.txt)
+documents the original character-counter, target outcomes, lives, and level
+completion behavior. A strict bounded 6502 replay core executes the source-built
+routine rather than replacing it with the port model under test.
 
 The decoded 24-byte artwork can be reviewed in the
 [composed sprite and graphic sheet](analysis/reconstruction/composed_sprite_sheet.png).

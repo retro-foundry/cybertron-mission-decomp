@@ -29,6 +29,8 @@ $requiredFiles = @(
     'analysis/reconstruction/runtime_object_lifecycle_reference.txt'
     'analysis/reconstruction/runtime_object_slot_contract.txt'
     'analysis/reconstruction/runtime_projectile_lifecycle.txt'
+    'analysis/reconstruction/runtime_score_status_contract.txt'
+    'tools/reconstruction/replay_6502.py'
     'tools/reconstruction/render_graphic_sheet.py'
     'tools/reconstruction/validate_port_contracts.py'
     'analysis/reconstruction/composed_sprite_sheet.png'
@@ -59,6 +61,8 @@ $maintainedFiles = @(
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_object_lifecycle_reference.txt')
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_object_slot_contract.txt')
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_projectile_lifecycle.txt')
+    (Join-Path $repoRoot 'analysis\reconstruction\runtime_score_status_contract.txt')
+    (Join-Path $repoRoot 'tools\reconstruction\replay_6502.py')
     (Join-Path $repoRoot 'tools\reconstruction\render_graphic_sheet.py')
     (Join-Path $repoRoot 'tools\reconstruction\validate_port_contracts.py')
 )
@@ -72,6 +76,7 @@ foreach ($maintainedFile in $maintainedFiles) {
 }
 
 $rendererScript = Join-Path $repoRoot 'tools\reconstruction\render_graphic_sheet.py'
+$replayScript = Join-Path $repoRoot 'tools\reconstruction\replay_6502.py'
 $pythonCommand = Get-Command python -ErrorAction SilentlyContinue
 if ($null -eq $pythonCommand) {
     throw 'Python 3 is required to syntax-check the bundled reconstruction tool.'
@@ -79,6 +84,10 @@ if ($null -eq $pythonCommand) {
 & $pythonCommand.Source -c 'import ast, pathlib, sys; ast.parse(pathlib.Path(sys.argv[1]).read_bytes())' $rendererScript
 if ($LASTEXITCODE -ne 0) {
     throw 'The bundled graphic-sheet renderer does not parse as Python.'
+}
+& $pythonCommand.Source -c 'import ast, pathlib, sys; ast.parse(pathlib.Path(sys.argv[1]).read_bytes())' $replayScript
+if ($LASTEXITCODE -ne 0) {
+    throw 'The bundled 6502 replay core does not parse as Python.'
 }
 
 $assemblyText = Get-Content -LiteralPath $source -Raw

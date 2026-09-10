@@ -6,6 +6,8 @@ import json
 import re
 import sys
 
+from replay_6502 import Replay6502
+
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_RUNTIME = ROOT / "build" / "reconstruction" / "CYBRUN"
@@ -17,6 +19,7 @@ MOVEMENT_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_player_move
 OBJECT_LIFECYCLE_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_object_lifecycle_reference.txt"
 OBJECT_SLOT_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_object_slot_contract.txt"
 PROJECTILE_LIFECYCLE_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_projectile_lifecycle.txt"
+SCORE_STATUS_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_score_status_contract.txt"
 LOAD_ADDRESS = 0x0D80
 
 
@@ -840,6 +843,70 @@ def main() -> None:
             fail(f"screen byte ${screen_byte:02X}: spook pause without expiry")
         expiry_rows += 1
 
+    # Replay the actual assembled $22E6 score routine for every valid four-
+    # character state. Calls to sound/status are bounded side-effect probes;
+    # all score carry and life-award instructions execute from CYBRUN itself.
+    score_reference = SCORE_STATUS_REFERENCE.read_text(encoding="ascii")
+    score_table_text = score_reference.split("target_score_increment_table_2737\n", 1)[1].split(
+        "\nscore_counter_contract_22e6_2319\n", 1
+    )[0]
+    expected_score_add = {
+        int(match.group(1)): int(match.group(3))
+        for match in re.finditer(r"^([1-5]) \$([0-9A-F]{2}) ([0-9]+)$", score_table_text, re.MULTILINE)
+    }
+    actual_score_add = {slot: block(0x2737 + slot, 1)[0] for slot in range(1, 6)}
+    if actual_score_add != expected_score_add:
+        fail(f"target score increments {actual_score_add}, expected {expected_score_add}")
+
+    def model_score_unit(chars: list[int]) -> tuple[list[int], bool]:
+        result = list(chars)
+        index = 0
+        while True:
+            result[index] += 1
+            if result[index] != 0x2A:
+                break
+            result[index] = 0x20
+            index += 1
+            if index == 4:
+                break
+        return result, all(value == 0x20 for value in result[:3])
+
+    score_replays = 0
+    for encoded_state in range(10000):
+        value = encoded_state
+        initial_chars = []
+        for _ in range(4):
+            initial_chars.append(0x20 + value % 10)
+            value //= 10
+        expected_chars, expected_life = model_score_unit(initial_chars)
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        memory[0x0CEC:0x0CF0] = bytes(initial_chars)
+        memory[0x0BB4] = 4
+        calls = []
+
+        def score_jsr_handler(cpu: Replay6502, target: int) -> bool:
+            if target in (0x21EA, 0x2345):
+                calls.append((target, cpu.a))
+                return True
+            if target == 0x1D3C:
+                return True
+            return False
+
+        cpu = Replay6502(memory, score_jsr_handler)
+        cpu.a = 1
+        cpu.run_subroutine(0x22E6)
+        actual_chars = list(memory[0x0CEC:0x0CF0])
+        actual_life = memory[0x0BB4] == 5
+        expected_calls = [(0x21EA, 0x15), (0x2345, 0x15)] if expected_life else []
+        if actual_chars != expected_chars or actual_life != expected_life or calls != expected_calls:
+            fail(
+                f"score state {encoded_state:04d}: chars/life/calls "
+                f"{actual_chars}/{actual_life}/{calls}, expected "
+                f"{expected_chars}/{expected_life}/{expected_calls}"
+            )
+        score_replays += 1
+
     print(
         "Validated port preflight: "
         "64 graphic pointers, "
@@ -856,7 +923,8 @@ def main() -> None:
         f"{setup_rows} deterministic setup frames, "
         f"{len(window_roles)} object-slot roles, "
         f"{lifecycle_rows} lifecycle states, "
-        f"{expiry_rows} projectile expiry bytes"
+        f"{expiry_rows} projectile expiry bytes, "
+        f"{score_replays} score CPU replays"
     )
 
 

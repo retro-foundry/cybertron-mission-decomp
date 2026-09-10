@@ -1,0 +1,268 @@
+runtime_score_status_contract
+Purpose: port-facing score, target/status, lives, level-completion, and life-loss contract.
+Port rule: preserve original character counters, status glyph draw order, target slot semantics, and level/life side effects; do not replace them with a generic score/lives system.
+
+target_collection_outcomes_0fd6
+Authority: $0FD6 receives renderer target/collect collision flag $004A, matches current room low nibble against $0C14,X, and updates $0C0D/$0BB4/$0BB6/$0BB7/$0032.
+matched_slot condition state_changes status_draw score_or_life sound_or_transition
+1-5 required_target $0C0D[X]=1 draw_$2F36+X_through_$1D3C score_increment_$2737[X] sound_id_5
+6 bonus_status $0C0D[6]=1_then_$12D8_rerolls_slot6 draw_$2F3C/$2D lives_$0BB4++ sound_id_5_then_$2345
+0 completion_gate_not_all_required $0C0D_required_slots_not_all_1 movement_delta_$003F/$0040_negated_then_$1718/$1983 no_score no_level_advance
+0 completion_gate_all_required required_$0C0D_slots_1..$006F_set_to_$FF lives_$0BB4++_level_$0BB6++_wrap_to_$0BB7++_room_bank_rotates no_score sound_id_18_wait_then_jump_$0EA4
+
+target_score_increment_table_2737
+slot graphic score_delta_decimal
+1 $3F 10
+2 $3E 50
+3 $32 100
+4 $3E 50
+5 $32 100
+
+score_counter_contract_22e6_2319
+Authority: $22E6 increments four characters at $0CEC-$0CEF and $2319 draws them right-to-left at status screen pointer $3318.
+operation behavior port_rule
+increment_digit INC_$0CEC+X uses original character bytes, not binary or BCD score storage
+wrap_digit byte_after_INC == '*' becomes space_and_carries_left
+life_bonus_on_upper_wrap when upper digits are all space, play sound id 21, increment $0BB4, redraw $2345
+draw_score $2319 draws four chars from $0CEC-$0CEF then trailing space glyph through bitmap/status renderer
+
+lives_and_target_status_draw_contract_2345
+Authority: $2345 draws lives/status glyphs from $0BB4 and collected target flags $0C0D.
+field behavior
+$0BB4_positive repeats graphic $39 through $1D3C
+$0BB4_zero_or_negative clears one 24-byte status cell instead of drawing repeated life glyphs
+target_status_scan scans slots 1..$006F and draws $2F36+X only for nonzero $0C0D[X]
+completion_gate_status slot 0 is not drawn as a normal target-status glyph in this scan
+bonus_slot_6 not in the required scan unless $006F reaches it; its main redraw comes from the bonus collision path
+
+life_loss_and_reset_contract_1a59_2493
+Authority: $19F3/$1964/$2493 route player-hit visuals to $1A59; $1AAC room exits do not decrement lives.
+event path effects
+player_collision_flash $19F3 alternates $30/$31 with saved current graphics, then calls $1A59
+saved_visible_redraw $2493 redraws $008E/$008D saved visible player pair before life loss when needed
+life_loss $1A59 decrements $0BB4, calls $2345, plays sound id 3, restores player pointers/Y, sets graphics $33/$34, draws player cells, sets $0082=$96
+room_exit $1AAC/$172A changes $0032 and restarts area via $1735 without decrementing $0BB4
+
+port_summary
+Target collection, score increment, lives/status redraw, and level completion are one coupled original path rooted at $0FD6 and $2345.
+The score field is four character bytes at $0CEC-$0CEF with original wrap behavior; it is not BCD or integer score storage.
+Life loss and room exit are distinct: $1A59 decrements $0BB4 and sets transition delay, while $1AAC/$172A changes rooms without decrementing lives.
+
+target_collection_and_level_completion_0fd6 0fd6-106e
+0fd6  LDA      #0x0
+0fd8  STA      0x0030
+0fda  LDX      #0xff
+0fdc  INX      
+0fdd  LDA      0x0032
+0fdf  AND      #0xf
+0fe1  CMP      0xc14,X
+0fe4  BNE      0x0fdc
+0fe6  CPX      #0x0
+0fe8  BEQ      0x1013
+0fea  LDA      #0x1
+0fec  STA      0xc0d,X
+0fef  STX      0x0077
+0ff1  TXA      
+0ff2  CLC      
+0ff3  ADC      #0x36
+0ff5  TAX      
+0ff6  JSR      0x0fcf
+0ff9  LDA      #0x5
+0ffb  JSR      0x21ea
+0ffe  LDX      0x0077
+1000  CPX      #0x6
+1002  BEQ      0x100a
+1004  LDA      0x2737,X
+1007  JMP      0x22e6
+100a  JSR      0x12d8
+100d  INC      0x0bb4
+1010  JMP      0x2345
+1013  LDX      #0x0
+1015  INX      
+1016  LDA      0xc0d,X
+1019  CMP      #0x1
+101b  BNE      0x1024
+101d  LDA      #0xff
+101f  STA      0xc0d,X
+1022  INC      0x004e
+1024  CPX      0x006f
+1026  BNE      0x1015
+1028  CPX      0x004e
+102a  BEQ      0x1042
+102c  LDA      0x003f
+102e  EOR      #0xff
+1030  STA      0x003f
+1032  INC      0x003f
+1034  LDA      0x0040
+1036  EOR      #0xff
+1038  STA      0x0040
+103a  INC      0x0040
+103c  JSR      0x1718
+103f  JMP      0x1983
+1042  INC      0x0bb4
+1045  INC      0x0bb6
+1048  LDA      0x0bb6
+104b  CMP      #0xa
+104d  BNE      0x1057
+104f  LDA      #0x0
+1051  STA      0x0bb6
+1054  INC      0x0bb7
+1057  LDA      0x0032
+1059  CLC      
+105a  ADC      #0x10
+105c  AND      #0x30
+105e  STA      0x0032
+1060  LDA      #0x12
+1062  JSR      0x21ea
+1065  LDA      #0x32
+1067  JSR      0x1307
+106a  PLA      
+106b  PLA      
+106c  PLA      
+106d  PLA      
+106e  JMP      0x0ea4
+
+life_loss_reset_1a59 1a59-1aaa
+1a59  DEC      0x0bb4
+1a5c  JSR      0x2345
+1a5f  LDA      #0x3
+1a61  JSR      0x21ea
+1a64  LDA      #0x0
+1a66  STA      0x0031
+1a68  LDA      0x0d11
+1a6b  SEC      
+1a6c  SBC      #0x8
+1a6e  STA      0x0a90
+1a71  LDA      0x0d51
+1a74  SBC      #0x0
+1a76  STA      0x0ad0
+1a79  LDA      0x0bd1
+1a7c  STA      0x0a50
+1a7f  STA      0x0a51
+1a82  LDA      0x0d11
+1a85  CLC      
+1a86  ADC      #0x10
+1a88  STA      0x0a91
+1a8b  LDA      0x0d51
+1a8e  ADC      #0x0
+1a90  STA      0x0ad1
+1a93  LDA      #0x33
+1a95  STA      0x2f10
+1a98  LDA      #0x34
+1a9a  STA      0x2f11
+1a9d  LDX      #0x10
+1a9f  JSR      0x13fb
+1aa2  LDX      #0x11
+1aa4  JSR      0x13fb
+1aa7  LDA      #0x96
+1aa9  STA      0x0082
+
+score_increment_22e6 22e6-2318
+22e6  STA      0x0076
+22e8  LDX      #0x0
+22ea  INC      0xcec,X
+22ed  LDA      0xcec,X
+22f0  CMP      #0x2a
+22f2  BNE      0x22fe
+22f4  LDA      #0x20
+22f6  STA      0xcec,X
+22f9  INX      
+22fa  CPX      #0x4
+22fc  BNE      0x22ea
+22fe  LDY      #0x2
+2300  LDA      0xcec,Y
+2303  CMP      #0x20
+2305  BNE      0x2315
+2307  DEY      
+2308  BPL      0x2300
+230a  LDA      #0x15
+230c  JSR      0x21ea
+230f  INC      0x0bb4
+2312  JSR      0x2345
+2315  DEC      0x0076
+2317  BNE      0x22e8
+
+score_draw_2319 2319-2344
+2319  LDA      #0x33
+231b  STA      0x0ac0
+231e  LDA      #0x18
+2320  STA      0x0a80
+2323  STA      0x0a40
+2326  LDX      #0x3
+2328  STX      0x0076
+232a  LDA      0xcec,X
+232d  JSR      0x1d3c
+2330  LDX      0x0076
+2332  DEX      
+2333  BPL      0x2328
+2335  LDA      #0x20
+2337  JMP      0x1d3c
+233a  LDA      0xa80,X
+233d  STA      0x0070
+233f  LDA      0xac0,X
+2342  STA      0x0071
+2344  RTS      
+
+lives_target_status_draw_2345 2345-23a2
+2345  LDA      #0x7b
+2347  STA      0x0ac0
+234a  LDA      #0x8
+234c  STA      0x0a80
+234f  STA      0x0a40
+2352  LDX      0x0bb4
+2355  BEQ      0x2365
+2357  BMI      0x2371
+2359  STX      0x0076
+235b  LDA      #0x39
+235d  JSR      0x1d3c
+2360  LDX      0x0076
+2362  DEX      
+2363  BNE      0x2359
+2365  JSR      0x233a
+2368  LDY      #0x17
+236a  LDA      #0x0
+236c  STA      (0x70),Y
+236e  DEY      
+236f  BPL      0x236c
+2371  LDA      #0x7d
+2373  STA      0x0ac0
+2376  LDA      #0x60
+2378  STA      0x0a80
+237b  LDX      #0x0
+237d  INX      
+237e  STX      0x0076
+2380  LDA      0xc0d,X
+2383  BEQ      0x239c
+2385  LDA      0x2f36,X
+2388  JSR      0x1d3c
+238b  SEC      
+238c  LDA      0x0a80
+238f  SBC      #0x38
+2391  STA      0x0a80
+2394  LDA      0x0ac0
+2397  SBC      #0x0
+2399  STA      0x0ac0
+239c  LDX      0x0076
+239e  CPX      0x006f
+23a0  BMI      0x237d
+23a2  RTS      
+
+saved_visible_player_redraw_2493 2493-24bc
+2493  LDA      0x2f10
+2496  STA      0x008c
+2498  LDA      0x2f11
+249b  STA      0x008b
+249d  LDA      0x008d
+249f  STA      0x2f11
+24a2  LDA      0x008e
+24a4  STA      0x2f10
+24a7  LDA      #0x0
+24a9  STA      0x0031
+24ab  LDX      #0x10
+24ad  JSR      0x13e8
+24b0  LDX      #0x11
+24b2  JSR      0x13e8
+24b5  LDA      0x008c
+24b7  STA      0x2f10
+24ba  LDA      0x008b
+24bc  STA      0x2f11
