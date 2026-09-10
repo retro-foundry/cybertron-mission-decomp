@@ -65,7 +65,8 @@ enemy/target placement, collision rejection, and the composed entry frame.
 The input preflight exhausts all 16 keyboard movement masks, joystick threshold
 edges, and every previous/current fire-latch transition. Each keyboard mask is
 also replayed through the actual assembled scanner with a bounded INKEY stub;
-72 X/Y/fire edge combinations replay the assembled joystick scanner.
+72 X/Y/fire edge combinations replay the assembled joystick scanner, and all
+eight non-idle deltas replay the assembled direction resolver.
 Object validation covers every setup-count row, all 41 render slots in the
 overlapping lifecycle windows, all six hit-animation states, and all 256
 projectile expiry input bytes.

@@ -224,6 +224,30 @@ def main() -> None:
             )
         keyboard_cpu_replays += 1
 
+    direction_cpu_replays = 0
+    for (x_delta, y_delta), expected_direction in (
+        ((0, 1), 0),
+        ((0, -1), 1),
+        ((1, 0), 2),
+        ((-1, 0), 3),
+        ((1, -1), 4),
+        ((1, 1), 5),
+        ((-1, -1), 6),
+        ((-1, 1), 7),
+    ):
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        cpu = Replay6502(memory)
+        cpu.x = x_delta & 0xFF
+        cpu.y = y_delta & 0xFF
+        cpu.run_subroutine(0x2207)
+        if cpu.a != expected_direction:
+            fail(
+                f"direction CPU replay ({x_delta:+d},{y_delta:+d}): "
+                f"{cpu.a}, expected {expected_direction}"
+            )
+        direction_cpu_replays += 1
+
     # Boundary values exercise both branches of each joystick threshold, and
     # all previous/current pairs exercise the rising-edge fire latch at $15DD.
     def joystick_axis(sample: int) -> int:
@@ -986,6 +1010,7 @@ def main() -> None:
         f"{movement_rows} movement projections, "
         f"{keyboard_rows} keyboard masks, "
         f"{keyboard_cpu_replays} keyboard CPU replays, "
+        f"{direction_cpu_replays} direction CPU replays, "
         f"{len(joystick_cases)} joystick thresholds, "
         f"{joystick_cpu_replays} joystick CPU replays, "
         f"{fire_edge_rows} fire-latch transitions, "
