@@ -11,3488 +11,3488 @@ org runtime_start
 
 
 .copy_current_score_to_best_if_not_lower
-    LDX      #&4    ; &0D80
+    LDX      #&4
 
 .compare_score_digit_loop_0d80
-    DEX    ; &0D82
-    BMI      copy_current_score_to_best_digits_0d80    ; &0D83
-    LDA      score_counter_chars,X    ; &0D85
-    CMP      best_score_counter_chars,X    ; &0D88
-    BEQ      compare_score_digit_loop_0d80    ; &0D8B
-    BPL      copy_current_score_to_best_digits_0d80    ; &0D8D
-    RTS    ; &0D8F
+    DEX
+    BMI      copy_current_score_to_best_digits_0d80
+    LDA      score_counter_chars,X
+    CMP      best_score_counter_chars,X
+    BEQ      compare_score_digit_loop_0d80
+    BPL      copy_current_score_to_best_digits_0d80
+    RTS
 
 .copy_current_score_to_best_digits_0d80
-    LDX      #&3    ; &0D90
+    LDX      #&3
 
 .copy_current_score_to_best_loop_0d80
-    LDA      score_counter_chars,X    ; &0D92
-    STA      best_score_counter_chars,X    ; &0D95
-    DEX    ; &0D98
-    BPL      copy_current_score_to_best_loop_0d80    ; &0D99
-    RTS    ; &0D9B
+    LDA      score_counter_chars,X
+    STA      best_score_counter_chars,X
+    DEX
+    BPL      copy_current_score_to_best_loop_0d80
+    RTS
 
 .update_title_score_glyph_tables
-    LDX      #&3    ; &0D9C
-    LDY      #&0    ; &0D9E
+    LDX      #&3
+    LDY      #&0
 
 .update_title_score_glyph_loop_0d9c
-    LDA      best_score_counter_chars,X    ; &0DA0
-    SEC    ; &0DA3
-    SBC      #&10    ; &0DA4
-    STA      best_score_title_digits,Y    ; &0DA6
-    LDA      score_counter_chars,X    ; &0DA9
-    SEC    ; &0DAC
-    SBC      #&10    ; &0DAD
-    STA      current_score_title_digits,Y    ; &0DAF
-    INY    ; &0DB2
-    DEX    ; &0DB3
-    BPL      update_title_score_glyph_loop_0d9c    ; &0DB4
-    RTS    ; &0DB6
+    LDA      best_score_counter_chars,X
+    SEC
+    SBC      #&10
+    STA      best_score_title_digits,Y
+    LDA      score_counter_chars,X
+    SEC
+    SBC      #&10
+    STA      current_score_title_digits,Y
+    INY
+    DEX
+    BPL      update_title_score_glyph_loop_0d9c
+    RTS
 
 .oswrch_wrapper_from_a
-    JSR      clear_all_palette_entries    ; &0DB7
-    LDA      #&c    ; &0DBA
-    JMP      MOS_OSWRCH    ; &0DBC
+    JSR      clear_all_palette_entries
+    LDA      #&c
+    JMP      MOS_OSWRCH
 
 .copy_level_modulo_24byte_fill_pattern
-    LDA      level_units_digit    ; &0DBF
-    AND      #&3    ; &0DC2
-    STA      zp_scratch_76    ; &0DC4
-    CLC    ; &0DC6
-    ADC      zp_scratch_76    ; &0DC7
-    ADC      zp_scratch_76    ; &0DC9
-    ASL      A    ; &0DCB
-    ASL      A    ; &0DCC
-    ASL      A    ; &0DCD
-    TAX    ; &0DCE
-    LDY      #&0    ; &0DCF
+    LDA      level_units_digit
+    AND      #&3
+    STA      zp_scratch_76
+    CLC
+    ADC      zp_scratch_76
+    ADC      zp_scratch_76
+    ASL      A
+    ASL      A
+    ASL      A
+    TAX
+    LDY      #&0
 
 .copy_level_fill_pattern_loop_0dbf
-    LDA      initial_screen_level_modulo_fill_patterns_0dbf,X    ; &0DD1
-    STA      (zp_screen_ptr_70_low),Y    ; &0DD4
-    INY    ; &0DD6
-    INX    ; &0DD7
-    CPY      #&18    ; &0DD8
-    BNE      copy_level_fill_pattern_loop_0dbf    ; &0DDA
-    RTS    ; &0DDC
+    LDA      initial_screen_level_modulo_fill_patterns_0dbf,X
+    STA      (zp_screen_ptr_70_low),Y
+    INY
+    INX
+    CPY      #&18
+    BNE      copy_level_fill_pattern_loop_0dbf
+    RTS
 
 .wait_one_frame_tick
-    LDA      bootstrap_osbyte81_x_result_flag    ; &0DDD
+    LDA      bootstrap_osbyte81_x_result_flag
 
 .wait_frame_tick_mode_branch
-    BEQ      wait_for_0224_tick_change    ; &0DE0
+    BEQ      wait_for_0224_tick_change
 
 .wait_vsync_with_osbyte19
-    LDA      #&13    ; &0DE2
-    JMP      MOS_OSBYTE    ; &0DE4
+    LDA      #&13
+    JMP      MOS_OSBYTE
 
 .wait_for_0224_tick_change
-    LDA      polled_frame_tick_byte_0224    ; &0DE7
+    LDA      polled_frame_tick_byte_0224
 
 .wait_for_0224_tick_change_loop_0ddd
-    CMP      polled_frame_tick_byte_0224    ; &0DEA
-    BEQ      wait_for_0224_tick_change_loop_0ddd    ; &0DED
-    RTS    ; &0DEF
+    CMP      polled_frame_tick_byte_0224
+    BEQ      wait_for_0224_tick_change_loop_0ddd
+    RTS
 
 .runtime_pre_entry_unexecuted_bytes_0df0
     ; unused/pre-entry bytes before runtime_entry at $0E02; preserved byte-exact
-    EQUB &68,&00,&8D,&78,&30,&00,&00,&B2    ; &0DF0
-    EQUB &0C,&00,&8C,&5E,&70,&00,&00,&78    ; &0DF8
+    EQUB &68,&00,&8D,&78,&30,&00,&00,&B2
+    EQUB &0C,&00,&8C,&5E,&70,&00,&00,&78
 
 .runtime_entry_nop_padding
-    NOP    ; &0E00
-    NOP    ; &0E01
+    NOP
+    NOP
 
 .runtime_entry_after_bootstrap
-    JSR      early_init_sub_13b4    ; &0E02
+    JSR      early_init_sub_13b4
 
 .menu_attract_entry_loop_0e05
-    LDA      #&c    ; &0E05
-    JSR      play_sound_id_if_enabled    ; &0E07
-    LDA      #&10    ; &0E0A
-    JSR      play_sound_id_if_enabled    ; &0E0C
-    JSR      oswrch_wrapper_from_a    ; &0E0F
-    JSR      show_controls_and_start_prompt_screen    ; &0E12
-    JSR      apply_level_palette    ; &0E15
-    JSR      wait_for_start_escape_fire_or_timeout    ; &0E18
-    BCS      start_level_or_round    ; &0E1B
-    JSR      oswrch_wrapper_from_a    ; &0E1D
-    JSR      show_object_legend_screen    ; &0E20
-    JSR      apply_level_palette    ; &0E23
-    JSR      wait_for_start_escape_fire_or_timeout    ; &0E26
-    BCS      start_level_or_round    ; &0E29
+    LDA      #&c
+    JSR      play_sound_id_if_enabled
+    LDA      #&10
+    JSR      play_sound_id_if_enabled
+    JSR      oswrch_wrapper_from_a
+    JSR      show_controls_and_start_prompt_screen
+    JSR      apply_level_palette
+    JSR      wait_for_start_escape_fire_or_timeout
+    BCS      start_level_or_round
+    JSR      oswrch_wrapper_from_a
+    JSR      show_object_legend_screen
+    JSR      apply_level_palette
+    JSR      wait_for_start_escape_fire_or_timeout
+    BCS      start_level_or_round
 
 .early_game_setup_path
-    JMP      menu_attract_entry_loop_0e05    ; &0E2B
+    JMP      menu_attract_entry_loop_0e05
 
 .wait_for_start_escape_fire_or_timeout
-    LDA      #&4    ; &0E2E
-    STA      text_render_colour_value    ; &0E30
-    LDA      #&0    ; &0E33
-    STA      zp_scratch_76    ; &0E35
-    STA      zp_scratch_79    ; &0E37
-    STA      zp_scratch_78    ; &0E39
-    STA      zp_scratch_77    ; &0E3B
-    LDA      #&2    ; &0E3D
-    STA      zp_indirect_74_high    ; &0E3F
-    LDA      bootstrap_osbyte81_x_result_flag    ; &0E41
-    BEQ      attract_wait_poll_loop_0e2e    ; &0E44
-    SEI    ; &0E46
+    LDA      #&4
+    STA      text_render_colour_value
+    LDA      #&0
+    STA      zp_scratch_76
+    STA      zp_scratch_79
+    STA      zp_scratch_78
+    STA      zp_scratch_77
+    LDA      #&2
+    STA      zp_indirect_74_high
+    LDA      bootstrap_osbyte81_x_result_flag
+    BEQ      attract_wait_poll_loop_0e2e
+    SEI
 
 .attract_wait_poll_loop_0e2e
-    LDA      #&2    ; &0E47
-    JSR      wait_frames_count_a    ; &0E49
-    JSR      draw_rotating_wait_text_strip    ; &0E4C
-    LDX      #&9d    ; &0E4F
-    JSR      scan_inkey_x    ; &0E51
-    BEQ      attract_wait_check_escape_0e2e    ; &0E54
-    LDA      #&0    ; &0E56
-    STA      input_mode_keyboard_or_joystick    ; &0E58
-    CLI    ; &0E5B
-    SEC    ; &0E5C
-    RTS    ; &0E5D
+    LDA      #&2
+    JSR      wait_frames_count_a
+    JSR      draw_rotating_wait_text_strip
+    LDX      #&9d
+    JSR      scan_inkey_x
+    BEQ      attract_wait_check_escape_0e2e
+    LDA      #&0
+    STA      input_mode_keyboard_or_joystick
+    CLI
+    SEC
+    RTS
 
 .attract_wait_check_escape_0e2e
-    LDX      #&8f    ; &0E5E
-    JSR      scan_inkey_x    ; &0E60
-    BEQ      attract_wait_check_joystick_fire_0e2e    ; &0E63
-    CLC    ; &0E65
-    RTS    ; &0E66
+    LDX      #&8f
+    JSR      scan_inkey_x
+    BEQ      attract_wait_check_joystick_fire_0e2e
+    CLC
+    RTS
 
 .attract_wait_check_joystick_fire_0e2e
-    LDA      #&80    ; &0E67
-    LDX      #&0    ; &0E69
-    JSR      MOS_OSBYTE    ; &0E6B
-    TXA    ; &0E6E
-    AND      #&1    ; &0E6F
-    BEQ      attract_wait_countdown_0e2e    ; &0E71
+    LDA      #&80
+    LDX      #&0
+    JSR      MOS_OSBYTE
+    TXA
+    AND      #&1
+    BEQ      attract_wait_countdown_0e2e
 
 .mark_status_and_return_carry_set
-    LDA      #&1    ; &0E73
-    STA      input_mode_keyboard_or_joystick    ; &0E75
-    CLI    ; &0E78
-    SEC    ; &0E79
-    RTS    ; &0E7A
+    LDA      #&1
+    STA      input_mode_keyboard_or_joystick
+    CLI
+    SEC
+    RTS
 
 .attract_wait_countdown_0e2e
-    DEC      zp_scratch_76    ; &0E7B
-    BNE      attract_wait_poll_loop_0e2e    ; &0E7D
-    DEC      zp_indirect_74_high    ; &0E7F
-    BNE      attract_wait_poll_loop_0e2e    ; &0E81
-    CLC    ; &0E83
-    RTS    ; &0E84
+    DEC      zp_scratch_76
+    BNE      attract_wait_poll_loop_0e2e
+    DEC      zp_indirect_74_high
+    BNE      attract_wait_poll_loop_0e2e
+    CLC
+    RTS
 
 .start_level_or_round
-    LDA      #&4    ; &0E85
-    STA      lives_status_count    ; &0E87
-    LDA      #&0    ; &0E8A
-    STA      room_area    ; &0E8C
-    LDA      #&0    ; &0E8E
-    STA      level_index_and_hazard_gate    ; &0E90
-    STA      level_tens_digit    ; &0E92
-    LDA      #&1    ; &0E95
-    STA      level_units_digit    ; &0E97
-    LDA      #&20    ; &0E9A
-    LDX      #&3    ; &0E9C
+    LDA      #&4
+    STA      lives_status_count
+    LDA      #&0
+    STA      room_area
+    LDA      #&0
+    STA      level_index_and_hazard_gate
+    STA      level_tens_digit
+    LDA      #&1
+    STA      level_units_digit
+    LDA      #&20
+    LDX      #&3
 
 .clear_score_counter_loop_0e85
-    STA      score_counter_chars,X    ; &0E9E
-    DEX    ; &0EA1
-    BPL      clear_score_counter_loop_0e85    ; &0EA2
+    STA      score_counter_chars,X
+    DEX
+    BPL      clear_score_counter_loop_0e85
 
 .begin_level_intro_setup_path_0e85
-    JSR      oswrch_wrapper_from_a    ; &0EA4
-    LDA      #&0    ; &0EA7
-    STA      level_loop_seed_or_status    ; &0EA9
-    STA      current_level_intro_or_loop_flag    ; &0EAC
-    JSR      show_level_intro_and_required_targets    ; &0EAE
-    LDA      level_tens_digit    ; &0EB1
-    BNE      level_active_loop    ; &0EB4
-    LDA      level_units_digit    ; &0EB6
-    CMP      #&6    ; &0EB9
-    BPL      level_active_loop    ; &0EBB
-    STA      level_index_and_hazard_gate    ; &0EBD
-    DEC      level_index_and_hazard_gate    ; &0EBF
+    JSR      oswrch_wrapper_from_a
+    LDA      #&0
+    STA      level_loop_seed_or_status
+    STA      current_level_intro_or_loop_flag
+    JSR      show_level_intro_and_required_targets
+    LDA      level_tens_digit
+    BNE      level_active_loop
+    LDA      level_units_digit
+    CMP      #&6
+    BPL      level_active_loop
+    STA      level_index_and_hazard_gate
+    DEC      level_index_and_hazard_gate
 
 .level_active_loop
-    LDA      level_loop_seed_or_status    ; &0EC1
-    STA      saved_level_loop_seed_or_status    ; &0EC4
-    LDA      #&1    ; &0EC6
-    STA      remaining_active_object_count    ; &0EC8
-    JSR      start_or_reset_player_and_level_objects    ; &0ECA
-    LDA      #&0    ; &0ECD
-    STA      transition_delay    ; &0ECF
-    STA      fire_edge_request    ; &0ED1
-    STA      input_delta_x    ; &0ED3
-    STA      input_delta_y    ; &0ED5
-    STA      projectile_spook_pause_collision_flag    ; &0ED7
-    JSR      frame_update    ; &0ED9
-    JSR      oswrch_wrapper_from_a    ; &0EDC
-    LDA      lives_status_count    ; &0EDF
-    BPL      level_active_loop    ; &0EE2
-    JSR      apply_level_palette    ; &0EE4
-    LDX      #&e5    ; &0EE7
-    LDA      #&0    ; &0EE9
-    LDY      #&53    ; &0EEB
-    JSR      draw_encoded_text_stream_to_screen    ; &0EED
-    LDA      #&13    ; &0EF0
-    JSR      play_sound_id_if_enabled    ; &0EF2
-    LDA      #&50    ; &0EF5
-    JSR      wait_frames_count_a    ; &0EF7
-    JMP      menu_attract_entry_loop_0e05    ; &0EFA
+    LDA      level_loop_seed_or_status
+    STA      saved_level_loop_seed_or_status
+    LDA      #&1
+    STA      remaining_active_object_count
+    JSR      start_or_reset_player_and_level_objects
+    LDA      #&0
+    STA      transition_delay
+    STA      fire_edge_request
+    STA      input_delta_x
+    STA      input_delta_y
+    STA      projectile_spook_pause_collision_flag
+    JSR      frame_update
+    JSR      oswrch_wrapper_from_a
+    LDA      lives_status_count
+    BPL      level_active_loop
+    JSR      apply_level_palette
+    LDX      #&e5
+    LDA      #&0
+    LDY      #&53
+    JSR      draw_encoded_text_stream_to_screen
+    LDA      #&13
+    JSR      play_sound_id_if_enabled
+    LDA      #&50
+    JSR      wait_frames_count_a
+    JMP      menu_attract_entry_loop_0e05
 
 .byte_decoded_rts_before_tile_generator_0efd
-    RTS    ; &0EFD
+    RTS
 
 .draw_24byte_tile_or_sprite
-    LDA      #&0    ; &0EFE
-    STA      zp_screen_ptr_70_high    ; &0F00
-    STX      zp_screen_ptr_70_low    ; &0F02
-    TXA    ; &0F04
-    JSR      add_a_to_pointer_70    ; &0F05
-    TXA    ; &0F08
-    JSR      add_a_to_pointer_70    ; &0F09
-    INC      zp_screen_ptr_70_low    ; &0F0C
-    LDX      #&3    ; &0F0E
-    JSR      shift_tile_pointer_70_left_x_times    ; &0F10
-    LDA      #&0    ; &0F13
-    STA      zp_calc_ptr_72_high    ; &0F15
-    STY      zp_calc_ptr_72_low    ; &0F17
-    TYA    ; &0F19
-    JSR      add_a_to_pointer_72    ; &0F1A
-    TYA    ; &0F1D
-    JSR      add_a_to_pointer_72    ; &0F1E
-    TYA    ; &0F21
-    JSR      add_a_to_pointer_72    ; &0F22
-    TYA    ; &0F25
-    JSR      add_a_to_pointer_72    ; &0F26
-    LDX      #&7    ; &0F29
-    JSR      shift_pointer_72_left_x_times    ; &0F2B
-    CLC    ; &0F2E
-    LDA      zp_screen_ptr_70_low    ; &0F2F
-    ADC      zp_calc_ptr_72_low    ; &0F31
-    STA      zp_screen_ptr_70_low    ; &0F33
-    LDA      zp_screen_ptr_70_high    ; &0F35
-    ADC      zp_calc_ptr_72_high    ; &0F37
-    STA      zp_screen_ptr_70_high    ; &0F39
-    CLC    ; &0F3B
-    LDA      zp_screen_ptr_70_high    ; &0F3C
-    ADC      #&30    ; &0F3E
-    STA      zp_screen_ptr_70_high    ; &0F40
-    LDA      #&0    ; &0F42
-    STA      zp_indirect_74_low    ; &0F44
-    STA      zp_scratch_77    ; &0F46
-    LDY      #&17    ; &0F48
-    LDA      room_tile_class_or_pattern    ; &0F4A
-    BEQ      clear_24byte_tile_loop    ; &0F4C
+    LDA      #&0
+    STA      zp_screen_ptr_70_high
+    STX      zp_screen_ptr_70_low
+    TXA
+    JSR      add_a_to_pointer_70
+    TXA
+    JSR      add_a_to_pointer_70
+    INC      zp_screen_ptr_70_low
+    LDX      #&3
+    JSR      shift_tile_pointer_70_left_x_times
+    LDA      #&0
+    STA      zp_calc_ptr_72_high
+    STY      zp_calc_ptr_72_low
+    TYA
+    JSR      add_a_to_pointer_72
+    TYA
+    JSR      add_a_to_pointer_72
+    TYA
+    JSR      add_a_to_pointer_72
+    TYA
+    JSR      add_a_to_pointer_72
+    LDX      #&7
+    JSR      shift_pointer_72_left_x_times
+    CLC
+    LDA      zp_screen_ptr_70_low
+    ADC      zp_calc_ptr_72_low
+    STA      zp_screen_ptr_70_low
+    LDA      zp_screen_ptr_70_high
+    ADC      zp_calc_ptr_72_high
+    STA      zp_screen_ptr_70_high
+    CLC
+    LDA      zp_screen_ptr_70_high
+    ADC      #&30
+    STA      zp_screen_ptr_70_high
+    LDA      #&0
+    STA      zp_indirect_74_low
+    STA      zp_scratch_77
+    LDY      #&17
+    LDA      room_tile_class_or_pattern
+    BEQ      clear_24byte_tile_loop
 
 .generate_next_compact_tile_row
-    LDA      room_tile_class_or_pattern    ; &0F4E
-    LSR      A    ; &0F50
-    PHP    ; &0F51
-    LSR      A    ; &0F52
-    PLP    ; &0F53
-    ROL      A    ; &0F54
-    STA      zp_scratch_78    ; &0F55
-    TAX    ; &0F57
-    LDA      tile_generator_outer_index_table_0efe,X    ; &0F58
-    TAY    ; &0F5B
-    JSR      write_compact_tile_pattern_byte    ; &0F5C
-    LDA      room_tile_class_or_pattern    ; &0F5F
-    LSR      A    ; &0F61
-    PHP    ; &0F62
-    LSR      A    ; &0F63
-    PLP    ; &0F64
-    ROL      A    ; &0F65
-    TAX    ; &0F66
-    LDA      tile_generator_side_index_table_0efe,X    ; &0F67
-    TAY    ; &0F6A
-    JSR      write_compact_tile_pattern_byte    ; &0F6B
+    LDA      room_tile_class_or_pattern
+    LSR      A
+    PHP
+    LSR      A
+    PLP
+    ROL      A
+    STA      zp_scratch_78
+    TAX
+    LDA      tile_generator_outer_index_table_0efe,X
+    TAY
+    JSR      write_compact_tile_pattern_byte
+    LDA      room_tile_class_or_pattern
+    LSR      A
+    PHP
+    LSR      A
+    PLP
+    ROL      A
+    TAX
+    LDA      tile_generator_side_index_table_0efe,X
+    TAY
+    JSR      write_compact_tile_pattern_byte
 
 .generate_compact_tile_middle_bytes
-    LDA      room_tile_class_or_pattern    ; &0F6E
-    LSR      A    ; &0F70
-    LSR      A    ; &0F71
-    TAX    ; &0F72
-    LDA      tile_generator_middle_index_table_0efe,X    ; &0F73
-    TAY    ; &0F76
-    JSR      write_compact_tile_pattern_byte    ; &0F77
-    LDA      zp_scratch_77    ; &0F7A
-    AND      #&7    ; &0F7C
-    CMP      #&6    ; &0F7E
-    BMI      generate_compact_tile_middle_bytes    ; &0F80
-    LDA      room_tile_class_or_pattern    ; &0F82
-    LSR      A    ; &0F84
-    TAX    ; &0F85
-    LDA      tile_generator_side_index_table_0efe,X    ; &0F86
-    TAY    ; &0F89
-    JSR      write_compact_tile_pattern_byte    ; &0F8A
-    LDA      room_tile_class_or_pattern    ; &0F8D
-    LSR      A    ; &0F8F
-    TAX    ; &0F90
-    LDA      tile_generator_outer_index_table_0efe,X    ; &0F91
-    TAY    ; &0F94
-    JSR      write_compact_tile_pattern_byte    ; &0F95
-    INC      zp_indirect_74_low    ; &0F98
-    LDA      zp_indirect_74_low    ; &0F9A
-    CMP      #&3    ; &0F9C
-    BNE      generate_next_compact_tile_row    ; &0F9E
-    RTS    ; &0FA0
+    LDA      room_tile_class_or_pattern
+    LSR      A
+    LSR      A
+    TAX
+    LDA      tile_generator_middle_index_table_0efe,X
+    TAY
+    JSR      write_compact_tile_pattern_byte
+    LDA      zp_scratch_77
+    AND      #&7
+    CMP      #&6
+    BMI      generate_compact_tile_middle_bytes
+    LDA      room_tile_class_or_pattern
+    LSR      A
+    TAX
+    LDA      tile_generator_side_index_table_0efe,X
+    TAY
+    JSR      write_compact_tile_pattern_byte
+    LDA      room_tile_class_or_pattern
+    LSR      A
+    TAX
+    LDA      tile_generator_outer_index_table_0efe,X
+    TAY
+    JSR      write_compact_tile_pattern_byte
+    INC      zp_indirect_74_low
+    LDA      zp_indirect_74_low
+    CMP      #&3
+    BNE      generate_next_compact_tile_row
+    RTS
 
 .clear_24byte_tile_loop
-    STA      (zp_screen_ptr_70_low),Y    ; &0FA1
-    DEY    ; &0FA3
-    BPL      clear_24byte_tile_loop    ; &0FA4
-    RTS    ; &0FA6
+    STA      (zp_screen_ptr_70_low),Y
+    DEY
+    BPL      clear_24byte_tile_loop
+    RTS
 
 .add_a_to_pointer_72
-    CLC    ; &0FA7
-    ADC      zp_calc_ptr_72_low    ; &0FA8
-    STA      zp_calc_ptr_72_low    ; &0FAA
-    LDA      zp_calc_ptr_72_high    ; &0FAC
-    ADC      #&0    ; &0FAE
-    STA      zp_calc_ptr_72_high    ; &0FB0
-    RTS    ; &0FB2
+    CLC
+    ADC      zp_calc_ptr_72_low
+    STA      zp_calc_ptr_72_low
+    LDA      zp_calc_ptr_72_high
+    ADC      #&0
+    STA      zp_calc_ptr_72_high
+    RTS
 
 .shift_tile_pointer_70_left_x_times
-    ASL      zp_screen_ptr_70_low    ; &0FB3
-    ROL      zp_screen_ptr_70_high    ; &0FB5
-    DEX    ; &0FB7
-    BNE      shift_tile_pointer_70_left_x_times    ; &0FB8
-    RTS    ; &0FBA
+    ASL      zp_screen_ptr_70_low
+    ROL      zp_screen_ptr_70_high
+    DEX
+    BNE      shift_tile_pointer_70_left_x_times
+    RTS
 
 .write_compact_tile_pattern_byte
-    LDA      #&2f    ; &0FBB
-    STA      zp_scratch_76    ; &0FBD
-    LDX      zp_indirect_74_low    ; &0FBF
-    LDA      tile_generator_source_low_table_0efe,X    ; &0FC1
-    STA      zp_indirect_74_high    ; &0FC4
-    LDA      (zp_indirect_74_high),Y    ; &0FC6
-    LDY      zp_scratch_77    ; &0FC8
-    STA      (zp_screen_ptr_70_low),Y    ; &0FCA
-    INC      zp_scratch_77    ; &0FCC
-    RTS    ; &0FCE
+    LDA      #&2f
+    STA      zp_scratch_76
+    LDX      zp_indirect_74_low
+    LDA      tile_generator_source_low_table_0efe,X
+    STA      zp_indirect_74_high
+    LDA      (zp_indirect_74_high),Y
+    LDY      zp_scratch_77
+    STA      (zp_screen_ptr_70_low),Y
+    INC      zp_scratch_77
+    RTS
 
 .draw_object_by_index_0
-    LDA      #&0    ; &0FCF
-    STA      render_mode_or_text_scratch    ; &0FD1
-    JMP      draw_object_by_index    ; &0FD3
+    LDA      #&0
+    STA      render_mode_or_text_scratch
+    JMP      draw_object_by_index
 
 .handle_collected_target_or_level_done
-    LDA      #&0    ; &0FD6
-    STA      renderer_collision_accumulator    ; &0FD8
-    LDX      #&ff    ; &0FDA
+    LDA      #&0
+    STA      renderer_collision_accumulator
+    LDX      #&ff
 
 .find_collected_target_slot
-    INX    ; &0FDC
-    LDA      room_area    ; &0FDD
-    AND      #&f    ; &0FDF
-    CMP      target_room_code,X    ; &0FE1
-    BNE      find_collected_target_slot    ; &0FE4
-    CPX      #&0    ; &0FE6
-    BEQ      begin_required_target_completion_scan    ; &0FE8
-    LDA      #&1    ; &0FEA
-    STA      target_collected_status,X    ; &0FEC
-    STX      zp_scratch_77    ; &0FEF
-    TXA    ; &0FF1
-    CLC    ; &0FF2
-    ADC      #&36    ; &0FF3
-    TAX    ; &0FF5
-    JSR      draw_object_by_index_0    ; &0FF6
-    LDA      #&5    ; &0FF9
-    JSR      play_sound_id_if_enabled    ; &0FFB
-    LDX      zp_scratch_77    ; &0FFE
-    CPX      #&6    ; &1000
-    BEQ      award_bonus_target_life    ; &1002
-    LDA      target_collection_score_add_table_0fd6,X    ; &1004
-    JMP      increment_four_char_score_or_counter    ; &1007
+    INX
+    LDA      room_area
+    AND      #&f
+    CMP      target_room_code,X
+    BNE      find_collected_target_slot
+    CPX      #&0
+    BEQ      begin_required_target_completion_scan
+    LDA      #&1
+    STA      target_collected_status,X
+    STX      zp_scratch_77
+    TXA
+    CLC
+    ADC      #&36
+    TAX
+    JSR      draw_object_by_index_0
+    LDA      #&5
+    JSR      play_sound_id_if_enabled
+    LDX      zp_scratch_77
+    CPX      #&6
+    BEQ      award_bonus_target_life
+    LDA      target_collection_score_add_table_0fd6,X
+    JMP      increment_four_char_score_or_counter
 
 .award_bonus_target_life
-    JSR      reroll_bonus_target_code    ; &100A
-    INC      lives_status_count    ; &100D
-    JMP      draw_lives_or_target_status    ; &1010
+    JSR      reroll_bonus_target_code
+    INC      lives_status_count
+    JMP      draw_lives_or_target_status
 
 .begin_required_target_completion_scan
-    LDX      #&0    ; &1013
+    LDX      #&0
 
 .scan_next_required_target_status
-    INX    ; &1015
-    LDA      target_collected_status,X    ; &1016
-    CMP      #&1    ; &1019
-    BNE      test_required_target_scan_complete    ; &101B
-    LDA      #&ff    ; &101D
-    STA      target_collected_status,X    ; &101F
-    INC      collected_target_count    ; &1022
+    INX
+    LDA      target_collected_status,X
+    CMP      #&1
+    BNE      test_required_target_scan_complete
+    LDA      #&ff
+    STA      target_collected_status,X
+    INC      collected_target_count
 
 .test_required_target_scan_complete
-    CPX      highest_required_target_slot    ; &1024
-    BNE      scan_next_required_target_status    ; &1026
-    CPX      collected_target_count    ; &1028
-    BEQ      advance_level_after_all_targets    ; &102A
-    LDA      input_delta_x    ; &102C
-    EOR      #&ff    ; &102E
-    STA      input_delta_x    ; &1030
-    INC      input_delta_x    ; &1032
-    LDA      input_delta_y    ; &1034
-    EOR      #&ff    ; &1036
-    STA      input_delta_y    ; &1038
-    INC      input_delta_y    ; &103A
-    JSR      apply_input_delta_to_player_pair    ; &103C
-    JMP      cancel_player_movement_delta    ; &103F
+    CPX      highest_required_target_slot
+    BNE      scan_next_required_target_status
+    CPX      collected_target_count
+    BEQ      advance_level_after_all_targets
+    LDA      input_delta_x
+    EOR      #&ff
+    STA      input_delta_x
+    INC      input_delta_x
+    LDA      input_delta_y
+    EOR      #&ff
+    STA      input_delta_y
+    INC      input_delta_y
+    JSR      apply_input_delta_to_player_pair
+    JMP      cancel_player_movement_delta
 
 .advance_level_after_all_targets
-    INC      lives_status_count    ; &1042
-    INC      level_units_digit    ; &1045
-    LDA      level_units_digit    ; &1048
-    CMP      #&a    ; &104B
-    BNE      enter_next_level_area    ; &104D
-    LDA      #&0    ; &104F
-    STA      level_units_digit    ; &1051
-    INC      level_tens_digit    ; &1054
+    INC      lives_status_count
+    INC      level_units_digit
+    LDA      level_units_digit
+    CMP      #&a
+    BNE      enter_next_level_area
+    LDA      #&0
+    STA      level_units_digit
+    INC      level_tens_digit
 
 .enter_next_level_area
-    LDA      room_area    ; &1057
-    CLC    ; &1059
-    ADC      #&10    ; &105A
-    AND      #&30    ; &105C
-    STA      room_area    ; &105E
-    LDA      #&12    ; &1060
-    JSR      play_sound_id_if_enabled    ; &1062
-    LDA      #&32    ; &1065
-    JSR      wait_frames_count_a    ; &1067
-    PLA    ; &106A
-    PLA    ; &106B
-    PLA    ; &106C
-    PLA    ; &106D
-    JMP      begin_level_intro_setup_path_0e85    ; &106E
+    LDA      room_area
+    CLC
+    ADC      #&10
+    AND      #&30
+    STA      room_area
+    LDA      #&12
+    JSR      play_sound_id_if_enabled
+    LDA      #&32
+    JSR      wait_frames_count_a
+    PLA
+    PLA
+    PLA
+    PLA
+    JMP      begin_level_intro_setup_path_0e85
 
 .draw_20char_buffer_as_bitmap_text
-    LDA      #&0    ; &1071
-    STA      object_x_by_index    ; &1073
+    LDA      #&0
+    STA      object_x_by_index
 
 .draw_next_text_character
-    LDX      object_x_by_index    ; &1076
-    LDA      text_buffer_20chars,X    ; &1079
-    STA      zp_calc_ptr_72_low    ; &107C
-    LDA      #&0    ; &107E
-    STA      zp_calc_ptr_72_high    ; &1080
-    LDX      #&3    ; &1082
-    JSR      shift_pointer_72_left_x_times    ; &1084
-    LDA      zp_calc_ptr_72_high    ; &1087
-    CLC    ; &1089
-    ADC      #&c0    ; &108A
-    STA      zp_calc_ptr_72_high    ; &108C
-    LDY      object_y_by_index    ; &108E
+    LDX      object_x_by_index
+    LDA      text_buffer_20chars,X
+    STA      zp_calc_ptr_72_low
+    LDA      #&0
+    STA      zp_calc_ptr_72_high
+    LDX      #&3
+    JSR      shift_pointer_72_left_x_times
+    LDA      zp_calc_ptr_72_high
+    CLC
+    ADC      #&c0
+    STA      zp_calc_ptr_72_high
+    LDY      object_y_by_index
 
 .load_character_font_quartet
-    TYA    ; &1091
-    AND      #&3    ; &1092
-    TAX    ; &1094
-    LDA      (zp_calc_ptr_72_low),Y    ; &1095
-    STA      font_expand_work_bytes,X    ; &1097
-    INY    ; &109A
-    TYA    ; &109B
-    AND      #&3    ; &109C
-    BNE      load_character_font_quartet    ; &109E
-    LDA      #&0    ; &10A0
-    STA      movement_delta_x    ; &10A2
+    TYA
+    AND      #&3
+    TAX
+    LDA      (zp_calc_ptr_72_low),Y
+    STA      font_expand_work_bytes,X
+    INY
+    TYA
+    AND      #&3
+    BNE      load_character_font_quartet
+    LDA      #&0
+    STA      movement_delta_x
 
 .draw_next_character_quarter
-    LDA      #&0    ; &10A4
-    STA      input_delta_y    ; &10A6
-    LDY      #&0    ; &10A8
+    LDA      #&0
+    STA      input_delta_y
+    LDY      #&0
 
 .draw_next_character_pixel_pair
-    LDA      #&0    ; &10AA
-    STA      render_mode_or_text_scratch    ; &10AC
-    LDX      input_delta_y    ; &10AE
-    LDA      font_expand_work_bytes,X    ; &10B0
-    AND      #&80    ; &10B3
-    BEQ      test_second_pixel_colour    ; &10B5
-    LDA      text_render_colour_value    ; &10B7
-    ASL      A    ; &10BA
-    STA      render_mode_or_text_scratch    ; &10BB
+    LDA      #&0
+    STA      render_mode_or_text_scratch
+    LDX      input_delta_y
+    LDA      font_expand_work_bytes,X
+    AND      #&80
+    BEQ      test_second_pixel_colour
+    LDA      text_render_colour_value
+    ASL      A
+    STA      render_mode_or_text_scratch
 
 .test_second_pixel_colour
-    LDA      font_expand_work_bytes,X    ; &10BD
-    AND      #&40    ; &10C0
-    BEQ      store_expanded_pixel_pair    ; &10C2
-    LDA      text_render_colour_value    ; &10C4
-    ORA      render_mode_or_text_scratch    ; &10C7
-    STA      render_mode_or_text_scratch    ; &10C9
+    LDA      font_expand_work_bytes,X
+    AND      #&40
+    BEQ      store_expanded_pixel_pair
+    LDA      text_render_colour_value
+    ORA      render_mode_or_text_scratch
+    STA      render_mode_or_text_scratch
 
 .store_expanded_pixel_pair
-    ASL      font_expand_work_bytes,X    ; &10CB
-    ASL      font_expand_work_bytes,X    ; &10CE
-    LDA      render_mode_or_text_scratch    ; &10D1
-    STA      (zp_screen_ptr_70_low),Y    ; &10D3
-    INY    ; &10D5
-    STA      (zp_screen_ptr_70_low),Y    ; &10D6
-    INC      input_delta_y    ; &10D8
-    INY    ; &10DA
-    CPY      #&8    ; &10DB
-    BNE      draw_next_character_pixel_pair    ; &10DD
-    LDA      #&8    ; &10DF
-    JSR      add_a_to_pointer_70    ; &10E1
-    INC      movement_delta_x    ; &10E4
-    LDA      movement_delta_x    ; &10E6
-    CMP      #&4    ; &10E8
-    BNE      draw_next_character_quarter    ; &10EA
-    INC      object_x_by_index    ; &10EC
-    LDA      object_x_by_index    ; &10EF
-    CMP      text_render_char_limit    ; &10F2
-    BNE      continue_text_character_loop    ; &10F4
-    RTS    ; &10F6
+    ASL      font_expand_work_bytes,X
+    ASL      font_expand_work_bytes,X
+    LDA      render_mode_or_text_scratch
+    STA      (zp_screen_ptr_70_low),Y
+    INY
+    STA      (zp_screen_ptr_70_low),Y
+    INC      input_delta_y
+    INY
+    CPY      #&8
+    BNE      draw_next_character_pixel_pair
+    LDA      #&8
+    JSR      add_a_to_pointer_70
+    INC      movement_delta_x
+    LDA      movement_delta_x
+    CMP      #&4
+    BNE      draw_next_character_quarter
+    INC      object_x_by_index
+    LDA      object_x_by_index
+    CMP      text_render_char_limit
+    BNE      continue_text_character_loop
+    RTS
 
 .continue_text_character_loop
-    JMP      draw_next_text_character    ; &10F7
+    JMP      draw_next_text_character
 
 .draw_20char_buffer_two_rows
-    LDA      #&14    ; &10FA
-    STA      text_render_char_limit    ; &10FC
-    LDA      #&0    ; &10FE
-    STA      object_y_by_index    ; &1100
-    JSR      draw_20char_buffer_as_bitmap_text    ; &1103
-    LDA      #&4    ; &1106
-    STA      object_y_by_index    ; &1108
-    JMP      draw_20char_buffer_as_bitmap_text    ; &110B
+    LDA      #&14
+    STA      text_render_char_limit
+    LDA      #&0
+    STA      object_y_by_index
+    JSR      draw_20char_buffer_as_bitmap_text
+    LDA      #&4
+    STA      object_y_by_index
+    JMP      draw_20char_buffer_as_bitmap_text
 
 .oswrch_zero_terminated_text_2600_x
-    LDA      control_help_text,X    ; &110E
-    BEQ      return_from_text_stream    ; &1111
-    JSR      MOS_OSWRCH    ; &1113
-    INX    ; &1116
-    JMP      oswrch_zero_terminated_text_2600_x    ; &1117
+    LDA      control_help_text,X
+    BEQ      return_from_text_stream
+    JSR      MOS_OSWRCH
+    INX
+    JMP      oswrch_zero_terminated_text_2600_x
 
 .return_from_text_stream
-    RTS    ; &111A
+    RTS
 
 .copy_encoded_text_stream_to_buffer
-    LDA      screen_copy_control_streams,X    ; &111B
-    TAY    ; &111E
-    INX    ; &111F
+    LDA      screen_copy_control_streams,X
+    TAY
+    INX
 
 .copy_next_encoded_text_byte
-    LDA      screen_copy_control_streams,X    ; &1120
-    BMI      return_from_text_stream    ; &1123
-    STA      text_buffer_20chars,Y    ; &1125
-    INY    ; &1128
-    INX    ; &1129
-    JMP      copy_next_encoded_text_byte    ; &112A
+    LDA      screen_copy_control_streams,X
+    BMI      return_from_text_stream
+    STA      text_buffer_20chars,Y
+    INY
+    INX
+    JMP      copy_next_encoded_text_byte
 
 .clear_20char_text_buffer
-    LDY      #&13    ; &112D
-    LDA      #&0    ; &112F
+    LDY      #&13
+    LDA      #&0
 
 .clear_next_text_buffer_byte
-    STA      text_buffer_20chars,Y    ; &1131
-    DEY    ; &1134
-    BPL      clear_next_text_buffer_byte    ; &1135
-    RTS    ; &1137
+    STA      text_buffer_20chars,Y
+    DEY
+    BPL      clear_next_text_buffer_byte
+    RTS
 
 .draw_encoded_text_stream_to_screen
-    STA      zp_screen_ptr_70_low    ; &1138
-    STY      zp_screen_ptr_70_high    ; &113A
-    JSR      clear_20char_text_buffer    ; &113C
-    JSR      copy_encoded_text_stream_to_buffer    ; &113F
-    JMP      draw_20char_buffer_two_rows    ; &1142
+    STA      zp_screen_ptr_70_low
+    STY      zp_screen_ptr_70_high
+    JSR      clear_20char_text_buffer
+    JSR      copy_encoded_text_stream_to_buffer
+    JMP      draw_20char_buffer_two_rows
 
 .show_controls_and_start_prompt_screen
-    LDA      #&4    ; &1145
-    STA      text_render_colour_value    ; &1147
-    LDX      #&0    ; &114A
-    JSR      oswrch_zero_terminated_text_2600_x    ; &114C
-    JSR      copy_current_score_to_best_if_not_lower    ; &114F
-    JSR      update_title_score_glyph_tables    ; &1152
-    LDA      #&10    ; &1155
-    LDY      #&30    ; &1157
-    LDX      #&7c    ; &1159
-    JSR      draw_encoded_text_stream_to_screen    ; &115B
-    LDA      #&80    ; &115E
-    LDY      #&37    ; &1160
-    LDX      #&f2    ; &1162
-    JSR      draw_encoded_text_stream_to_screen    ; &1164
-    LDA      #&4    ; &1167
-    STA      text_render_colour_value    ; &1169
-    LDX      #&87    ; &116C
-    LDY      #&6e    ; &116E
-    LDA      #&80    ; &1170
-    JMP      draw_encoded_text_stream_to_screen    ; &1172
+    LDA      #&4
+    STA      text_render_colour_value
+    LDX      #&0
+    JSR      oswrch_zero_terminated_text_2600_x
+    JSR      copy_current_score_to_best_if_not_lower
+    JSR      update_title_score_glyph_tables
+    LDA      #&10
+    LDY      #&30
+    LDX      #&7c
+    JSR      draw_encoded_text_stream_to_screen
+    LDA      #&80
+    LDY      #&37
+    LDX      #&f2
+    JSR      draw_encoded_text_stream_to_screen
+    LDA      #&4
+    STA      text_render_colour_value
+    LDX      #&87
+    LDY      #&6e
+    LDA      #&80
+    JMP      draw_encoded_text_stream_to_screen
 
 .show_object_legend_screen
-    LDA      #&4    ; &1175
-    STA      text_render_colour_value    ; &1177
-    LDX      #&0    ; &117A
+    LDA      #&4
+    STA      text_render_colour_value
+    LDX      #&0
 
 .draw_next_legend_text
-    STX      zp_scratch_79    ; &117C
-    LDY      object_legend_screen_high_bytes_1175,X    ; &117E
-    LDA      object_legend_text_stream_offsets_1175,X    ; &1181
-    STA      zp_scratch_78    ; &1184
-    LDA      object_legend_screen_low_bytes_1175,X    ; &1186
-    LDX      zp_scratch_78    ; &1189
-    JSR      draw_encoded_text_stream_to_screen    ; &118B
-    LDX      zp_scratch_79    ; &118E
-    INX    ; &1190
-    LDA      #&10    ; &1191
-    STA      text_render_colour_value    ; &1193
-    CPX      #&9    ; &1196
-    BNE      draw_next_legend_text    ; &1198
-    LDA      #&44    ; &119A
-    STA      object_screen_high_by_index    ; &119C
-    LDA      #&90    ; &119F
-    STA      object_screen_low_by_index    ; &11A1
-    LDA      #&1    ; &11A4
-    STA      object_y_by_index    ; &11A6
-    LDX      #&0    ; &11A9
-    STX      render_mode_or_text_scratch    ; &11AB
+    STX      zp_scratch_79
+    LDY      object_legend_screen_high_bytes_1175,X
+    LDA      object_legend_text_stream_offsets_1175,X
+    STA      zp_scratch_78
+    LDA      object_legend_screen_low_bytes_1175,X
+    LDX      zp_scratch_78
+    JSR      draw_encoded_text_stream_to_screen
+    LDX      zp_scratch_79
+    INX
+    LDA      #&10
+    STA      text_render_colour_value
+    CPX      #&9
+    BNE      draw_next_legend_text
+    LDA      #&44
+    STA      object_screen_high_by_index
+    LDA      #&90
+    STA      object_screen_low_by_index
+    LDA      #&1
+    STA      object_y_by_index
+    LDX      #&0
+    STX      render_mode_or_text_scratch
 
 .draw_next_legend_graphic
-    STX      zp_scratch_79    ; &11AD
-    LDA      object_legend_graphic_ids_1175,X    ; &11AF
-    STA      object_graphic_id_by_index    ; &11B2
-    LDX      #&0    ; &11B5
-    JSR      draw_object_by_index    ; &11B7
-    LDA      object_screen_low_by_index    ; &11BA
-    CLC    ; &11BD
-    ADC      #&80    ; &11BE
-    STA      object_screen_low_by_index    ; &11C0
-    LDA      object_screen_high_by_index    ; &11C3
-    ADC      #&7    ; &11C6
-    STA      object_screen_high_by_index    ; &11C8
-    LDX      zp_scratch_79    ; &11CB
-    INX    ; &11CD
-    CPX      #&7    ; &11CE
-    BNE      draw_next_legend_graphic    ; &11D0
-    LDA      #&0    ; &11D2
-    STA      object_y_by_index    ; &11D4
-    LDA      #&3d    ; &11D7
-    STA      object_screen_high_by_index    ; &11D9
-    LDA      #&10    ; &11DC
-    STA      object_screen_low_by_index    ; &11DE
-    LDA      #&2e    ; &11E1
-    STA      object_graphic_id_by_index    ; &11E3
-    LDX      #&0    ; &11E6
-    JSR      draw_object_by_index    ; &11E8
-    LDA      #&3f    ; &11EB
-    STA      object_screen_high_by_index    ; &11ED
-    LDA      #&90    ; &11F0
-    STA      object_screen_low_by_index    ; &11F2
-    INC      object_graphic_id_by_index    ; &11F5
-    LDX      #&0    ; &11F8
-    JSR      draw_object_by_index    ; &11FA
-    RTS    ; &11FD
+    STX      zp_scratch_79
+    LDA      object_legend_graphic_ids_1175,X
+    STA      object_graphic_id_by_index
+    LDX      #&0
+    JSR      draw_object_by_index
+    LDA      object_screen_low_by_index
+    CLC
+    ADC      #&80
+    STA      object_screen_low_by_index
+    LDA      object_screen_high_by_index
+    ADC      #&7
+    STA      object_screen_high_by_index
+    LDX      zp_scratch_79
+    INX
+    CPX      #&7
+    BNE      draw_next_legend_graphic
+    LDA      #&0
+    STA      object_y_by_index
+    LDA      #&3d
+    STA      object_screen_high_by_index
+    LDA      #&10
+    STA      object_screen_low_by_index
+    LDA      #&2e
+    STA      object_graphic_id_by_index
+    LDX      #&0
+    JSR      draw_object_by_index
+    LDA      #&3f
+    STA      object_screen_high_by_index
+    LDA      #&90
+    STA      object_screen_low_by_index
+    INC      object_graphic_id_by_index
+    LDX      #&0
+    JSR      draw_object_by_index
+    RTS
 
 .show_level_intro_and_required_targets
-    LDA      #&1    ; &11FE
-    STA      text_render_colour_value    ; &1200
-    JSR      seed_required_target_codes    ; &1203
-    JSR      apply_level_palette    ; &1206
-    LDA      #&0    ; &1209
-    STA      collected_target_count    ; &120B
-    STA      render_mode_or_text_scratch    ; &120D
-    LDX      #&b8    ; &120F
-    JSR      oswrch_zero_terminated_text_2600_x    ; &1211
-    JSR      clear_20char_text_buffer    ; &1214
-    LDX      #&de    ; &1217
-    JSR      copy_encoded_text_stream_to_buffer    ; &1219
-    LDA      level_tens_digit    ; &121C
-    BEQ      write_level_units_digit    ; &121F
-    CLC    ; &1221
-    ADC      #&10    ; &1222
-    STA      &0CD6    ; &1224
+    LDA      #&1
+    STA      text_render_colour_value
+    JSR      seed_required_target_codes
+    JSR      apply_level_palette
+    LDA      #&0
+    STA      collected_target_count
+    STA      render_mode_or_text_scratch
+    LDX      #&b8
+    JSR      oswrch_zero_terminated_text_2600_x
+    JSR      clear_20char_text_buffer
+    LDX      #&de
+    JSR      copy_encoded_text_stream_to_buffer
+    LDA      level_tens_digit
+    BEQ      write_level_units_digit
+    CLC
+    ADC      #&10
+    STA      &0CD6
 
 .write_level_units_digit
-    LDA      level_units_digit    ; &1227
-    CLC    ; &122A
-    ADC      #&10    ; &122B
-    STA      &0CD7    ; &122D
-    LDA      #&0    ; &1230
-    STA      zp_screen_ptr_70_low    ; &1232
-    LDA      #&49    ; &1234
-    STA      zp_screen_ptr_70_high    ; &1236
-    JSR      draw_20char_buffer_two_rows    ; &1238
-    LDX      #&c6    ; &123B
-    JSR      oswrch_zero_terminated_text_2600_x    ; &123D
-    LDA      #&b0    ; &1240
-    STA      object_screen_low_by_index    ; &1242
-    LDA      #&60    ; &1245
-    STA      object_screen_high_by_index    ; &1247
-    LDA      level_tens_digit    ; &124A
-    BNE      cap_level_intro_target_count    ; &124D
-    LDA      level_units_digit    ; &124F
-    CMP      #&6    ; &1252
-    BMI      begin_level_intro_target_loop    ; &1254
+    LDA      level_units_digit
+    CLC
+    ADC      #&10
+    STA      &0CD7
+    LDA      #&0
+    STA      zp_screen_ptr_70_low
+    LDA      #&49
+    STA      zp_screen_ptr_70_high
+    JSR      draw_20char_buffer_two_rows
+    LDX      #&c6
+    JSR      oswrch_zero_terminated_text_2600_x
+    LDA      #&b0
+    STA      object_screen_low_by_index
+    LDA      #&60
+    STA      object_screen_high_by_index
+    LDA      level_tens_digit
+    BNE      cap_level_intro_target_count
+    LDA      level_units_digit
+    CMP      #&6
+    BMI      begin_level_intro_target_loop
 
 .cap_level_intro_target_count
-    LDA      #&5    ; &1256
+    LDA      #&5
 
 .begin_level_intro_target_loop
-    TAX    ; &1258
-    DEX    ; &1259
+    TAX
+    DEX
 
 .level_intro_draw_next_required_target
-    STX      zp_scratch_79    ; &125A
-    LDA      level_intro_required_graphic_table_11fe,X    ; &125C
-    STA      object_graphic_id_by_index    ; &125F
-    LDA      #&14    ; &1262
-    JSR      wait_frames_count_a    ; &1264
-    LDX      #&0    ; &1267
-    JSR      draw_object_by_index    ; &1269
-    LDA      object_screen_high_by_index    ; &126C
-    CLC    ; &126F
-    ADC      #&5    ; &1270
-    STA      object_screen_high_by_index    ; &1272
+    STX      zp_scratch_79
+    LDA      level_intro_required_graphic_table_11fe,X
+    STA      object_graphic_id_by_index
+    LDA      #&14
+    JSR      wait_frames_count_a
+    LDX      #&0
+    JSR      draw_object_by_index
+    LDA      object_screen_high_by_index
+    CLC
+    ADC      #&5
+    STA      object_screen_high_by_index
 
 .play_level_intro_required_target_sound
-    LDA      #&d    ; &1275
-    JSR      play_sound_id_if_enabled    ; &1277
-    LDX      zp_scratch_79    ; &127A
-    DEX    ; &127C
-    BPL      level_intro_draw_next_required_target    ; &127D
-    LDA      #&64    ; &127F
-    JSR      wait_frames_count_a    ; &1281
+    LDA      #&d
+    JSR      play_sound_id_if_enabled
+    LDX      zp_scratch_79
+    DEX
+    BPL      level_intro_draw_next_required_target
+    LDA      #&64
+    JSR      wait_frames_count_a
 
 .finish_level_intro_clear_screen
-    JMP      oswrch_wrapper_from_a    ; &1284
+    JMP      oswrch_wrapper_from_a
 
 .read_joystick_axes_and_fire
-    LDA      #&80    ; &1287
-    LDX      #&1    ; &1289
-    JSR      MOS_OSBYTE    ; &128B
-    CPY      #&40    ; &128E
-    BCC      joystick_x_axis_positive_1287    ; &1290
-    CPY      #&c0    ; &1292
-    BCC      joystick_y_axis_scan_1287    ; &1294
-    DEC      input_delta_x    ; &1296
-    JMP      joystick_y_axis_scan_1287    ; &1298
+    LDA      #&80
+    LDX      #&1
+    JSR      MOS_OSBYTE
+    CPY      #&40
+    BCC      joystick_x_axis_positive_1287
+    CPY      #&c0
+    BCC      joystick_y_axis_scan_1287
+    DEC      input_delta_x
+    JMP      joystick_y_axis_scan_1287
 
 .joystick_x_axis_positive_1287
-    INC      input_delta_x    ; &129B
+    INC      input_delta_x
 
 .joystick_y_axis_scan_1287
-    LDA      #&80    ; &129D
-    LDX      #&2    ; &129F
-    JSR      MOS_OSBYTE    ; &12A1
-    CPY      #&40    ; &12A4
-    BCC      joystick_y_axis_positive_1287    ; &12A6
-    CPY      #&c0    ; &12A8
-    BCC      joystick_fire_scan_1287    ; &12AA
-    DEC      input_delta_y    ; &12AC
-    JMP      joystick_fire_scan_1287    ; &12AE
+    LDA      #&80
+    LDX      #&2
+    JSR      MOS_OSBYTE
+    CPY      #&40
+    BCC      joystick_y_axis_positive_1287
+    CPY      #&c0
+    BCC      joystick_fire_scan_1287
+    DEC      input_delta_y
+    JMP      joystick_fire_scan_1287
 
 .joystick_y_axis_positive_1287
-    INC      input_delta_y    ; &12B1
+    INC      input_delta_y
 
 .joystick_fire_scan_1287
-    LDA      #&80    ; &12B3
-    LDX      #&0    ; &12B5
-    JSR      MOS_OSBYTE    ; &12B7
-    TXA    ; &12BA
-    AND      #&1    ; &12BB
-    TAX    ; &12BD
-    RTS    ; &12BE
+    LDA      #&80
+    LDX      #&0
+    JSR      MOS_OSBYTE
+    TXA
+    AND      #&1
+    TAX
+    RTS
 
 .seed_required_target_codes
-    LDA      level_tens_digit    ; &12BF
-    BNE      target_code_cap_to_slot5_12bf    ; &12C2
-    LDX      level_units_digit    ; &12C4
-    CPX      #&6    ; &12C7
-    BMI      store_highest_required_target_slot_12bf    ; &12C9
+    LDA      level_tens_digit
+    BNE      target_code_cap_to_slot5_12bf
+    LDX      level_units_digit
+    CPX      #&6
+    BMI      store_highest_required_target_slot_12bf
 
 .target_code_cap_to_slot5_12bf
-    LDX      #&5    ; &12CB
+    LDX      #&5
 
 .store_highest_required_target_slot_12bf
-    STX      highest_required_target_slot    ; &12CD
-    LDX      #&ff    ; &12CF
+    STX      highest_required_target_slot
+    LDX      #&ff
 
 .seed_required_target_codes_loop_12bf
-    JSR      random_unique_target_code    ; &12D1
-    CPX      highest_required_target_slot    ; &12D4
-    BMI      seed_required_target_codes_loop_12bf    ; &12D6
+    JSR      random_unique_target_code
+    CPX      highest_required_target_slot
+    BMI      seed_required_target_codes_loop_12bf
 
 .reroll_bonus_target_code
-    LDX      #&5    ; &12D8
-    JMP      random_unique_target_code    ; &12DA
+    LDX      #&5
+    JMP      random_unique_target_code
 
 .random_unique_target_code
-    INX    ; &12DD
-    STX      object_x_by_index    ; &12DE
+    INX
+    STX      object_x_by_index
 
 .random_target_code_reroll_12dd
-    JSR      rng_next_byte    ; &12E1
-    LDA      rng_output_byte    ; &12E4
-    AND      #&f    ; &12E6
-    LDX      object_x_by_index    ; &12E8
-    STA      target_room_code,X    ; &12EB
-    LDA      #&0    ; &12EE
-    STA      target_collected_status,X    ; &12F0
-    LDY      #&ff    ; &12F3
+    JSR      rng_next_byte
+    LDA      rng_output_byte
+    AND      #&f
+    LDX      object_x_by_index
+    STA      target_room_code,X
+    LDA      #&0
+    STA      target_collected_status,X
+    LDY      #&ff
 
 .target_code_uniqueness_scan_loop_12dd
-    INY    ; &12F5
-    CPY      object_x_by_index    ; &12F6
-    BEQ      return_from_random_unique_target_code_12dd    ; &12F9
-    LDA      target_room_code,Y    ; &12FB
-    CMP      target_room_code,X    ; &12FE
-    BEQ      random_target_code_reroll_12dd    ; &1301
-    JMP      target_code_uniqueness_scan_loop_12dd    ; &1303
+    INY
+    CPY      object_x_by_index
+    BEQ      return_from_random_unique_target_code_12dd
+    LDA      target_room_code,Y
+    CMP      target_room_code,X
+    BEQ      random_target_code_reroll_12dd
+    JMP      target_code_uniqueness_scan_loop_12dd
 
 .return_from_random_unique_target_code_12dd
-    RTS    ; &1306
+    RTS
 
 .wait_frames_count_a
-    STA      wait_frame_counter    ; &1307
+    STA      wait_frame_counter
 
 .wait_frames_count_a_loop_1307
-    JSR      wait_one_frame_tick    ; &1309
-    DEC      wait_frame_counter    ; &130C
-    BNE      wait_frames_count_a_loop_1307    ; &130E
-    RTS    ; &1310
+    JSR      wait_one_frame_tick
+    DEC      wait_frame_counter
+    BNE      wait_frames_count_a_loop_1307
+    RTS
 
 .test_player_spook_pair_overlap
-    LDA      spook_release_timer    ; &1311
-    BNE      return_from_player_spook_overlap_test_1311    ; &1314
-    LDA      #&0    ; &1316
-    STA      renderer_collision_accumulator    ; &1318
-    LDA      player_x_first_cell    ; &131A
-    SEC    ; &131D
-    SBC      spook_first_cell_x    ; &131E
-    BPL      player_spook_overlap_compare_x_range_1311    ; &1321
-    EOR      #&ff    ; &1323
-    CLC    ; &1325
-    ADC      #&1    ; &1326
+    LDA      spook_release_timer
+    BNE      return_from_player_spook_overlap_test_1311
+    LDA      #&0
+    STA      renderer_collision_accumulator
+    LDA      player_x_first_cell
+    SEC
+    SBC      spook_first_cell_x
+    BPL      player_spook_overlap_compare_x_range_1311
+    EOR      #&ff
+    CLC
+    ADC      #&1
 
 .player_spook_overlap_compare_x_range_1311
-    CMP      #&3    ; &1328
-    BPL      return_from_player_spook_overlap_test_1311    ; &132A
-    LDA      player_y_first_cell    ; &132C
-    SEC    ; &132F
-    SBC      spook_first_cell_y    ; &1330
-    BPL      player_spook_overlap_compare_y_range_1311    ; &1333
-    EOR      #&ff    ; &1335
-    CLC    ; &1337
-    ADC      #&1    ; &1338
+    CMP      #&3
+    BPL      return_from_player_spook_overlap_test_1311
+    LDA      player_y_first_cell
+    SEC
+    SBC      spook_first_cell_y
+    BPL      player_spook_overlap_compare_y_range_1311
+    EOR      #&ff
+    CLC
+    ADC      #&1
 
 .player_spook_overlap_compare_y_range_1311
-    CMP      #&4    ; &133A
-    BPL      return_from_player_spook_overlap_test_1311    ; &133C
-    INC      renderer_collision_accumulator    ; &133E
+    CMP      #&4
+    BPL      return_from_player_spook_overlap_test_1311
+    INC      renderer_collision_accumulator
 
 .return_from_player_spook_overlap_test_1311
-    RTS    ; &1340
+    RTS
 
 .draw_rotating_wait_text_strip
-    LDA      zp_scratch_78    ; &1341
-    CMP      #&18    ; &1343
-    BNE      rotating_wait_text_pointer_setup_1341    ; &1345
-    LDX      #&17    ; &1347
+    LDA      zp_scratch_78
+    CMP      #&18
+    BNE      rotating_wait_text_pointer_setup_1341
+    LDX      #&17
 
 .clear_rotating_wait_text_edge_loop_1341
-    LDA      #&0    ; &1349
-    STA      &7B90,X    ; &134B
-    STA      &7E10,X    ; &134E
-    DEX    ; &1351
-    BPL      clear_rotating_wait_text_edge_loop_1341    ; &1352
+    LDA      #&0
+    STA      &7B90,X
+    STA      &7E10,X
+    DEX
+    BPL      clear_rotating_wait_text_edge_loop_1341
 
 .rotating_wait_text_pointer_setup_1341
-    LDY      #&7b    ; &1354
-    STY      zp_screen_ptr_70_high    ; &1356
-    LDA      zp_scratch_78    ; &1358
-    CLC    ; &135A
-    ADC      #&90    ; &135B
-    STA      zp_screen_ptr_70_low    ; &135D
-    JSR      clear_20char_text_buffer    ; &135F
-    LDY      #&0    ; &1362
-    LDX      zp_scratch_77    ; &1364
+    LDY      #&7b
+    STY      zp_screen_ptr_70_high
+    LDA      zp_scratch_78
+    CLC
+    ADC      #&90
+    STA      zp_screen_ptr_70_low
+    JSR      clear_20char_text_buffer
+    LDY      #&0
+    LDX      zp_scratch_77
 
 .copy_rotating_wait_text_chars_loop_1341
-    LDA      scroll_or_animation_seed_table,X    ; &1366
-    STA      text_buffer_20chars,Y    ; &1369
-    INX    ; &136C
-    TXA    ; &136D
-    AND      #&3f    ; &136E
-    TAX    ; &1370
-    INY    ; &1371
-    CPY      #&a    ; &1372
-    BNE      copy_rotating_wait_text_chars_loop_1341    ; &1374
-    JSR      wait_one_frame_tick    ; &1376
-    LDA      #&0    ; &1379
-    STA      object_y_by_index    ; &137B
-    LDA      #&b    ; &137E
-    STA      text_render_char_limit    ; &1380
-    JSR      draw_20char_buffer_as_bitmap_text    ; &1382
-    INC      zp_screen_ptr_70_high    ; &1385
-    LDA      #&20    ; &1387
-    JSR      add_a_to_pointer_70    ; &1389
-    LDA      #&4    ; &138C
-    STA      object_y_by_index    ; &138E
-    JSR      draw_20char_buffer_as_bitmap_text    ; &1391
-    LDA      zp_scratch_78    ; &1394
-    SEC    ; &1396
-    SBC      #&8    ; &1397
-    AND      #&1f    ; &1399
-    STA      zp_scratch_78    ; &139B
-    CMP      #&18    ; &139D
-    BNE      return_from_rotating_wait_text_1341    ; &139F
-    INC      zp_scratch_77    ; &13A1
-    LDA      zp_scratch_77    ; &13A3
-    AND      #&3f    ; &13A5
-    STA      zp_scratch_77    ; &13A7
+    LDA      scroll_or_animation_seed_table,X
+    STA      text_buffer_20chars,Y
+    INX
+    TXA
+    AND      #&3f
+    TAX
+    INY
+    CPY      #&a
+    BNE      copy_rotating_wait_text_chars_loop_1341
+    JSR      wait_one_frame_tick
+    LDA      #&0
+    STA      object_y_by_index
+    LDA      #&b
+    STA      text_render_char_limit
+    JSR      draw_20char_buffer_as_bitmap_text
+    INC      zp_screen_ptr_70_high
+    LDA      #&20
+    JSR      add_a_to_pointer_70
+    LDA      #&4
+    STA      object_y_by_index
+    JSR      draw_20char_buffer_as_bitmap_text
+    LDA      zp_scratch_78
+    SEC
+    SBC      #&8
+    AND      #&1f
+    STA      zp_scratch_78
+    CMP      #&18
+    BNE      return_from_rotating_wait_text_1341
+    INC      zp_scratch_77
+    LDA      zp_scratch_77
+    AND      #&3f
+    STA      zp_scratch_77
 
 .return_from_rotating_wait_text_1341
-    RTS    ; &13A9
+    RTS
 
 .scan_inkey_x
-    LDA      #&81    ; &13AA
-    LDY      #&ff    ; &13AC
-    JSR      MOS_OSBYTE    ; &13AE
-    CPX      #&0    ; &13B1
-    RTS    ; &13B3
+    LDA      #&81
+    LDY      #&ff
+    JSR      MOS_OSBYTE
+    CPX      #&0
+    RTS
 
 .early_init_sub_13b4
-    LDX      #&b    ; &13B4
+    LDX      #&b
 
 .early_init_vdu_byte_loop_13b4
-    LDA      early_init_vdu_bytes_13b4,X    ; &13B6
-    JSR      MOS_OSWRCH    ; &13B9
-    DEX    ; &13BC
-    BPL      early_init_vdu_byte_loop_13b4    ; &13BD
-    RTS    ; &13BF
+    LDA      early_init_vdu_bytes_13b4,X
+    JSR      MOS_OSWRCH
+    DEX
+    BPL      early_init_vdu_byte_loop_13b4
+    RTS
 
 .add_a_to_pointer_70
-    CLC    ; &13C0
-    ADC      zp_screen_ptr_70_low    ; &13C1
-    STA      zp_screen_ptr_70_low    ; &13C3
-    LDA      zp_screen_ptr_70_high    ; &13C5
-    ADC      #&0    ; &13C7
-    STA      zp_screen_ptr_70_high    ; &13C9
-    RTS    ; &13CB
+    CLC
+    ADC      zp_screen_ptr_70_low
+    STA      zp_screen_ptr_70_low
+    LDA      zp_screen_ptr_70_high
+    ADC      #&0
+    STA      zp_screen_ptr_70_high
+    RTS
 
 .byte_decoded_add_a_to_pointer_72_copy
-    CLC    ; &13CC
-    ADC      zp_calc_ptr_72_low    ; &13CD
-    STA      zp_calc_ptr_72_low    ; &13CF
-    LDA      zp_calc_ptr_72_high    ; &13D1
-    ADC      #&0    ; &13D3
-    STA      zp_calc_ptr_72_high    ; &13D5
-    RTS    ; &13D7
+    CLC
+    ADC      zp_calc_ptr_72_low
+    STA      zp_calc_ptr_72_low
+    LDA      zp_calc_ptr_72_high
+    ADC      #&0
+    STA      zp_calc_ptr_72_high
+    RTS
 
 .shift_pointer_70_left_x_times
-    ASL      zp_screen_ptr_70_low    ; &13D8
-    ROL      zp_screen_ptr_70_high    ; &13DA
-    DEX    ; &13DC
-    BNE      shift_pointer_70_left_x_times    ; &13DD
-    RTS    ; &13DF
+    ASL      zp_screen_ptr_70_low
+    ROL      zp_screen_ptr_70_high
+    DEX
+    BNE      shift_pointer_70_left_x_times
+    RTS
 
 .shift_pointer_72_left_x_times
-    ASL      zp_calc_ptr_72_low    ; &13E0
-    ROL      zp_calc_ptr_72_high    ; &13E2
-    DEX    ; &13E4
-    BNE      shift_pointer_72_left_x_times    ; &13E5
-    RTS    ; &13E7
+    ASL      zp_calc_ptr_72_low
+    ROL      zp_calc_ptr_72_high
+    DEX
+    BNE      shift_pointer_72_left_x_times
+    RTS
 
 .draw_object_using_saved_screen_ptr
-    LDA      saved_object_screen_low_by_index,X    ; &13E8
-    STA      zp_screen_ptr_70_low    ; &13EB
-    LDA      saved_object_screen_high_by_index,X    ; &13ED
-    STA      zp_screen_ptr_70_high    ; &13F0
-    LDA      saved_object_y_by_index,X    ; &13F2
-    STA      object_render_y_or_parity    ; &13F5
-    JMP      render_object_with_loaded_screen_ptr_1404    ; &13F8
+    LDA      saved_object_screen_low_by_index,X
+    STA      zp_screen_ptr_70_low
+    LDA      saved_object_screen_high_by_index,X
+    STA      zp_screen_ptr_70_high
+    LDA      saved_object_y_by_index,X
+    STA      object_render_y_or_parity
+    JMP      render_object_with_loaded_screen_ptr_1404
 
 .draw_object_by_index
-    JSR      load_object_screen_ptr    ; &13FB
-    LDA      object_y_by_index,X    ; &13FE
-    STA      object_render_y_or_parity    ; &1401
+    JSR      load_object_screen_ptr
+    LDA      object_y_by_index,X
+    STA      object_render_y_or_parity
 
 .render_object_with_loaded_screen_ptr_1404
-    LDY      render_mode_or_text_scratch    ; &1404
-    LDA      renderer_store_vector_low_table,Y    ; &1406
-    STA      zp_indirect_74_low    ; &1409
-    LDA      renderer_store_vector_high_table,Y    ; &140B
-    STA      zp_indirect_74_high    ; &140E
-    LDY      object_graphic_id_by_index,X    ; &1410
-    LDA      graphic_record_low_pointer_table_1404,Y    ; &1413
-    STA      render_source_operand_low    ; &1416
-    LDA      graphic_record_high_pointer_table_1404,Y    ; &1419
-    STA      render_source_operand_high    ; &141C
-    LDA      object_render_y_or_parity    ; &141F
-    AND      #&1    ; &1422
-    BNE      render_odd_y_split_setup_143a    ; &1424
-    LDX      #&0    ; &1426
-    LDY      #&0    ; &1428
+    LDY      render_mode_or_text_scratch
+    LDA      renderer_store_vector_low_table,Y
+    STA      zp_indirect_74_low
+    LDA      renderer_store_vector_high_table,Y
+    STA      zp_indirect_74_high
+    LDY      object_graphic_id_by_index,X
+    LDA      graphic_record_low_pointer_table_1404,Y
+    STA      render_source_operand_low
+    LDA      graphic_record_high_pointer_table_1404,Y
+    STA      render_source_operand_high
+    LDA      object_render_y_or_parity
+    AND      #&1
+    BNE      render_odd_y_split_setup_143a
+    LDX      #&0
+    LDY      #&0
 
 .render_even_y_contiguous_loop_1426
-    JSR      render_load_source_byte_and_jump_store_stub    ; &142A
-    INY    ; &142D
-    INX    ; &142E
-    CPY      #&18    ; &142F
-    BNE      render_even_y_contiguous_loop_1426    ; &1431
-    RTS    ; &1433
+    JSR      render_load_source_byte_and_jump_store_stub
+    INY
+    INX
+    CPY      #&18
+    BNE      render_even_y_contiguous_loop_1426
+    RTS
 
 .render_load_source_byte_and_jump_store_stub
-    LDA      &FFFF,X    ; &1434
-    JMP      (zp_indirect_74_low)    ; &1437
+    LDA      &FFFF,X
+    JMP      (zp_indirect_74_low)
 
 .render_odd_y_split_setup_143a
-    LDX      #&0    ; &143A
-    LDY      #&4    ; &143C
+    LDX      #&0
+    LDY      #&4
 
 .render_odd_y_split_loop_143a
-    JSR      render_load_source_byte_and_jump_store_stub    ; &143E
-    INY    ; &1441
-    INX    ; &1442
-    TXA    ; &1443
-    AND      #&3    ; &1444
-    BNE      render_odd_y_split_progress_check_143a    ; &1446
-    TXA    ; &1448
-    CLC    ; &1449
-    ADC      #&4    ; &144A
-    TAX    ; &144C
-    TYA    ; &144D
-    ADC      #&4    ; &144E
-    TAY    ; &1450
+    JSR      render_load_source_byte_and_jump_store_stub
+    INY
+    INX
+    TXA
+    AND      #&3
+    BNE      render_odd_y_split_progress_check_143a
+    TXA
+    CLC
+    ADC      #&4
+    TAX
+    TYA
+    ADC      #&4
+    TAY
 
 .render_odd_y_split_progress_check_143a
-    CPY      #&98    ; &1451
-    BEQ      return_from_object_render_walk_1404    ; &1453
-    CPX      #&18    ; &1455
-    BNE      render_odd_y_split_loop_143a    ; &1457
-    LDX      #&4    ; &1459
-    LDY      #&80    ; &145B
-    INC      zp_screen_ptr_70_high    ; &145D
-    INC      zp_screen_ptr_70_high    ; &145F
-    JMP      render_odd_y_split_loop_143a    ; &1461
+    CPY      #&98
+    BEQ      return_from_object_render_walk_1404
+    CPX      #&18
+    BNE      render_odd_y_split_loop_143a
+    LDX      #&4
+    LDY      #&80
+    INC      zp_screen_ptr_70_high
+    INC      zp_screen_ptr_70_high
+    JMP      render_odd_y_split_loop_143a
 
 .return_from_object_render_walk_1404
-    RTS    ; &1464
+    RTS
 
 .render_store_eor_source
-    EOR      (zp_screen_ptr_70_low),Y    ; &1465
-    STA      (zp_screen_ptr_70_low),Y    ; &1467
-    RTS    ; &1469
+    EOR      (zp_screen_ptr_70_low),Y
+    STA      (zp_screen_ptr_70_low),Y
+    RTS
 
 .render_store_eor_source_track_collision_bits
-    STA      zp_calc_ptr_72_low    ; &146A
-    LDA      (zp_screen_ptr_70_low),Y    ; &146C
-    ORA      renderer_collision_accumulator    ; &146E
-    STA      renderer_collision_accumulator    ; &1470
-    LDA      zp_calc_ptr_72_low    ; &1472
-    EOR      (zp_screen_ptr_70_low),Y    ; &1474
-    STA      (zp_screen_ptr_70_low),Y    ; &1476
-    RTS    ; &1478
+    STA      zp_calc_ptr_72_low
+    LDA      (zp_screen_ptr_70_low),Y
+    ORA      renderer_collision_accumulator
+    STA      renderer_collision_accumulator
+    LDA      zp_calc_ptr_72_low
+    EOR      (zp_screen_ptr_70_low),Y
+    STA      (zp_screen_ptr_70_low),Y
+    RTS
 
 .render_store_clear_byte
-    LDA      #&0    ; &1479
-    STA      (zp_screen_ptr_70_low),Y    ; &147B
-    RTS    ; &147D
+    LDA      #&0
+    STA      (zp_screen_ptr_70_low),Y
+    RTS
 
 .render_collision_test_and_conditional_store
-    LDA      (zp_screen_ptr_70_low),Y    ; &147E
-    ORA      renderer_collision_accumulator    ; &1480
-    STA      renderer_collision_accumulator    ; &1482
-    LDA      (zp_screen_ptr_70_low),Y    ; &1484
-    AND      #&55    ; &1486
-    CMP      #&40    ; &1488
-    BEQ      mark_renderer_player_collision_class    ; &148A
-    CMP      #&45    ; &148C
-    BEQ      mark_renderer_target_collect_collision_class    ; &148E
-    LDA      (zp_screen_ptr_70_low),Y    ; &1490
-    AND      #&aa    ; &1492
-    CMP      #&80    ; &1494
-    BEQ      mark_renderer_player_collision_class    ; &1496
-    CMP      #&8a    ; &1498
-    BEQ      mark_renderer_target_collect_collision_class    ; &149A
-    RTS    ; &149C
+    LDA      (zp_screen_ptr_70_low),Y
+    ORA      renderer_collision_accumulator
+    STA      renderer_collision_accumulator
+    LDA      (zp_screen_ptr_70_low),Y
+    AND      #&55
+    CMP      #&40
+    BEQ      mark_renderer_player_collision_class
+    CMP      #&45
+    BEQ      mark_renderer_target_collect_collision_class
+    LDA      (zp_screen_ptr_70_low),Y
+    AND      #&aa
+    CMP      #&80
+    BEQ      mark_renderer_player_collision_class
+    CMP      #&8a
+    BEQ      mark_renderer_target_collect_collision_class
+    RTS
 
 .mark_renderer_player_collision_class
-    LDA      #&1    ; &149D
-    STA      player_collision_class_flag    ; &149F
-    RTS    ; &14A2
+    LDA      #&1
+    STA      player_collision_class_flag
+    RTS
 
 .mark_renderer_target_collect_collision_class
-    LDA      #&1    ; &14A3
-    STA      target_collect_collision_flag    ; &14A5
-    RTS    ; &14A7
+    LDA      #&1
+    STA      target_collect_collision_flag
+    RTS
 
 .render_collision_accumulate_only
-    LDA      (zp_screen_ptr_70_low),Y    ; &14A8
-    ORA      renderer_collision_accumulator    ; &14AA
-    STA      renderer_collision_accumulator    ; &14AC
-    RTS    ; &14AE
+    LDA      (zp_screen_ptr_70_low),Y
+    ORA      renderer_collision_accumulator
+    STA      renderer_collision_accumulator
+    RTS
 
 .render_compare_source_to_screen
-    CMP      (zp_screen_ptr_70_low),Y    ; &14AF
-    BNE      render_compare_source_mismatch_14af    ; &14B1
-    RTS    ; &14B3
+    CMP      (zp_screen_ptr_70_low),Y
+    BNE      render_compare_source_mismatch_14af
+    RTS
 
 .render_compare_source_mismatch_14af
-    LDA      #&1    ; &14B4
-    STA      renderer_collision_accumulator    ; &14B6
-    RTS    ; &14B8
+    LDA      #&1
+    STA      renderer_collision_accumulator
+    RTS
 
 .load_packed_room_tile_nibble
-    LDA      room_tile_y_index    ; &14B9
-    ASL      A    ; &14BB
-    ADC      room_tile_y_index    ; &14BC
-    STA      room_tile_class_or_pattern    ; &14BE
-    LDA      room_tile_x_index    ; &14C0
-    LSR      A    ; &14C2
-    CLC    ; &14C3
-    ADC      room_tile_class_or_pattern    ; &14C4
-    TAY    ; &14C6
-    LDA      #&0    ; &14C7
-    STA      zp_screen_ptr_70_high    ; &14C9
-    LDA      room_area    ; &14CB
-    STA      zp_screen_ptr_70_low    ; &14CD
-    LDX      #&4    ; &14CF
-    JSR      shift_pointer_70_left_x_times    ; &14D1
-    LDA      room_area    ; &14D4
-    JSR      add_a_to_pointer_70    ; &14D6
-    LDA      room_area    ; &14D9
-    JSR      add_a_to_pointer_70    ; &14DB
-    LDA      #&e0    ; &14DE
-    JSR      add_a_to_pointer_70    ; &14E0
-    LDA      room_area    ; &14E3
-    CMP      #&10    ; &14E5
-    BPL      room_tile_area_ge_10_bank_adjust_14b9    ; &14E7
-    LDA      #&27    ; &14E9
-    CLC    ; &14EB
-    ADC      zp_screen_ptr_70_high    ; &14EC
-    STA      zp_screen_ptr_70_high    ; &14EE
-    JMP      room_tile_read_packed_byte_14b9    ; &14F0
+    LDA      room_tile_y_index
+    ASL      A
+    ADC      room_tile_y_index
+    STA      room_tile_class_or_pattern
+    LDA      room_tile_x_index
+    LSR      A
+    CLC
+    ADC      room_tile_class_or_pattern
+    TAY
+    LDA      #&0
+    STA      zp_screen_ptr_70_high
+    LDA      room_area
+    STA      zp_screen_ptr_70_low
+    LDX      #&4
+    JSR      shift_pointer_70_left_x_times
+    LDA      room_area
+    JSR      add_a_to_pointer_70
+    LDA      room_area
+    JSR      add_a_to_pointer_70
+    LDA      #&e0
+    JSR      add_a_to_pointer_70
+    LDA      room_area
+    CMP      #&10
+    BPL      room_tile_area_ge_10_bank_adjust_14b9
+    LDA      #&27
+    CLC
+    ADC      zp_screen_ptr_70_high
+    STA      zp_screen_ptr_70_high
+    JMP      room_tile_read_packed_byte_14b9
 
 .room_tile_area_ge_10_bank_adjust_14b9
-    LDA      #&2    ; &14F3
-    CLC    ; &14F5
-    ADC      zp_screen_ptr_70_high    ; &14F6
-    STA      zp_screen_ptr_70_high    ; &14F8
+    LDA      #&2
+    CLC
+    ADC      zp_screen_ptr_70_high
+    STA      zp_screen_ptr_70_high
 
 .room_tile_read_packed_byte_14b9
-    LDA      (zp_screen_ptr_70_low),Y    ; &14FA
-    STA      room_tile_class_or_pattern    ; &14FC
-    STA      zp_calc_ptr_72_low    ; &14FE
-    LDA      room_tile_x_index    ; &1500
-    AND      #&1    ; &1502
-    BNE      room_tile_high_nibble_path_14b9    ; &1504
-    LDA      room_tile_class_or_pattern    ; &1506
-    AND      #&f    ; &1508
-    STA      room_tile_class_or_pattern    ; &150A
-    RTS    ; &150C
+    LDA      (zp_screen_ptr_70_low),Y
+    STA      room_tile_class_or_pattern
+    STA      zp_calc_ptr_72_low
+    LDA      room_tile_x_index
+    AND      #&1
+    BNE      room_tile_high_nibble_path_14b9
+    LDA      room_tile_class_or_pattern
+    AND      #&f
+    STA      room_tile_class_or_pattern
+    RTS
 
 .room_tile_high_nibble_path_14b9
-    LDA      room_tile_class_or_pattern    ; &150D
-    LSR      A    ; &150F
-    LSR      A    ; &1510
-    LSR      A    ; &1511
-    LSR      A    ; &1512
-    STA      room_tile_class_or_pattern    ; &1513
-    RTS    ; &1515
+    LDA      room_tile_class_or_pattern
+    LSR      A
+    LSR      A
+    LSR      A
+    LSR      A
+    STA      room_tile_class_or_pattern
+    RTS
 
 .draw_playfield_tiles
-    LDA      #&0    ; &1516
-    STA      room_tile_column_or_fill_index    ; &1518
-    LDA      #&0    ; &151A
-    STA      room_tile_x_index    ; &151C
+    LDA      #&0
+    STA      room_tile_column_or_fill_index
+    LDA      #&0
+    STA      room_tile_x_index
 
 .draw_playfield_major_column_setup_1516
-    LDA      #&0    ; &151E
-    STA      room_tile_y_index    ; &1520
-    LDA      #&3    ; &1522
-    STA      zp_scratch_3c    ; &1524
+    LDA      #&0
+    STA      room_tile_y_index
+    LDA      #&3
+    STA      zp_scratch_3c
 
 .draw_playfield_major_tile_loop_1516
-    JSR      load_packed_room_tile_nibble    ; &1526
-    AND      #&8    ; &1529
-    LDY      room_tile_y_index    ; &152B
-    STA      player_collision_class_flag,Y    ; &152D
-    LDY      zp_scratch_3c    ; &1530
-    LDX      room_tile_column_or_fill_index    ; &1532
-    JSR      draw_24byte_tile_or_sprite    ; &1534
-    LDA      room_tile_y_index    ; &1537
-    CMP      #&5    ; &1539
-    BEQ      fill_finished_major_column_gaps_1516    ; &153B
-    LDA      #&4    ; &153D
-    STA      zp_scratch_3d    ; &153F
-    LDA      room_tile_class_or_pattern    ; &1541
-    AND      #&2    ; &1543
-    PHP    ; &1545
-    LDA      #&0    ; &1546
-    STA      room_tile_class_or_pattern    ; &1548
-    PLP    ; &154A
-    BEQ      draw_vertical_gap_cells_loop_1516    ; &154B
-    LDA      #&3    ; &154D
-    STA      room_tile_class_or_pattern    ; &154F
+    JSR      load_packed_room_tile_nibble
+    AND      #&8
+    LDY      room_tile_y_index
+    STA      player_collision_class_flag,Y
+    LDY      zp_scratch_3c
+    LDX      room_tile_column_or_fill_index
+    JSR      draw_24byte_tile_or_sprite
+    LDA      room_tile_y_index
+    CMP      #&5
+    BEQ      fill_finished_major_column_gaps_1516
+    LDA      #&4
+    STA      zp_scratch_3d
+    LDA      room_tile_class_or_pattern
+    AND      #&2
+    PHP
+    LDA      #&0
+    STA      room_tile_class_or_pattern
+    PLP
+    BEQ      draw_vertical_gap_cells_loop_1516
+    LDA      #&3
+    STA      room_tile_class_or_pattern
 
 .draw_vertical_gap_cells_loop_1516
-    INC      zp_scratch_3c    ; &1551
-    LDY      zp_scratch_3c    ; &1553
-    LDX      room_tile_column_or_fill_index    ; &1555
-    JSR      draw_24byte_tile_or_sprite    ; &1557
-    DEC      zp_scratch_3d    ; &155A
-    BNE      draw_vertical_gap_cells_loop_1516    ; &155C
-    INC      zp_scratch_3c    ; &155E
-    INC      room_tile_y_index    ; &1560
-    JMP      draw_playfield_major_tile_loop_1516    ; &1562
+    INC      zp_scratch_3c
+    LDY      zp_scratch_3c
+    LDX      room_tile_column_or_fill_index
+    JSR      draw_24byte_tile_or_sprite
+    DEC      zp_scratch_3d
+    BNE      draw_vertical_gap_cells_loop_1516
+    INC      zp_scratch_3c
+    INC      room_tile_y_index
+    JMP      draw_playfield_major_tile_loop_1516
 
 .fill_finished_major_column_gaps_1516
-    JSR      fill_room_masked_offset_screen_gaps    ; &1565
-    LDA      room_tile_x_index    ; &1568
-    CMP      #&5    ; &156A
-    BNE      draw_horizontal_gap_columns_setup_1516    ; &156C
+    JSR      fill_room_masked_offset_screen_gaps
+    LDA      room_tile_x_index
+    CMP      #&5
+    BNE      draw_horizontal_gap_columns_setup_1516
 
 .return_from_draw_playfield_tiles_1516
-    RTS    ; &156E
+    RTS
 
 .draw_horizontal_gap_columns_setup_1516
-    LDA      #&4    ; &156F
-    STA      room_gap_column_repeat_counter    ; &1571
-    INC      room_tile_column_or_fill_index    ; &1573
+    LDA      #&4
+    STA      room_gap_column_repeat_counter
+    INC      room_tile_column_or_fill_index
 
 .draw_horizontal_gap_column_setup_1516
-    LDA      #&0    ; &1575
-    STA      room_tile_y_index    ; &1577
-    LDA      #&3    ; &1579
-    STA      zp_scratch_3c    ; &157B
+    LDA      #&0
+    STA      room_tile_y_index
+    LDA      #&3
+    STA      zp_scratch_3c
 
 .draw_horizontal_gap_column_tile_loop_1516
-    LDA      #&0    ; &157D
-    STA      room_tile_class_or_pattern    ; &157F
-    LDY      room_tile_y_index    ; &1581
-    LDA      player_collision_class_flag,Y    ; &1583
-    BEQ      draw_horizontal_gap_tile_1516    ; &1586
-    LDA      #&c    ; &1588
-    STA      room_tile_class_or_pattern    ; &158A
+    LDA      #&0
+    STA      room_tile_class_or_pattern
+    LDY      room_tile_y_index
+    LDA      player_collision_class_flag,Y
+    BEQ      draw_horizontal_gap_tile_1516
+    LDA      #&c
+    STA      room_tile_class_or_pattern
 
 .draw_horizontal_gap_tile_1516
-    LDY      zp_scratch_3c    ; &158C
-    LDX      room_tile_column_or_fill_index    ; &158E
-    JSR      draw_24byte_tile_or_sprite    ; &1590
-    LDA      room_tile_y_index    ; &1593
-    CMP      #&5    ; &1595
-    BEQ      fill_finished_horizontal_gap_column_1516    ; &1597
-    LDA      #&4    ; &1599
-    STA      zp_scratch_3d    ; &159B
-    LDA      #&0    ; &159D
-    STA      room_tile_class_or_pattern    ; &159F
+    LDY      zp_scratch_3c
+    LDX      room_tile_column_or_fill_index
+    JSR      draw_24byte_tile_or_sprite
+    LDA      room_tile_y_index
+    CMP      #&5
+    BEQ      fill_finished_horizontal_gap_column_1516
+    LDA      #&4
+    STA      zp_scratch_3d
+    LDA      #&0
+    STA      room_tile_class_or_pattern
 
 .draw_horizontal_gap_clear_vertical_run_loop_1516
-    INC      zp_scratch_3c    ; &15A1
-    LDY      zp_scratch_3c    ; &15A3
-    LDX      room_tile_column_or_fill_index    ; &15A5
-    JSR      draw_24byte_tile_or_sprite    ; &15A7
-    DEC      zp_scratch_3d    ; &15AA
-    BNE      draw_horizontal_gap_clear_vertical_run_loop_1516    ; &15AC
-    INC      zp_scratch_3c    ; &15AE
-    INC      room_tile_y_index    ; &15B0
-    JMP      draw_horizontal_gap_column_tile_loop_1516    ; &15B2
+    INC      zp_scratch_3c
+    LDY      zp_scratch_3c
+    LDX      room_tile_column_or_fill_index
+    JSR      draw_24byte_tile_or_sprite
+    DEC      zp_scratch_3d
+    BNE      draw_horizontal_gap_clear_vertical_run_loop_1516
+    INC      zp_scratch_3c
+    INC      room_tile_y_index
+    JMP      draw_horizontal_gap_column_tile_loop_1516
 
 .fill_finished_horizontal_gap_column_1516
-    JSR      fill_room_masked_forward_screen_gaps    ; &15B5
-    INC      room_tile_column_or_fill_index    ; &15B8
-    DEC      room_gap_column_repeat_counter    ; &15BA
-    BNE      draw_horizontal_gap_column_setup_1516    ; &15BC
-    INC      room_tile_x_index    ; &15BE
-    JMP      draw_playfield_major_column_setup_1516    ; &15C0
+    JSR      fill_room_masked_forward_screen_gaps
+    INC      room_tile_column_or_fill_index
+    DEC      room_gap_column_repeat_counter
+    BNE      draw_horizontal_gap_column_setup_1516
+    INC      room_tile_x_index
+    JMP      draw_playfield_major_column_setup_1516
 
 .read_game_input_and_pause
-    JSR      handle_sound_on_off_keys    ; &15C3
-    LDA      #&0    ; &15C6
-    STA      input_delta_x    ; &15C8
-    STA      input_delta_y    ; &15CA
-    STA      input_scan_index    ; &15CC
-    LDA      input_mode_keyboard_or_joystick    ; &15CF
-    BNE      active_input_joystick_path_15c3    ; &15D2
-    JSR      scan_movement_keys    ; &15D4
-    JMP      active_input_fire_edge_check_15c3    ; &15D7
+    JSR      handle_sound_on_off_keys
+    LDA      #&0
+    STA      input_delta_x
+    STA      input_delta_y
+    STA      input_scan_index
+    LDA      input_mode_keyboard_or_joystick
+    BNE      active_input_joystick_path_15c3
+    JSR      scan_movement_keys
+    JMP      active_input_fire_edge_check_15c3
 
 .active_input_joystick_path_15c3
-    JSR      read_joystick_axes_and_fire    ; &15DA
+    JSR      read_joystick_axes_and_fire
 
 .active_input_fire_edge_check_15c3
-    LDA      previous_fire_input_latch    ; &15DD
-    BNE      active_input_store_fire_latch_15c3    ; &15E0
-    CPX      #&0    ; &15E2
-    BEQ      active_input_store_fire_latch_15c3    ; &15E4
-    LDA      #&1    ; &15E6
-    STA      fire_edge_request    ; &15E8
+    LDA      previous_fire_input_latch
+    BNE      active_input_store_fire_latch_15c3
+    CPX      #&0
+    BEQ      active_input_store_fire_latch_15c3
+    LDA      #&1
+    STA      fire_edge_request
 
 .active_input_store_fire_latch_15c3
-    STX      previous_fire_input_latch    ; &15EA
-    JSR      scan_escape_key    ; &15ED
-    BEQ      active_input_check_pause_key_15c3    ; &15F0
-    PLA    ; &15F2
-    PLA    ; &15F3
-    PLA    ; &15F4
-    PLA    ; &15F5
-    JMP      menu_attract_entry_loop_0e05    ; &15F6
+    STX      previous_fire_input_latch
+    JSR      scan_escape_key
+    BEQ      active_input_check_pause_key_15c3
+    PLA
+    PLA
+    PLA
+    PLA
+    JMP      menu_attract_entry_loop_0e05
 
 .active_input_check_pause_key_15c3
-    LDX      #&c8    ; &15F9
-    JSR      scan_inkey_current_x    ; &15FB
-    BNE      active_input_wait_for_resume_key_15c3    ; &15FE
-    RTS    ; &1600
+    LDX      #&c8
+    JSR      scan_inkey_current_x
+    BNE      active_input_wait_for_resume_key_15c3
+    RTS
 
 .active_input_wait_for_resume_key_15c3
-    LDX      #&cc    ; &1601
-    JSR      scan_inkey_current_x    ; &1603
-    BEQ      active_input_wait_for_resume_key_15c3    ; &1606
-    RTS    ; &1608
+    LDX      #&cc
+    JSR      scan_inkey_current_x
+    BEQ      active_input_wait_for_resume_key_15c3
+    RTS
 
 .scan_movement_keys
-    LDY      input_scan_index    ; &1609
-    LDA      keyboard_inkey_codes_table_1609,Y    ; &160C
-    TAX    ; &160F
-    JSR      scan_inkey_current_x    ; &1610
-    BEQ      keyboard_scan_next_key_1609    ; &1613
-    LDY      input_scan_index    ; &1615
-    LDA      input_delta_x    ; &1618
-    CLC    ; &161A
-    ADC      keyboard_input_delta_x_table_1609,Y    ; &161B
-    STA      input_delta_x    ; &161E
-    LDA      input_delta_y    ; &1620
-    CLC    ; &1622
-    ADC      keyboard_input_delta_y_table_1609,Y    ; &1623
-    STA      input_delta_y    ; &1626
+    LDY      input_scan_index
+    LDA      keyboard_inkey_codes_table_1609,Y
+    TAX
+    JSR      scan_inkey_current_x
+    BEQ      keyboard_scan_next_key_1609
+    LDY      input_scan_index
+    LDA      input_delta_x
+    CLC
+    ADC      keyboard_input_delta_x_table_1609,Y
+    STA      input_delta_x
+    LDA      input_delta_y
+    CLC
+    ADC      keyboard_input_delta_y_table_1609,Y
+    STA      input_delta_y
 
 .keyboard_scan_next_key_1609
-    INC      input_scan_index    ; &1628
-    LDA      input_scan_index    ; &162B
-    CMP      #&4    ; &162E
-    BNE      scan_movement_keys    ; &1630
-    LDX      #&9a    ; &1632
-    JMP      scan_inkey_current_x    ; &1634
+    INC      input_scan_index
+    LDA      input_scan_index
+    CMP      #&4
+    BNE      scan_movement_keys
+    LDX      #&9a
+    JMP      scan_inkey_current_x
 
 .byte_decoded_code_1637
-    LDA      #&0    ; &1637
-    STA      zp_screen_ptr_70_high    ; &1639
-    LDA      zp_scratch_3d    ; &163B
-    STA      zp_screen_ptr_70_low    ; &163D
-    LDX      #&3    ; &163F
-    JSR      shift_pointer_70_left_x_times    ; &1641
-    LDA      zp_screen_ptr_70_high    ; &1644
-    CLC    ; &1646
-    ADC      #&30    ; &1647
-    STA      zp_screen_ptr_70_high    ; &1649
-    LDA      #&0    ; &164B
-    STA      zp_scratch_3c    ; &164D
+    LDA      #&0
+    STA      zp_screen_ptr_70_high
+    LDA      zp_scratch_3d
+    STA      zp_screen_ptr_70_low
+    LDX      #&3
+    JSR      shift_pointer_70_left_x_times
+    LDA      zp_screen_ptr_70_high
+    CLC
+    ADC      #&30
+    STA      zp_screen_ptr_70_high
+    LDA      #&0
+    STA      zp_scratch_3c
 
 .byte_decoded_code_1637_loop_164f
-    LDY      #&7    ; &164F
+    LDY      #&7
 
 .byte_decoded_code_1637_loop_1651
-    LDA      #&0    ; &1651
-    STA      (zp_screen_ptr_70_low),Y    ; &1653
-    DEY    ; &1655
-    BPL      byte_decoded_code_1637_loop_1651    ; &1656
-    LDA      #&80    ; &1658
-    JSR      add_a_to_pointer_70    ; &165A
-    INC      zp_screen_ptr_70_high    ; &165D
-    INC      zp_screen_ptr_70_high    ; &165F
-    INC      zp_scratch_3c    ; &1661
-    LDA      zp_scratch_3c    ; &1663
-    CMP      #&20    ; &1665
-    BNE      byte_decoded_code_1637_loop_164f    ; &1667
-    RTS    ; &1669
+    LDA      #&0
+    STA      (zp_screen_ptr_70_low),Y
+    DEY
+    BPL      byte_decoded_code_1637_loop_1651
+    LDA      #&80
+    JSR      add_a_to_pointer_70
+    INC      zp_screen_ptr_70_high
+    INC      zp_screen_ptr_70_high
+    INC      zp_scratch_3c
+    LDA      zp_scratch_3c
+    CMP      #&20
+    BNE      byte_decoded_code_1637_loop_164f
+    RTS
 
 .compute_screen_ptr_for_object
-    JSR      load_object_screen_ptr    ; &166A
-    LDA      zp_screen_ptr_70_low    ; &166D
-    STA      saved_object_screen_low_by_index,X    ; &166F
-    LDA      zp_screen_ptr_70_high    ; &1672
-    STA      saved_object_screen_high_by_index,X    ; &1674
-    LDA      movement_delta_x    ; &1677
-    BMI      compute_screen_ptr_x_negative_166a    ; &1679
-    BEQ      compute_screen_ptr_y_delta_166a    ; &167B
-    LDA      #&8    ; &167D
-    JSR      add_a_to_pointer_70    ; &167F
-    JMP      compute_screen_ptr_y_delta_166a    ; &1682
+    JSR      load_object_screen_ptr
+    LDA      zp_screen_ptr_70_low
+    STA      saved_object_screen_low_by_index,X
+    LDA      zp_screen_ptr_70_high
+    STA      saved_object_screen_high_by_index,X
+    LDA      movement_delta_x
+    BMI      compute_screen_ptr_x_negative_166a
+    BEQ      compute_screen_ptr_y_delta_166a
+    LDA      #&8
+    JSR      add_a_to_pointer_70
+    JMP      compute_screen_ptr_y_delta_166a
 
 .compute_screen_ptr_x_negative_166a
-    SEC    ; &1685
-    LDA      zp_screen_ptr_70_low    ; &1686
-    SBC      #&8    ; &1688
-    STA      zp_screen_ptr_70_low    ; &168A
-    LDA      zp_screen_ptr_70_high    ; &168C
-    SBC      #&0    ; &168E
-    STA      zp_screen_ptr_70_high    ; &1690
+    SEC
+    LDA      zp_screen_ptr_70_low
+    SBC      #&8
+    STA      zp_screen_ptr_70_low
+    LDA      zp_screen_ptr_70_high
+    SBC      #&0
+    STA      zp_screen_ptr_70_high
 
 .compute_screen_ptr_y_delta_166a
-    LDA      movement_delta_y    ; &1692
-    BMI      compute_screen_ptr_y_negative_166a    ; &1694
-    BEQ      return_from_compute_screen_ptr_166a    ; &1696
-    LDA      object_y_by_index,X    ; &1698
-    AND      #&1    ; &169B
-    BNE      return_from_compute_screen_ptr_166a    ; &169D
-    LDA      #&80    ; &169F
-    JSR      add_a_to_pointer_70    ; &16A1
-    INC      zp_screen_ptr_70_high    ; &16A4
-    INC      zp_screen_ptr_70_high    ; &16A6
-    RTS    ; &16A8
+    LDA      movement_delta_y
+    BMI      compute_screen_ptr_y_negative_166a
+    BEQ      return_from_compute_screen_ptr_166a
+    LDA      object_y_by_index,X
+    AND      #&1
+    BNE      return_from_compute_screen_ptr_166a
+    LDA      #&80
+    JSR      add_a_to_pointer_70
+    INC      zp_screen_ptr_70_high
+    INC      zp_screen_ptr_70_high
+    RTS
 
 .compute_screen_ptr_y_negative_166a
-    LDA      object_y_by_index,X    ; &16A9
-    AND      #&1    ; &16AC
-    BEQ      return_from_compute_screen_ptr_166a    ; &16AE
-    SEC    ; &16B0
-    LDA      zp_screen_ptr_70_low    ; &16B1
-    SBC      #&80    ; &16B3
-    STA      zp_screen_ptr_70_low    ; &16B5
-    LDA      zp_screen_ptr_70_high    ; &16B7
-    SBC      #&2    ; &16B9
-    STA      zp_screen_ptr_70_high    ; &16BB
+    LDA      object_y_by_index,X
+    AND      #&1
+    BEQ      return_from_compute_screen_ptr_166a
+    SEC
+    LDA      zp_screen_ptr_70_low
+    SBC      #&80
+    STA      zp_screen_ptr_70_low
+    LDA      zp_screen_ptr_70_high
+    SBC      #&2
+    STA      zp_screen_ptr_70_high
 
 .return_from_compute_screen_ptr_166a
-    RTS    ; &16BD
+    RTS
 
 .move_object_and_update_screen_ptr
-    LDA      movement_delta_x    ; &16BE
-    CLC    ; &16C0
-    ADC      object_x_by_index,X    ; &16C1
-    STA      object_x_by_index,X    ; &16C4
-    LDA      object_y_by_index,X    ; &16C7
-    STA      saved_object_y_by_index,X    ; &16CA
-    CLC    ; &16CD
-    ADC      movement_delta_y    ; &16CE
-    STA      object_y_by_index,X    ; &16D0
-    JSR      compute_screen_ptr_for_object    ; &16D3
-    LDA      zp_screen_ptr_70_low    ; &16D6
-    STA      object_screen_low_by_index,X    ; &16D8
-    LDA      zp_screen_ptr_70_high    ; &16DB
-    STA      object_screen_high_by_index,X    ; &16DD
-    RTS    ; &16E0
+    LDA      movement_delta_x
+    CLC
+    ADC      object_x_by_index,X
+    STA      object_x_by_index,X
+    LDA      object_y_by_index,X
+    STA      saved_object_y_by_index,X
+    CLC
+    ADC      movement_delta_y
+    STA      object_y_by_index,X
+    JSR      compute_screen_ptr_for_object
+    LDA      zp_screen_ptr_70_low
+    STA      object_screen_low_by_index,X
+    LDA      zp_screen_ptr_70_high
+    STA      object_screen_high_by_index,X
+    RTS
 
 .apply_player_input_to_player_pair
-    LDA      input_delta_x    ; &16E1
-    BNE      player_input_nonzero_delta_16e1    ; &16E3
-    LDA      input_delta_y    ; &16E5
-    BNE      player_input_nonzero_delta_16e1    ; &16E7
-    LDA      player_direction    ; &16E9
-    ASL      A    ; &16EB
-    ASL      A    ; &16EC
-    CLC    ; &16ED
-    ADC      #&2    ; &16EE
-    STA      player_graphic_id_second_cell    ; &16F0
-    JMP      apply_input_delta_to_player_pair    ; &16F3
+    LDA      input_delta_x
+    BNE      player_input_nonzero_delta_16e1
+    LDA      input_delta_y
+    BNE      player_input_nonzero_delta_16e1
+    LDA      player_direction
+    ASL      A
+    ASL      A
+    CLC
+    ADC      #&2
+    STA      player_graphic_id_second_cell
+    JMP      apply_input_delta_to_player_pair
 
 .player_input_nonzero_delta_16e1
-    LDX      input_delta_x    ; &16F6
-    LDY      input_delta_y    ; &16F8
-    JSR      direction_from_delta_xy    ; &16FA
-    STA      player_direction    ; &16FD
-    ASL      A    ; &16FF
-    ASL      A    ; &1700
-    STA      player_graphic_id_first_cell    ; &1701
-    STA      zp_scratch_3d    ; &1704
-    LDA      frame_phase    ; &1706
-    LSR      A    ; &1708
-    LSR      A    ; &1709
-    CMP      #&3    ; &170A
-    BNE      player_second_graphic_animation_store_16e1    ; &170C
-    LDA      #&1    ; &170E
+    LDX      input_delta_x
+    LDY      input_delta_y
+    JSR      direction_from_delta_xy
+    STA      player_direction
+    ASL      A
+    ASL      A
+    STA      player_graphic_id_first_cell
+    STA      zp_scratch_3d
+    LDA      frame_phase
+    LSR      A
+    LSR      A
+    CMP      #&3
+    BNE      player_second_graphic_animation_store_16e1
+    LDA      #&1
 
 .player_second_graphic_animation_store_16e1
-    CLC    ; &1710
-    INC      zp_scratch_3d    ; &1711
-    ADC      zp_scratch_3d    ; &1713
-    STA      player_graphic_id_second_cell    ; &1715
+    CLC
+    INC      zp_scratch_3d
+    ADC      zp_scratch_3d
+    STA      player_graphic_id_second_cell
 
 .apply_input_delta_to_player_pair
-    LDA      input_delta_x    ; &1718
-    STA      movement_delta_x    ; &171A
-    LDA      input_delta_y    ; &171C
-    STA      movement_delta_y    ; &171E
-    LDX      #&10    ; &1720
-    JSR      move_object_and_update_screen_ptr    ; &1722
-    LDX      #&11    ; &1725
-    JMP      move_object_and_update_screen_ptr    ; &1727
+    LDA      input_delta_x
+    STA      movement_delta_x
+    LDA      input_delta_y
+    STA      movement_delta_y
+    LDX      #&10
+    JSR      move_object_and_update_screen_ptr
+    LDX      #&11
+    JMP      move_object_and_update_screen_ptr
 
 .add_direction_score_or_state_delta
-    STX      saved_level_loop_seed_or_status    ; &172A
-    LDA      player_direction_graphic_delta_table_16e1,X    ; &172C
-    CLC    ; &172F
-    ADC      room_area    ; &1730
-    STA      room_area    ; &1732
-    RTS    ; &1734
+    STX      saved_level_loop_seed_or_status
+    LDA      player_direction_graphic_delta_table_16e1,X
+    CLC
+    ADC      room_area
+    STA      room_area
+    RTS
 
 .start_or_reset_player_and_level_objects
-    JSR      apply_level_palette    ; &1735
-    INC      current_level_intro_or_loop_flag    ; &1738
-    LDA      current_level_intro_or_loop_flag    ; &173A
-    CMP      #&18    ; &173C
-    BNE      setup_remaining_object_score_gate_1735    ; &173E
-    LDA      level_index_and_hazard_gate    ; &1740
-    CMP      #&5    ; &1742
-    BEQ      setup_remaining_object_score_gate_1735    ; &1744
-    INC      level_index_and_hazard_gate    ; &1746
+    JSR      apply_level_palette
+    INC      current_level_intro_or_loop_flag
+    LDA      current_level_intro_or_loop_flag
+    CMP      #&18
+    BNE      setup_remaining_object_score_gate_1735
+    LDA      level_index_and_hazard_gate
+    CMP      #&5
+    BEQ      setup_remaining_object_score_gate_1735
+    INC      level_index_and_hazard_gate
 
 .setup_remaining_object_score_gate_1735
-    LDA      remaining_active_object_count    ; &1748
-    BNE      setup_player_start_state_1735    ; &174A
-    LDA      #&19    ; &174C
-    JSR      increment_four_char_score_or_counter    ; &174E
+    LDA      remaining_active_object_count
+    BNE      setup_player_start_state_1735
+    LDA      #&19
+    JSR      increment_four_char_score_or_counter
 
 .setup_player_start_state_1735
-    JSR      draw_playfield_tiles    ; &1751
-    LDX      saved_level_loop_seed_or_status    ; &1754
-    STX      level_loop_seed_or_status    ; &1756
-    LDA      player_start_x_by_exit_1735,X    ; &1759
-    STA      player_x_first_cell    ; &175C
-    STA      &0A11    ; &175F
-    LDA      player_start_direction_by_exit_1735,X    ; &1762
-    STA      player_direction    ; &1765
-    LDA      player_start_first_graphic_by_exit_1735,X    ; &1767
-    STA      player_graphic_id_first_cell    ; &176A
-    LDA      player_start_second_graphic_by_exit_1735,X    ; &176D
-    STA      player_graphic_id_second_cell    ; &1770
-    LDA      #&3    ; &1773
-    STA      frame_phase    ; &1775
-    LDA      player_start_y_by_exit_1735,X    ; &1777
-    STA      player_y_first_cell    ; &177A
-    CLC    ; &177D
-    ADC      #&2    ; &177E
-    STA      player_y_second_cell    ; &1780
-    LDA      player_start_first_screen_low_by_exit_1735,X    ; &1783
-    STA      player_screen_low_first_cell    ; &1786
-    LDA      player_start_first_screen_high_by_exit_1735,X    ; &1789
-    STA      player_screen_high_first_cell    ; &178C
-    LDA      player_start_second_screen_low_by_exit_1735,X    ; &178F
-    STA      player_screen_low_second_cell    ; &1792
-    LDA      player_start_second_screen_high_by_exit_1735,X    ; &1795
-    STA      player_screen_high_second_cell    ; &1798
-    LDX      #&7    ; &179B
+    JSR      draw_playfield_tiles
+    LDX      saved_level_loop_seed_or_status
+    STX      level_loop_seed_or_status
+    LDA      player_start_x_by_exit_1735,X
+    STA      player_x_first_cell
+    STA      &0A11
+    LDA      player_start_direction_by_exit_1735,X
+    STA      player_direction
+    LDA      player_start_first_graphic_by_exit_1735,X
+    STA      player_graphic_id_first_cell
+    LDA      player_start_second_graphic_by_exit_1735,X
+    STA      player_graphic_id_second_cell
+    LDA      #&3
+    STA      frame_phase
+    LDA      player_start_y_by_exit_1735,X
+    STA      player_y_first_cell
+    CLC
+    ADC      #&2
+    STA      player_y_second_cell
+    LDA      player_start_first_screen_low_by_exit_1735,X
+    STA      player_screen_low_first_cell
+    LDA      player_start_first_screen_high_by_exit_1735,X
+    STA      player_screen_high_first_cell
+    LDA      player_start_second_screen_low_by_exit_1735,X
+    STA      player_screen_low_second_cell
+    LDA      player_start_second_screen_high_by_exit_1735,X
+    STA      player_screen_high_second_cell
+    LDX      #&7
 
 .clear_shot_hazard_seed_loop_1735
-    LDA      #&0    ; &179D
-    STA      shot_visible_flag_by_slot,X    ; &179F
-    LDA      #&ff    ; &17A2
-    STA      shot_direction_or_inactive_by_slot,X    ; &17A4
-    DEX    ; &17A7
-    BPL      clear_shot_hazard_seed_loop_1735    ; &17A8
-    LDA      #&0    ; &17AA
-    STA      active_player_shot_count    ; &17AC
-    STA      active_spawned_hazard_count    ; &17AE
-    JSR      draw_static_status_panel    ; &17B1
-    JSR      setup_spinner_clone_cyberdroid_counts    ; &17B4
-    JSR      place_target_code_objects_for_room    ; &17B7
-    LDA      #&1    ; &17BA
-    STA      bounds_or_outside_flag    ; &17BC
-    RTS    ; &17BE
+    LDA      #&0
+    STA      shot_visible_flag_by_slot,X
+    LDA      #&ff
+    STA      shot_direction_or_inactive_by_slot,X
+    DEX
+    BPL      clear_shot_hazard_seed_loop_1735
+    LDA      #&0
+    STA      active_player_shot_count
+    STA      active_spawned_hazard_count
+    JSR      draw_static_status_panel
+    JSR      setup_spinner_clone_cyberdroid_counts
+    JSR      place_target_code_objects_for_room
+    LDA      #&1
+    STA      bounds_or_outside_flag
+    RTS
 
 .frame_update_continue_or_delay
-    LDA      transition_delay    ; &17BF
-    CMP      #&1    ; &17C1
-    BNE      transition_delay_active_countdown_17bf    ; &17C3
-    RTS    ; &17C5
+    LDA      transition_delay
+    CMP      #&1
+    BNE      transition_delay_active_countdown_17bf
+    RTS
 
 .transition_delay_active_countdown_17bf
-    LDA      transition_delay    ; &17C6
-    BEQ      advance_frame_phase_mod16_17bf    ; &17C8
-    DEC      transition_delay    ; &17CA
+    LDA      transition_delay
+    BEQ      advance_frame_phase_mod16_17bf
+    DEC      transition_delay
 
 .advance_frame_phase_mod16_17bf
-    INC      frame_phase    ; &17CC
-    LDA      frame_phase    ; &17CE
-    AND      #&f    ; &17D0
-    STA      frame_phase    ; &17D2
-    BNE      phase_mod4_palette_gate_17bf    ; &17D4
+    INC      frame_phase
+    LDA      frame_phase
+    AND      #&f
+    STA      frame_phase
+    BNE      phase_mod4_palette_gate_17bf
 
 .tick_spook_release_timer_on_phase0
-    LDA      spook_release_timer    ; &17D6
-    BEQ      phase_mod4_palette_gate_17bf    ; &17D9
-    JSR      release_spook_pair_when_timer_expires    ; &17DB
+    LDA      spook_release_timer
+    BEQ      phase_mod4_palette_gate_17bf
+    JSR      release_spook_pair_when_timer_expires
 
 .phase_mod4_palette_gate_17bf
-    LDA      frame_phase    ; &17DE
-    AND      #&3    ; &17E0
-    BNE      phase_mod4_hit_animation_gate_17bf    ; &17E2
+    LDA      frame_phase
+    AND      #&3
+    BNE      phase_mod4_hit_animation_gate_17bf
 
 .cycle_active_palette_triplet
-    LDY      palette_cycle_row_index    ; &17E4
-    LDA      palette_cycle_logical13_values_17e4,Y    ; &17E7
-    LDX      #&d    ; &17EA
-    JSR      vdu19_set_palette_or_colour    ; &17EC
-    LDA      palette_cycle_logical14_values_17e4,Y    ; &17EF
-    INX    ; &17F2
-    JSR      vdu19_set_palette_or_colour    ; &17F3
-    LDA      palette_cycle_logical15_values_17e4,Y    ; &17F6
-    INX    ; &17F9
-    JSR      vdu19_set_palette_or_colour    ; &17FA
-    INC      palette_cycle_row_index    ; &17FD
-    LDA      palette_cycle_row_index    ; &1800
-    CMP      #&3    ; &1803
-    BNE      phase_mod4_hit_animation_gate_17bf    ; &1805
-    LDA      #&0    ; &1807
-    STA      palette_cycle_row_index    ; &1809
+    LDY      palette_cycle_row_index
+    LDA      palette_cycle_logical13_values_17e4,Y
+    LDX      #&d
+    JSR      vdu19_set_palette_or_colour
+    LDA      palette_cycle_logical14_values_17e4,Y
+    INX
+    JSR      vdu19_set_palette_or_colour
+    LDA      palette_cycle_logical15_values_17e4,Y
+    INX
+    JSR      vdu19_set_palette_or_colour
+    INC      palette_cycle_row_index
+    LDA      palette_cycle_row_index
+    CMP      #&3
+    BNE      phase_mod4_hit_animation_gate_17bf
+    LDA      #&0
+    STA      palette_cycle_row_index
 
 .phase_mod4_hit_animation_gate_17bf
-    LDA      frame_phase    ; &180C
-    AND      #&3    ; &180E
-    BNE      run_active_object_scheduler_17bf    ; &1810
+    LDA      frame_phase
+    AND      #&3
+    BNE      run_active_object_scheduler_17bf
 
 .erase_previous_hit_object_frame
-    LDX      #&14    ; &1812
-    LDA      #&0    ; &1814
-    STA      render_mode_or_text_scratch    ; &1816
+    LDX      #&14
+    LDA      #&0
+    STA      render_mode_or_text_scratch
 
 .erase_hit_object_loop_1812
-    STX      active_object_index    ; &1818
-    LDA      object_lifecycle_base_for_indexed_refs,X    ; &181A
-    CMP      #&2    ; &181D
-    BMI      erase_hit_object_next_slot_1812    ; &181F
-    LDA      object_lifecycle_base_for_indexed_refs,X    ; &1821
-    CMP      #&5    ; &1824
-    BNE      erase_hit_object_draw_current_1812    ; &1826
-    LDA      #&0    ; &1828
-    STA      object_lifecycle_base_for_indexed_refs,X    ; &182A
+    STX      active_object_index
+    LDA      object_lifecycle_base_for_indexed_refs,X
+    CMP      #&2
+    BMI      erase_hit_object_next_slot_1812
+    LDA      object_lifecycle_base_for_indexed_refs,X
+    CMP      #&5
+    BNE      erase_hit_object_draw_current_1812
+    LDA      #&0
+    STA      object_lifecycle_base_for_indexed_refs,X
 
 .erase_hit_object_draw_current_1812
-    JSR      draw_object_by_index    ; &182D
+    JSR      draw_object_by_index
 
 .erase_hit_object_next_slot_1812
-    LDX      active_object_index    ; &1830
-    INX    ; &1832
-    CPX      #&20    ; &1833
-    BNE      erase_hit_object_loop_1812    ; &1835
+    LDX      active_object_index
+    INX
+    CPX      #&20
+    BNE      erase_hit_object_loop_1812
 
 .run_active_object_scheduler_17bf
-    JSR      update_active_spinner_clone_cyberdroid_objects    ; &1837
-    LDA      frame_phase    ; &183A
-    AND      #&3    ; &183C
-    CMP      #&3    ; &183E
-    BNE      frame_update    ; &1840
-    LDA      transition_delay    ; &1842
-    BNE      frame_update    ; &1844
-    JSR      redraw_player_with_saved_graphic_pair    ; &1846
+    JSR      update_active_spinner_clone_cyberdroid_objects
+    LDA      frame_phase
+    AND      #&3
+    CMP      #&3
+    BNE      frame_update
+    LDA      transition_delay
+    BNE      frame_update
+    JSR      redraw_player_with_saved_graphic_pair
 
 .frame_update
-    LDA      frame_phase    ; &1849
-    AND      #&3    ; &184B
-    CMP      #&3    ; &184D
-    BNE      after_visible_player_draw_gate_1849    ; &184F
-    LDA      transition_delay    ; &1851
-    BNE      after_visible_player_draw_gate_1849    ; &1853
-    LDA      #&1    ; &1855
-    STA      render_mode_or_text_scratch    ; &1857
-    LDX      #&10    ; &1859
-    JSR      draw_object_by_index    ; &185B
-    LDX      #&11    ; &185E
-    JSR      draw_object_by_index    ; &1860
+    LDA      frame_phase
+    AND      #&3
+    CMP      #&3
+    BNE      after_visible_player_draw_gate_1849
+    LDA      transition_delay
+    BNE      after_visible_player_draw_gate_1849
+    LDA      #&1
+    STA      render_mode_or_text_scratch
+    LDX      #&10
+    JSR      draw_object_by_index
+    LDX      #&11
+    JSR      draw_object_by_index
 
 .save_visible_player_graphic_pair_for_collision_redraw
-    LDA      player_graphic_id_first_cell    ; &1863
-    STA      saved_visible_player_graphic_id_first    ; &1866
-    LDA      player_graphic_id_second_cell    ; &1868
-    STA      saved_visible_player_graphic_id_second    ; &186B
+    LDA      player_graphic_id_first_cell
+    STA      saved_visible_player_graphic_id_first
+    LDA      player_graphic_id_second_cell
+    STA      saved_visible_player_graphic_id_second
 
 .after_visible_player_draw_gate_1849
-    JSR      move_spook_pair_towards_player    ; &186D
-    LDA      frame_phase    ; &1870
-    AND      #&3    ; &1872
-    BNE      redraw_shot_hazard_slots_and_test_collisions    ; &1874
+    JSR      move_spook_pair_towards_player
+    LDA      frame_phase
+    AND      #&3
+    BNE      redraw_shot_hazard_slots_and_test_collisions
 
 .advance_hit_object_animation_frame
-    LDX      #&14    ; &1876
-    LDA      #&0    ; &1878
-    STA      render_mode_or_text_scratch    ; &187A
+    LDX      #&14
+    LDA      #&0
+    STA      render_mode_or_text_scratch
 
 .advance_hit_object_animation_loop_1876
-    STX      active_object_index    ; &187C
-    LDA      object_lifecycle_base_for_indexed_refs,X    ; &187E
-    CMP      #&2    ; &1881
-    BMI      advance_hit_object_animation_next_slot_1876    ; &1883
-    CMP      #&5    ; &1885
-    BPL      advance_hit_object_animation_next_slot_1876    ; &1887
-    CLC    ; &1889
-    ADC      #&38    ; &188A
-    STA      object_graphic_id_by_index,X    ; &188C
-    INC      object_lifecycle_base_for_indexed_refs,X    ; &188F
-    JSR      draw_object_by_index    ; &1892
+    STX      active_object_index
+    LDA      object_lifecycle_base_for_indexed_refs,X
+    CMP      #&2
+    BMI      advance_hit_object_animation_next_slot_1876
+    CMP      #&5
+    BPL      advance_hit_object_animation_next_slot_1876
+    CLC
+    ADC      #&38
+    STA      object_graphic_id_by_index,X
+    INC      object_lifecycle_base_for_indexed_refs,X
+    JSR      draw_object_by_index
 
 .advance_hit_object_animation_next_slot_1876
-    LDX      active_object_index    ; &1895
-    INX    ; &1897
-    CPX      #&20    ; &1898
-    BNE      advance_hit_object_animation_loop_1876    ; &189A
+    LDX      active_object_index
+    INX
+    CPX      #&20
+    BNE      advance_hit_object_animation_loop_1876
 
 .redraw_shot_hazard_slots_and_test_collisions
-    LDX      #&7    ; &189C
+    LDX      #&7
 
 .preinput_shot_hazard_scan_loop_189c
-    STX      active_object_index    ; &189E
-    JSR      erase_visible_shot_or_hazard_previous_bytes    ; &18A0
-    JSR      draw_active_shot_or_hazard_and_test    ; &18A3
-    LDX      active_object_index    ; &18A6
-    DEX    ; &18A8
-    BPL      preinput_shot_hazard_scan_loop_189c    ; &18A9
+    STX      active_object_index
+    JSR      erase_visible_shot_or_hazard_previous_bytes
+    JSR      draw_active_shot_or_hazard_and_test
+    LDX      active_object_index
+    DEX
+    BPL      preinput_shot_hazard_scan_loop_189c
 
 .consume_projectile_spook_pause_collision_flag
-    LDA      projectile_spook_pause_collision_flag    ; &18AB
-    BEQ      transition_delay_skip_input_gate_18c4    ; &18AD
-    LDA      #&32    ; &18AF
-    STA      spook_pause_counter    ; &18B1
-    LDX      #&c    ; &18B4
-    LDA      #&4    ; &18B6
-    JSR      vdu19_set_palette_or_colour    ; &18B8
-    LDA      #&0    ; &18BB
-    STA      projectile_spook_pause_collision_flag    ; &18BD
-    LDA      #&14    ; &18BF
-    JSR      play_sound_id_if_enabled    ; &18C1
+    LDA      projectile_spook_pause_collision_flag
+    BEQ      transition_delay_skip_input_gate_18c4
+    LDA      #&32
+    STA      spook_pause_counter
+    LDX      #&c
+    LDA      #&4
+    JSR      vdu19_set_palette_or_colour
+    LDA      #&0
+    STA      projectile_spook_pause_collision_flag
+    LDA      #&14
+    JSR      play_sound_id_if_enabled
 
 .transition_delay_skip_input_gate_18c4
-    LDA      transition_delay    ; &18C4
-    BEQ      input_bounds_and_player_collision_path_18cb    ; &18C6
-    JMP      move_shot_hazard_slots_and_spawn_new    ; &18C8
+    LDA      transition_delay
+    BEQ      input_bounds_and_player_collision_path_18cb
+    JMP      move_shot_hazard_slots_and_spawn_new
 
 .input_bounds_and_player_collision_path_18cb
-    JSR      read_game_input_and_pause    ; &18CB
-    JSR      test_player_bounds_and_restart_area    ; &18CE
-    LDA      bounds_or_outside_flag    ; &18D1
-    BNE      bounds_flag_restart_frame_18cb    ; &18D3
-    STA      renderer_collision_accumulator    ; &18D5
-    LDA      frame_phase    ; &18D7
-    AND      #&3    ; &18D9
-    CMP      #&3    ; &18DB
-    BNE      move_shot_hazard_slots_and_spawn_new    ; &18DD
+    JSR      read_game_input_and_pause
+    JSR      test_player_bounds_and_restart_area
+    LDA      bounds_or_outside_flag
+    BNE      bounds_flag_restart_frame_18cb
+    STA      renderer_collision_accumulator
+    LDA      frame_phase
+    AND      #&3
+    CMP      #&3
+    BNE      move_shot_hazard_slots_and_spawn_new
 
 .player_collision_movement_window
-    LDA      #&4    ; &18DF
-    STA      render_mode_or_text_scratch    ; &18E1
-    LDX      #&10    ; &18E3
-    JSR      draw_object_by_index    ; &18E5
-    LDX      #&11    ; &18E8
-    JSR      draw_object_by_index    ; &18EA
-    LDA      renderer_collision_accumulator    ; &18ED
-    BNE      clear_player_before_life_loss_path_18df    ; &18EF
-    JSR      test_player_spook_pair_overlap    ; &18F1
-    LDA      renderer_collision_accumulator    ; &18F4
-    BNE      clear_player_before_life_loss_path_18df    ; &18F6
-    JSR      apply_player_input_to_player_pair    ; &18F8
-    LDA      #&0    ; &18FB
-    STA      player_collision_class_flag    ; &18FD
-    STA      target_collect_collision_flag    ; &1900
-    LDX      #&10    ; &1902
-    LDA      #&3    ; &1904
-    STA      render_mode_or_text_scratch    ; &1906
-    JSR      draw_object_by_index    ; &1908
-    LDX      #&11    ; &190B
-    JSR      draw_object_by_index    ; &190D
-    LDA      target_collect_collision_flag    ; &1910
-    BEQ      player_collision_class_check_18df    ; &1912
-    JSR      handle_collected_target_or_level_done    ; &1914
-    JSR      draw_lives_or_target_status    ; &1917
+    LDA      #&4
+    STA      render_mode_or_text_scratch
+    LDX      #&10
+    JSR      draw_object_by_index
+    LDX      #&11
+    JSR      draw_object_by_index
+    LDA      renderer_collision_accumulator
+    BNE      clear_player_before_life_loss_path_18df
+    JSR      test_player_spook_pair_overlap
+    LDA      renderer_collision_accumulator
+    BNE      clear_player_before_life_loss_path_18df
+    JSR      apply_player_input_to_player_pair
+    LDA      #&0
+    STA      player_collision_class_flag
+    STA      target_collect_collision_flag
+    LDX      #&10
+    LDA      #&3
+    STA      render_mode_or_text_scratch
+    JSR      draw_object_by_index
+    LDX      #&11
+    JSR      draw_object_by_index
+    LDA      target_collect_collision_flag
+    BEQ      player_collision_class_check_18df
+    JSR      handle_collected_target_or_level_done
+    JSR      draw_lives_or_target_status
 
 .player_collision_class_check_18df
-    LDA      player_collision_class_flag    ; &191A
-    BEQ      renderer_collision_high_bits_check_18df    ; &191D
-    JMP      player_collision_flash_sequence    ; &191F
+    LDA      player_collision_class_flag
+    BEQ      renderer_collision_high_bits_check_18df
+    JMP      player_collision_flash_sequence
 
 .bounds_flag_restart_frame_18cb
-    JMP      frame_update    ; &1922
+    JMP      frame_update
 
 .renderer_collision_high_bits_check_18df
-    LDA      renderer_collision_accumulator    ; &1925
-    AND      #&c0    ; &1927
-    BEQ      move_shot_hazard_slots_and_spawn_new    ; &1929
-    JSR      redraw_player_with_saved_graphic_pair    ; &192B
-    JSR      lose_life_and_reset_player    ; &192E
-    JMP      move_shot_hazard_slots_and_spawn_new    ; &1931
+    LDA      renderer_collision_accumulator
+    AND      #&c0
+    BEQ      move_shot_hazard_slots_and_spawn_new
+    JSR      redraw_player_with_saved_graphic_pair
+    JSR      lose_life_and_reset_player
+    JMP      move_shot_hazard_slots_and_spawn_new
 
 .clear_player_before_life_loss_path_18df
-    JSR      clear_player_cells_before_life_loss    ; &1934
+    JSR      clear_player_cells_before_life_loss
 
 .move_shot_hazard_slots_and_spawn_new
-    LDA      #&7    ; &1937
-    STA      active_object_index    ; &1939
+    LDA      #&7
+    STA      active_object_index
 
 .move_shot_hazard_slots_loop_1937
-    LDX      active_object_index    ; &193B
-    JSR      move_active_shot_or_hazard    ; &193D
-    DEC      active_object_index    ; &1940
-    BPL      move_shot_hazard_slots_loop_1937    ; &1942
-    LDA      transition_delay    ; &1944
-    BNE      expire_shot_hazard_slots_after_draw    ; &1946
-    JSR      spawn_player_shot_if_fire_pressed    ; &1948
-    JSR      maybe_spawn_hazard_from_moving_object    ; &194B
+    LDX      active_object_index
+    JSR      move_active_shot_or_hazard
+    DEC      active_object_index
+    BPL      move_shot_hazard_slots_loop_1937
+    LDA      transition_delay
+    BNE      expire_shot_hazard_slots_after_draw
+    JSR      spawn_player_shot_if_fire_pressed
+    JSR      maybe_spawn_hazard_from_moving_object
 
 .expire_shot_hazard_slots_after_draw
-    LDA      #&7    ; &194E
-    STA      active_object_index    ; &1950
+    LDA      #&7
+    STA      active_object_index
 
 .expire_shot_hazard_slots_loop_194e
-    LDX      active_object_index    ; &1952
-    JSR      expire_projectile_or_hazard_on_collision    ; &1954
-    DEC      active_object_index    ; &1957
-    BPL      expire_shot_hazard_slots_loop_194e    ; &1959
-    JMP      frame_update_continue_or_delay    ; &195B
+    LDX      active_object_index
+    JSR      expire_projectile_or_hazard_on_collision
+    DEC      active_object_index
+    BPL      expire_shot_hazard_slots_loop_194e
+    JMP      frame_update_continue_or_delay
 
 .byte_decoded_code_195e
-    JSR      handle_player_hit_from_active_object    ; &195E
-    JMP      move_shot_hazard_slots_and_spawn_new    ; &1961
+    JSR      handle_player_hit_from_active_object
+    JMP      move_shot_hazard_slots_and_spawn_new
 
 .handle_player_hit_from_active_object
-    LDA      frame_phase    ; &1964
-    AND      #&3    ; &1966
-    CMP      #&3    ; &1968
-    BEQ      clear_player_cells_before_life_loss    ; &196A
-    JSR      redraw_player_with_saved_graphic_pair    ; &196C
-    JMP      jump_to_life_loss_after_player_redraw_1964    ; &196F
+    LDA      frame_phase
+    AND      #&3
+    CMP      #&3
+    BEQ      clear_player_cells_before_life_loss
+    JSR      redraw_player_with_saved_graphic_pair
+    JMP      jump_to_life_loss_after_player_redraw_1964
 
 .clear_player_cells_before_life_loss
-    LDA      #&0    ; &1972
-    STA      render_mode_or_text_scratch    ; &1974
-    LDX      #&10    ; &1976
-    JSR      draw_object_by_index    ; &1978
-    LDX      #&11    ; &197B
-    JSR      draw_object_by_index    ; &197D
+    LDA      #&0
+    STA      render_mode_or_text_scratch
+    LDX      #&10
+    JSR      draw_object_by_index
+    LDX      #&11
+    JSR      draw_object_by_index
 
 .jump_to_life_loss_after_player_redraw_1964
-    JMP      lose_life_and_reset_player    ; &1980
+    JMP      lose_life_and_reset_player
 
 .cancel_player_movement_delta
-    LDA      #&0    ; &1983
-    STA      input_delta_x    ; &1985
-    STA      input_delta_y    ; &1987
-    JMP      apply_input_delta_to_player_pair    ; &1989
+    LDA      #&0
+    STA      input_delta_x
+    STA      input_delta_y
+    JMP      apply_input_delta_to_player_pair
 
 .update_active_spinner_clone_cyberdroid_objects
-    LDX      #&14    ; &198C
+    LDX      #&14
 
 .addr_198E
-    STX      active_object_index    ; &198E
-    LDA      object_lifecycle_base_for_indexed_refs,X    ; &1990
-    CMP      #&1    ; &1993
-    BNE      addr_19EB    ; &1995
-    LDA      object_graphic_id_by_index,X    ; &1997
-    CMP      #&2a    ; &199A
-    BNE      addr_19B1    ; &199C
-    TXA    ; &199E
-    AND      #&f    ; &199F
-    CMP      frame_phase    ; &19A1
-    BNE      addr_19B1    ; &19A3
-    JSR      begin_target_enemy_move_test    ; &19A5
-    JSR      move_spinner_towards_player_x_then_y    ; &19A8
-    JSR      end_target_enemy_move_test    ; &19AB
-    JMP      addr_19EB    ; &19AE
+    STX      active_object_index
+    LDA      object_lifecycle_base_for_indexed_refs,X
+    CMP      #&1
+    BNE      addr_19EB
+    LDA      object_graphic_id_by_index,X
+    CMP      #&2a
+    BNE      addr_19B1
+    TXA
+    AND      #&f
+    CMP      frame_phase
+    BNE      addr_19B1
+    JSR      begin_target_enemy_move_test
+    JSR      move_spinner_towards_player_x_then_y
+    JSR      end_target_enemy_move_test
+    JMP      addr_19EB
 
 .addr_19B1
-    LDA      object_graphic_id_by_index,X    ; &19B1
-    CMP      #&2b    ; &19B4
-    BNE      addr_19D1    ; &19B6
-    TXA    ; &19B8
-    AND      #&7    ; &19B9
-    STA      zp_indirect_74_low    ; &19BB
-    LDA      frame_phase    ; &19BD
-    AND      #&7    ; &19BF
-    CMP      zp_indirect_74_low    ; &19C1
-    BNE      addr_19D1    ; &19C3
-    JSR      begin_target_enemy_move_test    ; &19C5
-    JSR      move_clone_continue_or_random    ; &19C8
-    JSR      end_target_enemy_move_test    ; &19CB
-    JMP      addr_19EB    ; &19CE
+    LDA      object_graphic_id_by_index,X
+    CMP      #&2b
+    BNE      addr_19D1
+    TXA
+    AND      #&7
+    STA      zp_indirect_74_low
+    LDA      frame_phase
+    AND      #&7
+    CMP      zp_indirect_74_low
+    BNE      addr_19D1
+    JSR      begin_target_enemy_move_test
+    JSR      move_clone_continue_or_random
+    JSR      end_target_enemy_move_test
+    JMP      addr_19EB
 
 .addr_19D1
-    LDA      object_graphic_id_by_index,X    ; &19D1
-    CMP      #&2c    ; &19D4
-    BNE      addr_19EB    ; &19D6
-    TXA    ; &19D8
-    AND      #&f    ; &19D9
-    CMP      frame_phase    ; &19DB
-    BNE      addr_19EB    ; &19DD
-    JSR      begin_target_enemy_move_test    ; &19DF
-    JSR      move_cyberdroid_persistent    ; &19E2
-    JSR      end_target_enemy_move_test    ; &19E5
-    JMP      addr_19EB    ; &19E8
+    LDA      object_graphic_id_by_index,X
+    CMP      #&2c
+    BNE      addr_19EB
+    TXA
+    AND      #&f
+    CMP      frame_phase
+    BNE      addr_19EB
+    JSR      begin_target_enemy_move_test
+    JSR      move_cyberdroid_persistent
+    JSR      end_target_enemy_move_test
+    JMP      addr_19EB
 
 .addr_19EB
-    LDX      active_object_index    ; &19EB
-    INX    ; &19ED
-    CPX      #&20    ; &19EE
-    BNE      addr_198E    ; &19F0
-    RTS    ; &19F2
+    LDX      active_object_index
+    INX
+    CPX      #&20
+    BNE      addr_198E
+    RTS
 
 .player_collision_flash_sequence
-    LDA      #&4    ; &19F3
-    JSR      play_sound_id_if_enabled    ; &19F5
-    LDA      player_graphic_id_first_cell    ; &19F8
-    STA      movement_delta_x    ; &19FB
-    LDA      player_graphic_id_second_cell    ; &19FD
-    STA      movement_delta_y    ; &1A00
-    LDA      #&32    ; &1A02
-    STA      frame_phase    ; &1A04
+    LDA      #&4
+    JSR      play_sound_id_if_enabled
+    LDA      player_graphic_id_first_cell
+    STA      movement_delta_x
+    LDA      player_graphic_id_second_cell
+    STA      movement_delta_y
+    LDA      #&32
+    STA      frame_phase
 
 .addr_1A06
-    JSR      wait_one_frame_tick    ; &1A06
-    LDA      frame_phase    ; &1A09
-    AND      #&f    ; &1A0B
-    LDX      #&8    ; &1A0D
-    JSR      vdu19_set_palette_or_colour    ; &1A0F
-    LDA      #&30    ; &1A12
-    STA      player_graphic_id_first_cell    ; &1A14
-    LDA      #&31    ; &1A17
-    STA      player_graphic_id_second_cell    ; &1A19
-    LDA      #&1    ; &1A1C
-    STA      render_mode_or_text_scratch    ; &1A1E
-    LDX      #&10    ; &1A20
-    JSR      draw_object_using_saved_screen_ptr    ; &1A22
-    LDX      #&11    ; &1A25
-    JSR      draw_object_using_saved_screen_ptr    ; &1A27
-    JSR      wait_one_frame_tick    ; &1A2A
-    LDA      movement_delta_x    ; &1A2D
-    STA      player_graphic_id_first_cell    ; &1A2F
-    LDA      movement_delta_y    ; &1A32
-    STA      player_graphic_id_second_cell    ; &1A34
-    LDX      #&10    ; &1A37
-    JSR      draw_object_using_saved_screen_ptr    ; &1A39
-    LDX      #&11    ; &1A3C
-    JSR      draw_object_using_saved_screen_ptr    ; &1A3E
-    DEC      frame_phase    ; &1A41
-    BPL      addr_1A06    ; &1A43
-    LDA      #&2    ; &1A45
-    STA      render_mode_or_text_scratch    ; &1A47
-    LDX      #&10    ; &1A49
-    JSR      draw_object_using_saved_screen_ptr    ; &1A4B
-    LDX      #&11    ; &1A4E
-    JSR      draw_object_using_saved_screen_ptr    ; &1A50
-    JSR      lose_life_and_reset_player    ; &1A53
-    JMP      move_shot_hazard_slots_and_spawn_new    ; &1A56
+    JSR      wait_one_frame_tick
+    LDA      frame_phase
+    AND      #&f
+    LDX      #&8
+    JSR      vdu19_set_palette_or_colour
+    LDA      #&30
+    STA      player_graphic_id_first_cell
+    LDA      #&31
+    STA      player_graphic_id_second_cell
+    LDA      #&1
+    STA      render_mode_or_text_scratch
+    LDX      #&10
+    JSR      draw_object_using_saved_screen_ptr
+    LDX      #&11
+    JSR      draw_object_using_saved_screen_ptr
+    JSR      wait_one_frame_tick
+    LDA      movement_delta_x
+    STA      player_graphic_id_first_cell
+    LDA      movement_delta_y
+    STA      player_graphic_id_second_cell
+    LDX      #&10
+    JSR      draw_object_using_saved_screen_ptr
+    LDX      #&11
+    JSR      draw_object_using_saved_screen_ptr
+    DEC      frame_phase
+    BPL      addr_1A06
+    LDA      #&2
+    STA      render_mode_or_text_scratch
+    LDX      #&10
+    JSR      draw_object_using_saved_screen_ptr
+    LDX      #&11
+    JSR      draw_object_using_saved_screen_ptr
+    JSR      lose_life_and_reset_player
+    JMP      move_shot_hazard_slots_and_spawn_new
 
 .lose_life_and_reset_player
-    DEC      lives_status_count    ; &1A59
-    JSR      draw_lives_or_target_status    ; &1A5C
-    LDA      #&3    ; &1A5F
-    JSR      play_sound_id_if_enabled    ; &1A61
-    LDA      #&0    ; &1A64
-    STA      render_mode_or_text_scratch    ; &1A66
-    LDA      saved_player_second_screen_low    ; &1A68
-    SEC    ; &1A6B
-    SBC      #&8    ; &1A6C
-    STA      player_screen_low_first_cell    ; &1A6E
-    LDA      saved_player_second_screen_high    ; &1A71
-    SBC      #&0    ; &1A74
-    STA      player_screen_high_first_cell    ; &1A76
-    LDA      &0BD1    ; &1A79
-    STA      player_y_first_cell    ; &1A7C
-    STA      player_y_second_cell    ; &1A7F
-    LDA      saved_player_second_screen_low    ; &1A82
-    CLC    ; &1A85
-    ADC      #&10    ; &1A86
-    STA      player_screen_low_second_cell    ; &1A88
-    LDA      saved_player_second_screen_high    ; &1A8B
-    ADC      #&0    ; &1A8E
-    STA      player_screen_high_second_cell    ; &1A90
-    LDA      #&33    ; &1A93
-    STA      player_graphic_id_first_cell    ; &1A95
-    LDA      #&34    ; &1A98
-    STA      player_graphic_id_second_cell    ; &1A9A
-    LDX      #&10    ; &1A9D
-    JSR      draw_object_by_index    ; &1A9F
-    LDX      #&11    ; &1AA2
-    JSR      draw_object_by_index    ; &1AA4
-    LDA      #&96    ; &1AA7
-    STA      transition_delay    ; &1AA9
-    RTS    ; &1AAB
+    DEC      lives_status_count
+    JSR      draw_lives_or_target_status
+    LDA      #&3
+    JSR      play_sound_id_if_enabled
+    LDA      #&0
+    STA      render_mode_or_text_scratch
+    LDA      saved_player_second_screen_low
+    SEC
+    SBC      #&8
+    STA      player_screen_low_first_cell
+    LDA      saved_player_second_screen_high
+    SBC      #&0
+    STA      player_screen_high_first_cell
+    LDA      &0BD1
+    STA      player_y_first_cell
+    STA      player_y_second_cell
+    LDA      saved_player_second_screen_low
+    CLC
+    ADC      #&10
+    STA      player_screen_low_second_cell
+    LDA      saved_player_second_screen_high
+    ADC      #&0
+    STA      player_screen_high_second_cell
+    LDA      #&33
+    STA      player_graphic_id_first_cell
+    LDA      #&34
+    STA      player_graphic_id_second_cell
+    LDX      #&10
+    JSR      draw_object_by_index
+    LDX      #&11
+    JSR      draw_object_by_index
+    LDA      #&96
+    STA      transition_delay
+    RTS
 
 .test_player_bounds_and_restart_area
-    LDA      #&0    ; &1AAC
-    STA      bounds_or_outside_flag    ; &1AAE
-    LDA      player_x_first_cell    ; &1AB0
-    CMP      #&2    ; &1AB3
-    BPL      addr_1ABC    ; &1AB5
-    LDX      #&1    ; &1AB7
-    JMP      addr_1ADB    ; &1AB9
+    LDA      #&0
+    STA      bounds_or_outside_flag
+    LDA      player_x_first_cell
+    CMP      #&2
+    BPL      addr_1ABC
+    LDX      #&1
+    JMP      addr_1ADB
 
 .addr_1ABC
-    CMP      #&4c    ; &1ABC
-    BMI      addr_1AC5    ; &1ABE
-    LDX      #&0    ; &1AC0
-    JMP      addr_1ADB    ; &1AC2
+    CMP      #&4c
+    BMI      addr_1AC5
+    LDX      #&0
+    JMP      addr_1ADB
 
 .addr_1AC5
-    LDA      player_y_first_cell    ; &1AC5
-    CMP      #&7    ; &1AC8
-    BPL      addr_1AD1    ; &1ACA
-    LDX      #&2    ; &1ACC
-    JMP      addr_1ADB    ; &1ACE
+    LDA      player_y_first_cell
+    CMP      #&7
+    BPL      addr_1AD1
+    LDX      #&2
+    JMP      addr_1ADB
 
 .addr_1AD1
-    CMP      #&36    ; &1AD1
-    BMI      addr_1ADA    ; &1AD3
-    LDX      #&3    ; &1AD5
-    JMP      addr_1ADB    ; &1AD7
+    CMP      #&36
+    BMI      addr_1ADA
+    LDX      #&3
+    JMP      addr_1ADB
 
 .addr_1ADA
-    RTS    ; &1ADA
+    RTS
 
 .addr_1ADB
-    JSR      add_direction_score_or_state_delta    ; &1ADB
-    JSR      clear_all_palette_entries    ; &1ADE
-    LDA      #&c    ; &1AE1
-    JSR      MOS_OSWRCH    ; &1AE3
-    JMP      start_or_reset_player_and_level_objects    ; &1AE6
+    JSR      add_direction_score_or_state_delta
+    JSR      clear_all_palette_entries
+    LDA      #&c
+    JSR      MOS_OSWRCH
+    JMP      start_or_reset_player_and_level_objects
 
 .erase_visible_shot_or_hazard_previous_bytes
-    LDA      shot_visible_flag_by_slot,X    ; &1AE9
-    BEQ      addr_1ADA    ; &1AEC
-    LDA      shot_screen_low_previous,X    ; &1AEE
-    STA      zp_screen_ptr_70_low    ; &1AF1
-    LDA      shot_screen_high_previous,X    ; &1AF3
-    STA      zp_screen_ptr_70_high    ; &1AF6
-    LDY      #&1    ; &1AF8
+    LDA      shot_visible_flag_by_slot,X
+    BEQ      addr_1ADA
+    LDA      shot_screen_low_previous,X
+    STA      zp_screen_ptr_70_low
+    LDA      shot_screen_high_previous,X
+    STA      zp_screen_ptr_70_high
+    LDY      #&1
 
 .addr_1AFA
-    LDA      (zp_screen_ptr_70_low),Y    ; &1AFA
-    EOR      #&2a    ; &1AFC
-    STA      (zp_screen_ptr_70_low),Y    ; &1AFE
-    DEY    ; &1B00
-    BPL      addr_1AFA    ; &1B01
-    LDA      shot_direction_or_inactive_by_slot,X    ; &1B03
-    BPL      addr_1B0D    ; &1B06
-    LDA      #&0    ; &1B08
-    STA      shot_visible_flag_by_slot,X    ; &1B0A
+    LDA      (zp_screen_ptr_70_low),Y
+    EOR      #&2a
+    STA      (zp_screen_ptr_70_low),Y
+    DEY
+    BPL      addr_1AFA
+    LDA      shot_direction_or_inactive_by_slot,X
+    BPL      addr_1B0D
+    LDA      #&0
+    STA      shot_visible_flag_by_slot,X
 
 .addr_1B0D
-    RTS    ; &1B0D
+    RTS
 
 .draw_active_shot_or_hazard_and_test
-    LDA      #&0    ; &1B0E
-    STA      renderer_collision_accumulator    ; &1B10
-    LDA      shot_direction_or_inactive_by_slot,X    ; &1B12
-    BMI      addr_1ADA    ; &1B15
-    LDA      #&1    ; &1B17
-    STA      shot_visible_flag_by_slot,X    ; &1B19
-    LDA      shot_screen_low_current,X    ; &1B1C
-    STA      zp_screen_ptr_70_low    ; &1B1F
-    LDA      shot_screen_high_current,X    ; &1B21
-    STA      zp_screen_ptr_70_high    ; &1B24
-    LDY      #&1    ; &1B26
+    LDA      #&0
+    STA      renderer_collision_accumulator
+    LDA      shot_direction_or_inactive_by_slot,X
+    BMI      addr_1ADA
+    LDA      #&1
+    STA      shot_visible_flag_by_slot,X
+    LDA      shot_screen_low_current,X
+    STA      zp_screen_ptr_70_low
+    LDA      shot_screen_high_current,X
+    STA      zp_screen_ptr_70_high
+    LDY      #&1
 
 .addr_1B28
-    LDA      (zp_screen_ptr_70_low),Y    ; &1B28
-    AND      #&aa    ; &1B2A
-    ORA      renderer_collision_accumulator    ; &1B2C
-    STA      renderer_collision_accumulator    ; &1B2E
-    LDA      (zp_screen_ptr_70_low),Y    ; &1B30
-    EOR      #&2a    ; &1B32
-    STA      (zp_screen_ptr_70_low),Y    ; &1B34
-    DEY    ; &1B36
-    BPL      addr_1B28    ; &1B37
-    LDA      renderer_collision_accumulator    ; &1B39
-    BNE      addr_1B3E    ; &1B3B
-    RTS    ; &1B3D
+    LDA      (zp_screen_ptr_70_low),Y
+    AND      #&aa
+    ORA      renderer_collision_accumulator
+    STA      renderer_collision_accumulator
+    LDA      (zp_screen_ptr_70_low),Y
+    EOR      #&2a
+    STA      (zp_screen_ptr_70_low),Y
+    DEY
+    BPL      addr_1B28
+    LDA      renderer_collision_accumulator
+    BNE      addr_1B3E
+    RTS
 
 .addr_1B3E
-    JMP      handle_shot_or_hazard_overlap_collisions    ; &1B3E
+    JMP      handle_shot_or_hazard_overlap_collisions
 
 .expire_projectile_or_hazard_on_collision
-    LDA      shot_direction_or_inactive_by_slot,X    ; &1B41
-    BMI      addr_1ADA    ; &1B44
-    LDA      #&0    ; &1B46
-    STA      projectile_spook_pause_collision_flag    ; &1B48
-    LDA      shot_screen_low_current,X    ; &1B4A
-    STA      zp_screen_ptr_70_low    ; &1B4D
-    LDA      shot_screen_high_current,X    ; &1B4F
-    STA      zp_screen_ptr_70_high    ; &1B52
-    LDY      #&1    ; &1B54
+    LDA      shot_direction_or_inactive_by_slot,X
+    BMI      addr_1ADA
+    LDA      #&0
+    STA      projectile_spook_pause_collision_flag
+    LDA      shot_screen_low_current,X
+    STA      zp_screen_ptr_70_low
+    LDA      shot_screen_high_current,X
+    STA      zp_screen_ptr_70_high
+    LDY      #&1
 
 .addr_1B56
-    LDA      (zp_screen_ptr_70_low),Y    ; &1B56
-    AND      #&aa    ; &1B58
-    CMP      #&a0    ; &1B5A
-    BEQ      mark_projectile_spook_pause_collision    ; &1B5C
-    CMP      #&80    ; &1B5E
-    BEQ      deactivate_shot_or_hazard_slot    ; &1B60
-    CMP      #&82    ; &1B62
-    BEQ      deactivate_shot_or_hazard_slot    ; &1B64
-    CMP      #&8a    ; &1B66
-    BEQ      deactivate_shot_or_hazard_slot    ; &1B68
-    DEY    ; &1B6A
-    BPL      addr_1B56    ; &1B6B
-    JSR      test_projectile_inside_playfield    ; &1B6D
-    LDA      bounds_or_outside_flag    ; &1B70
-    BNE      deactivate_shot_or_hazard_slot    ; &1B72
-    RTS    ; &1B74
+    LDA      (zp_screen_ptr_70_low),Y
+    AND      #&aa
+    CMP      #&a0
+    BEQ      mark_projectile_spook_pause_collision
+    CMP      #&80
+    BEQ      deactivate_shot_or_hazard_slot
+    CMP      #&82
+    BEQ      deactivate_shot_or_hazard_slot
+    CMP      #&8a
+    BEQ      deactivate_shot_or_hazard_slot
+    DEY
+    BPL      addr_1B56
+    JSR      test_projectile_inside_playfield
+    LDA      bounds_or_outside_flag
+    BNE      deactivate_shot_or_hazard_slot
+    RTS
 
 .mark_projectile_spook_pause_collision
-    INC      projectile_spook_pause_collision_flag    ; &1B75
+    INC      projectile_spook_pause_collision_flag
 
 .deactivate_shot_or_hazard_slot
-    LDA      #&ff    ; &1B77
-    STA      shot_direction_or_inactive_by_slot,X    ; &1B79
-    CPX      #&4    ; &1B7C
-    BPL      addr_1B83    ; &1B7E
-    DEC      active_player_shot_count    ; &1B80
-    RTS    ; &1B82
+    LDA      #&ff
+    STA      shot_direction_or_inactive_by_slot,X
+    CPX      #&4
+    BPL      addr_1B83
+    DEC      active_player_shot_count
+    RTS
 
 .addr_1B83
-    DEC      active_spawned_hazard_count    ; &1B83
-    RTS    ; &1B86
+    DEC      active_spawned_hazard_count
+    RTS
 
 .move_active_shot_or_hazard
-    LDY      shot_direction_or_inactive_by_slot,X    ; &1B87
-    BMI      addr_1BE2    ; &1B8A
-    LDA      shot_screen_low_current,X    ; &1B8C
-    STA      shot_screen_low_previous,X    ; &1B8F
-    STA      zp_screen_ptr_70_low    ; &1B92
-    LDA      shot_screen_high_current,X    ; &1B94
-    STA      shot_screen_high_previous,X    ; &1B97
-    STA      zp_screen_ptr_70_high    ; &1B9A
-    LDA      shot_x_by_slot,X    ; &1B9C
-    CLC    ; &1B9F
-    ADC      projectile_grid_x_delta_by_dir_1b87,Y    ; &1BA0
-    STA      shot_x_by_slot,X    ; &1BA3
-    LDA      shot_y_by_slot,X    ; &1BA6
-    CLC    ; &1BA9
-    ADC      projectile_grid_y_delta_by_dir_1b87,Y    ; &1BAA
-    STA      shot_y_by_slot,X    ; &1BAD
-    CLC    ; &1BB0
-    LDA      shot_screen_low_current,X    ; &1BB1
-    ADC      projectile_ptr_low_delta_by_dir_1b87,Y    ; &1BB4
-    STA      shot_screen_low_current,X    ; &1BB7
-    LDA      shot_screen_high_current,X    ; &1BBA
-    ADC      projectile_ptr_high_delta_by_dir_1b87,Y    ; &1BBD
-    STA      shot_screen_high_current,X    ; &1BC0
-    LDA      projectile_grid_y_delta_by_dir_1b87,Y    ; &1BC3
-    BEQ      addr_1BE2    ; &1BC6
-    BPL      addr_1BE3    ; &1BC8
-    LDA      shot_y_by_slot,X    ; &1BCA
-    AND      #&1    ; &1BCD
-    BEQ      addr_1BE2    ; &1BCF
-    LDA      shot_screen_low_current,X    ; &1BD1
-    SEC    ; &1BD4
-    SBC      #&78    ; &1BD5
-    STA      shot_screen_low_current,X    ; &1BD7
-    LDA      shot_screen_high_current,X    ; &1BDA
-    SBC      #&2    ; &1BDD
-    STA      shot_screen_high_current,X    ; &1BDF
+    LDY      shot_direction_or_inactive_by_slot,X
+    BMI      addr_1BE2
+    LDA      shot_screen_low_current,X
+    STA      shot_screen_low_previous,X
+    STA      zp_screen_ptr_70_low
+    LDA      shot_screen_high_current,X
+    STA      shot_screen_high_previous,X
+    STA      zp_screen_ptr_70_high
+    LDA      shot_x_by_slot,X
+    CLC
+    ADC      projectile_grid_x_delta_by_dir_1b87,Y
+    STA      shot_x_by_slot,X
+    LDA      shot_y_by_slot,X
+    CLC
+    ADC      projectile_grid_y_delta_by_dir_1b87,Y
+    STA      shot_y_by_slot,X
+    CLC
+    LDA      shot_screen_low_current,X
+    ADC      projectile_ptr_low_delta_by_dir_1b87,Y
+    STA      shot_screen_low_current,X
+    LDA      shot_screen_high_current,X
+    ADC      projectile_ptr_high_delta_by_dir_1b87,Y
+    STA      shot_screen_high_current,X
+    LDA      projectile_grid_y_delta_by_dir_1b87,Y
+    BEQ      addr_1BE2
+    BPL      addr_1BE3
+    LDA      shot_y_by_slot,X
+    AND      #&1
+    BEQ      addr_1BE2
+    LDA      shot_screen_low_current,X
+    SEC
+    SBC      #&78
+    STA      shot_screen_low_current,X
+    LDA      shot_screen_high_current,X
+    SBC      #&2
+    STA      shot_screen_high_current,X
 
 .addr_1BE2
-    RTS    ; &1BE2
+    RTS
 
 .addr_1BE3
-    LDA      shot_y_by_slot,X    ; &1BE3
-    AND      #&1    ; &1BE6
-    BNE      addr_1BE2    ; &1BE8
-    LDA      shot_screen_low_current,X    ; &1BEA
-    CLC    ; &1BED
-    ADC      #&78    ; &1BEE
-    STA      shot_screen_low_current,X    ; &1BF0
-    LDA      shot_screen_high_current,X    ; &1BF3
-    ADC      #&2    ; &1BF6
-    STA      shot_screen_high_current,X    ; &1BF8
-    RTS    ; &1BFB
+    LDA      shot_y_by_slot,X
+    AND      #&1
+    BNE      addr_1BE2
+    LDA      shot_screen_low_current,X
+    CLC
+    ADC      #&78
+    STA      shot_screen_low_current,X
+    LDA      shot_screen_high_current,X
+    ADC      #&2
+    STA      shot_screen_high_current,X
+    RTS
 
 .compute_shot_screen_ptr
-    STX      zp_indirect_74_low    ; &1BFC
-    LDA      shot_y_by_slot,X    ; &1BFE
-    AND      #&fe    ; &1C01
-    ASL      A    ; &1C03
-    ASL      A    ; &1C04
-    STA      zp_screen_ptr_70_low    ; &1C05
-    LDA      #&0    ; &1C07
-    STA      zp_screen_ptr_70_high    ; &1C09
-    LDA      shot_y_by_slot,X    ; &1C0B
-    AND      #&fe    ; &1C0E
-    JSR      add_a_to_pointer_70    ; &1C10
-    LDX      #&6    ; &1C13
-    JSR      shift_pointer_70_left_x_times    ; &1C15
-    LDX      zp_indirect_74_low    ; &1C18
-    LDA      shot_y_by_slot,X    ; &1C1A
-    AND      #&1    ; &1C1D
-    BEQ      addr_1C26    ; &1C1F
-    LDA      #&4    ; &1C21
-    JSR      add_a_to_pointer_70    ; &1C23
+    STX      zp_indirect_74_low
+    LDA      shot_y_by_slot,X
+    AND      #&fe
+    ASL      A
+    ASL      A
+    STA      zp_screen_ptr_70_low
+    LDA      #&0
+    STA      zp_screen_ptr_70_high
+    LDA      shot_y_by_slot,X
+    AND      #&fe
+    JSR      add_a_to_pointer_70
+    LDX      #&6
+    JSR      shift_pointer_70_left_x_times
+    LDX      zp_indirect_74_low
+    LDA      shot_y_by_slot,X
+    AND      #&1
+    BEQ      addr_1C26
+    LDA      #&4
+    JSR      add_a_to_pointer_70
 
 .addr_1C26
-    LDA      shot_x_by_slot,X    ; &1C26
-    STA      zp_calc_ptr_72_low    ; &1C29
-    LDA      #&0    ; &1C2B
-    STA      zp_calc_ptr_72_high    ; &1C2D
-    LDX      #&3    ; &1C2F
-    JSR      shift_pointer_72_left_x_times    ; &1C31
-    LDA      #&30    ; &1C34
-    CLC    ; &1C36
-    ADC      zp_screen_ptr_70_high    ; &1C37
-    STA      zp_screen_ptr_70_high    ; &1C39
-    LDX      zp_indirect_74_low    ; &1C3B
-    LDA      zp_screen_ptr_70_low    ; &1C3D
-    CLC    ; &1C3F
-    ADC      zp_calc_ptr_72_low    ; &1C40
-    STA      shot_screen_low_current,X    ; &1C42
-    LDA      zp_screen_ptr_70_high    ; &1C45
-    ADC      zp_calc_ptr_72_high    ; &1C47
-    STA      shot_screen_high_current,X    ; &1C49
-    RTS    ; &1C4C
+    LDA      shot_x_by_slot,X
+    STA      zp_calc_ptr_72_low
+    LDA      #&0
+    STA      zp_calc_ptr_72_high
+    LDX      #&3
+    JSR      shift_pointer_72_left_x_times
+    LDA      #&30
+    CLC
+    ADC      zp_screen_ptr_70_high
+    STA      zp_screen_ptr_70_high
+    LDX      zp_indirect_74_low
+    LDA      zp_screen_ptr_70_low
+    CLC
+    ADC      zp_calc_ptr_72_low
+    STA      shot_screen_low_current,X
+    LDA      zp_screen_ptr_70_high
+    ADC      zp_calc_ptr_72_high
+    STA      shot_screen_high_current,X
+    RTS
 
 .spawn_player_shot_if_fire_pressed
-    LDA      fire_edge_request    ; &1C4D
-    BEQ      addr_1C8C    ; &1C4F
-    LDA      #&0    ; &1C51
-    STA      fire_edge_request    ; &1C53
-    LDA      active_player_shot_count    ; &1C55
-    CMP      #&4    ; &1C57
-    BEQ      addr_1C8C    ; &1C59
-    INC      active_player_shot_count    ; &1C5B
-    LDX      #&ff    ; &1C5D
+    LDA      fire_edge_request
+    BEQ      addr_1C8C
+    LDA      #&0
+    STA      fire_edge_request
+    LDA      active_player_shot_count
+    CMP      #&4
+    BEQ      addr_1C8C
+    INC      active_player_shot_count
+    LDX      #&ff
 
 .addr_1C5F
-    INX    ; &1C5F
-    LDA      shot_direction_or_inactive_by_slot,X    ; &1C60
-    BPL      addr_1C5F    ; &1C63
-    LDA      player_direction    ; &1C65
-    STA      shot_direction_or_inactive_by_slot,X    ; &1C67
-    TAY    ; &1C6A
-    LDA      #&0    ; &1C6B
-    STA      shot_visible_flag_by_slot,X    ; &1C6D
-    LDA      player_x_first_cell    ; &1C70
-    CLC    ; &1C73
-    ADC      player_shot_x_offsets_1c4d,Y    ; &1C74
-    STA      shot_x_by_slot,X    ; &1C77
-    LDA      player_y_first_cell    ; &1C7A
-    CLC    ; &1C7D
-    ADC      player_shot_y_offsets_1c4d,Y    ; &1C7E
-    STA      shot_y_by_slot,X    ; &1C81
-    JSR      compute_shot_screen_ptr    ; &1C84
-    LDA      #&0    ; &1C87
-    JSR      play_sound_id_if_enabled    ; &1C89
+    INX
+    LDA      shot_direction_or_inactive_by_slot,X
+    BPL      addr_1C5F
+    LDA      player_direction
+    STA      shot_direction_or_inactive_by_slot,X
+    TAY
+    LDA      #&0
+    STA      shot_visible_flag_by_slot,X
+    LDA      player_x_first_cell
+    CLC
+    ADC      player_shot_x_offsets_1c4d,Y
+    STA      shot_x_by_slot,X
+    LDA      player_y_first_cell
+    CLC
+    ADC      player_shot_y_offsets_1c4d,Y
+    STA      shot_y_by_slot,X
+    JSR      compute_shot_screen_ptr
+    LDA      #&0
+    JSR      play_sound_id_if_enabled
 
 .addr_1C8C
-    RTS    ; &1C8C
+    RTS
 
 .test_projectile_inside_playfield
-    LDA      #&0    ; &1C8D
-    STA      bounds_or_outside_flag    ; &1C8F
-    LDA      shot_x_by_slot,X    ; &1C91
-    CMP      #&2    ; &1C94
-    BMI      addr_1CA8    ; &1C96
-    CMP      #&4e    ; &1C98
-    BPL      addr_1CA8    ; &1C9A
-    LDA      shot_y_by_slot,X    ; &1C9C
-    CMP      #&7    ; &1C9F
-    BMI      addr_1CA8    ; &1CA1
-    CMP      #&39    ; &1CA3
-    BPL      addr_1CA8    ; &1CA5
-    RTS    ; &1CA7
+    LDA      #&0
+    STA      bounds_or_outside_flag
+    LDA      shot_x_by_slot,X
+    CMP      #&2
+    BMI      addr_1CA8
+    CMP      #&4e
+    BPL      addr_1CA8
+    LDA      shot_y_by_slot,X
+    CMP      #&7
+    BMI      addr_1CA8
+    CMP      #&39
+    BPL      addr_1CA8
+    RTS
 
 .addr_1CA8
-    INC      bounds_or_outside_flag    ; &1CA8
-    RTS    ; &1CAA
+    INC      bounds_or_outside_flag
+    RTS
 
 .draw_static_status_panel
-    LDA      #&32    ; &1CAB
-    STA      object_screen_high_by_index    ; &1CAD
-    LDA      #&88    ; &1CB0
-    STA      object_screen_low_by_index    ; &1CB2
-    LDA      #&0    ; &1CB5
-    STA      object_y_by_index    ; &1CB7
-    LDA      #&25    ; &1CBA
-    JSR      draw_status_glyph_at_current_ptr    ; &1CBC
-    LDA      #&35    ; &1CBF
-    JSR      draw_status_glyph_at_current_ptr    ; &1CC1
-    LDA      #&20    ; &1CC4
-    JSR      draw_status_glyph_at_current_ptr    ; &1CC6
-    LDA      #&36    ; &1CC9
-    JSR      draw_status_glyph_at_current_ptr    ; &1CCB
-    LDA      #&37    ; &1CCE
-    JSR      draw_status_glyph_at_current_ptr    ; &1CD0
-    JSR      draw_score_counter_digits    ; &1CD3
-    JSR      draw_lives_or_target_status    ; &1CD6
-    LDA      #&2a    ; &1CD9
-    STA      &34BA    ; &1CDB
-    STA      &34BD    ; &1CDE
-    LDA      #&34    ; &1CE1
-    STA      object_screen_high_by_index    ; &1CE3
-    LDA      #&8    ; &1CE6
-    STA      object_screen_low_by_index    ; &1CE8
-    LDA      #&36    ; &1CEB
-    JSR      draw_status_glyph_at_current_ptr    ; &1CED
-    LDA      #&20    ; &1CF0
-    JSR      draw_status_glyph_at_current_ptr    ; &1CF2
-    LDA      #&20    ; &1CF5
-    JSR      draw_status_glyph_at_current_ptr    ; &1CF7
-    LDA      #&38    ; &1CFA
-    JSR      draw_status_glyph_at_current_ptr    ; &1CFC
-    JSR      advance_status_glyph_ptr    ; &1CFF
-    LDA      room_area    ; &1D02
-    AND      #&f    ; &1D04
-    CMP      #&9    ; &1D06
-    BMI      addr_1D1C    ; &1D08
-    LDA      #&21    ; &1D0A
-    JSR      draw_status_glyph_at_current_ptr    ; &1D0C
-    LDA      room_area    ; &1D0F
-    AND      #&f    ; &1D11
-    CLC    ; &1D13
-    ADC      #&17    ; &1D14
-    JSR      draw_status_glyph_at_current_ptr    ; &1D16
-    JMP      addr_1D29    ; &1D19
+    LDA      #&32
+    STA      object_screen_high_by_index
+    LDA      #&88
+    STA      object_screen_low_by_index
+    LDA      #&0
+    STA      object_y_by_index
+    LDA      #&25
+    JSR      draw_status_glyph_at_current_ptr
+    LDA      #&35
+    JSR      draw_status_glyph_at_current_ptr
+    LDA      #&20
+    JSR      draw_status_glyph_at_current_ptr
+    LDA      #&36
+    JSR      draw_status_glyph_at_current_ptr
+    LDA      #&37
+    JSR      draw_status_glyph_at_current_ptr
+    JSR      draw_score_counter_digits
+    JSR      draw_lives_or_target_status
+    LDA      #&2a
+    STA      &34BA
+    STA      &34BD
+    LDA      #&34
+    STA      object_screen_high_by_index
+    LDA      #&8
+    STA      object_screen_low_by_index
+    LDA      #&36
+    JSR      draw_status_glyph_at_current_ptr
+    LDA      #&20
+    JSR      draw_status_glyph_at_current_ptr
+    LDA      #&20
+    JSR      draw_status_glyph_at_current_ptr
+    LDA      #&38
+    JSR      draw_status_glyph_at_current_ptr
+    JSR      advance_status_glyph_ptr
+    LDA      room_area
+    AND      #&f
+    CMP      #&9
+    BMI      addr_1D1C
+    LDA      #&21
+    JSR      draw_status_glyph_at_current_ptr
+    LDA      room_area
+    AND      #&f
+    CLC
+    ADC      #&17
+    JSR      draw_status_glyph_at_current_ptr
+    JMP      addr_1D29
 
 .addr_1D1C
-    JSR      advance_status_glyph_ptr    ; &1D1C
-    LDA      room_area    ; &1D1F
-    AND      #&f    ; &1D21
-    CLC    ; &1D23
-    ADC      #&21    ; &1D24
-    JSR      draw_status_glyph_at_current_ptr    ; &1D26
+    JSR      advance_status_glyph_ptr
+    LDA      room_area
+    AND      #&f
+    CLC
+    ADC      #&21
+    JSR      draw_status_glyph_at_current_ptr
 
 .addr_1D29
-    JSR      advance_status_glyph_ptr    ; &1D29
-    LDA      level_tens_digit    ; &1D2C
-    ADC      #&20    ; &1D2F
-    JSR      draw_status_glyph_at_current_ptr    ; &1D31
-    LDA      level_units_digit    ; &1D34
-    ADC      #&20    ; &1D37
-    JMP      draw_status_glyph_at_current_ptr    ; &1D39
+    JSR      advance_status_glyph_ptr
+    LDA      level_tens_digit
+    ADC      #&20
+    JSR      draw_status_glyph_at_current_ptr
+    LDA      level_units_digit
+    ADC      #&20
+    JMP      draw_status_glyph_at_current_ptr
 
 .draw_status_glyph_at_current_ptr
-    STA      object_graphic_id_by_index    ; &1D3C
-    LDA      #&2    ; &1D3F
-    STA      render_mode_or_text_scratch    ; &1D41
-    LDX      #&0    ; &1D43
-    JSR      draw_object_by_index    ; &1D45
-    DEC      render_mode_or_text_scratch    ; &1D48
-    LDX      #&0    ; &1D4A
-    JSR      draw_object_by_index    ; &1D4C
+    STA      object_graphic_id_by_index
+    LDA      #&2
+    STA      render_mode_or_text_scratch
+    LDX      #&0
+    JSR      draw_object_by_index
+    DEC      render_mode_or_text_scratch
+    LDX      #&0
+    JSR      draw_object_by_index
 
 .advance_status_glyph_ptr
-    LDA      object_screen_low_by_index    ; &1D4F
-    CLC    ; &1D52
-    ADC      #&18    ; &1D53
-    STA      object_screen_low_by_index    ; &1D55
-    LDA      object_screen_high_by_index    ; &1D58
-    ADC      #&0    ; &1D5B
-    STA      object_screen_high_by_index    ; &1D5D
-    RTS    ; &1D60
+    LDA      object_screen_low_by_index
+    CLC
+    ADC      #&18
+    STA      object_screen_low_by_index
+    LDA      object_screen_high_by_index
+    ADC      #&0
+    STA      object_screen_high_by_index
+    RTS
 
 .rng_next_byte
-    LDY      #&8    ; &1D61
-    LDA      #&0    ; &1D63
-    STA      rng_output_byte    ; &1D65
+    LDY      #&8
+    LDA      #&0
+    STA      rng_output_byte
 
 .addr_1D67
-    LDA      &7A    ; &1D67
-    AND      #&48    ; &1D69
-    ADC      #&38    ; &1D6B
-    ASL      A    ; &1D6D
-    ASL      A    ; &1D6E
-    ROL      &7C    ; &1D6F
-    ROL      &7B    ; &1D71
-    ROL      &7A    ; &1D73
-    LDA      &7A    ; &1D75
-    LSR      A    ; &1D77
-    LSR      A    ; &1D78
-    AND      #&1    ; &1D79
-    ASL      rng_output_byte    ; &1D7B
-    ORA      rng_output_byte    ; &1D7D
-    STA      rng_output_byte    ; &1D7F
-    DEY    ; &1D81
-    BNE      addr_1D67    ; &1D82
-    RTS    ; &1D84
+    LDA      &7A
+    AND      #&48
+    ADC      #&38
+    ASL      A
+    ASL      A
+    ROL      &7C
+    ROL      &7B
+    ROL      &7A
+    LDA      &7A
+    LSR      A
+    LSR      A
+    AND      #&1
+    ASL      rng_output_byte
+    ORA      rng_output_byte
+    STA      rng_output_byte
+    DEY
+    BNE      addr_1D67
+    RTS
 
 .compute_item_screen_ptr
-    STX      zp_indirect_74_low    ; &1D85
-    LDA      object_y_by_index,X    ; &1D87
-    AND      #&fe    ; &1D8A
-    ASL      A    ; &1D8C
-    ASL      A    ; &1D8D
-    STA      zp_screen_ptr_70_low    ; &1D8E
-    LDA      #&0    ; &1D90
-    STA      zp_screen_ptr_70_high    ; &1D92
-    LDA      object_y_by_index,X    ; &1D94
-    AND      #&fe    ; &1D97
-    JSR      add_a_to_pointer_70    ; &1D99
-    LDX      #&6    ; &1D9C
-    JSR      shift_pointer_70_left_x_times    ; &1D9E
-    LDX      zp_indirect_74_low    ; &1DA1
-    LDA      object_x_by_index,X    ; &1DA3
-    STA      zp_calc_ptr_72_low    ; &1DA6
-    LDA      #&0    ; &1DA8
-    STA      zp_calc_ptr_72_high    ; &1DAA
-    LDX      #&3    ; &1DAC
-    JSR      shift_pointer_72_left_x_times    ; &1DAE
-    LDA      #&30    ; &1DB1
-    CLC    ; &1DB3
-    ADC      zp_screen_ptr_70_high    ; &1DB4
-    STA      zp_screen_ptr_70_high    ; &1DB6
-    LDX      zp_indirect_74_low    ; &1DB8
-    LDA      zp_screen_ptr_70_low    ; &1DBA
-    CLC    ; &1DBC
-    ADC      zp_calc_ptr_72_low    ; &1DBD
-    STA      object_screen_low_by_index,X    ; &1DBF
-    LDA      zp_screen_ptr_70_high    ; &1DC2
-    ADC      zp_calc_ptr_72_high    ; &1DC4
-    STA      object_screen_high_by_index,X    ; &1DC6
-    LDA      #&7    ; &1DC9
-    RTS    ; &1DCB
+    STX      zp_indirect_74_low
+    LDA      object_y_by_index,X
+    AND      #&fe
+    ASL      A
+    ASL      A
+    STA      zp_screen_ptr_70_low
+    LDA      #&0
+    STA      zp_screen_ptr_70_high
+    LDA      object_y_by_index,X
+    AND      #&fe
+    JSR      add_a_to_pointer_70
+    LDX      #&6
+    JSR      shift_pointer_70_left_x_times
+    LDX      zp_indirect_74_low
+    LDA      object_x_by_index,X
+    STA      zp_calc_ptr_72_low
+    LDA      #&0
+    STA      zp_calc_ptr_72_high
+    LDX      #&3
+    JSR      shift_pointer_72_left_x_times
+    LDA      #&30
+    CLC
+    ADC      zp_screen_ptr_70_high
+    STA      zp_screen_ptr_70_high
+    LDX      zp_indirect_74_low
+    LDA      zp_screen_ptr_70_low
+    CLC
+    ADC      zp_calc_ptr_72_low
+    STA      object_screen_low_by_index,X
+    LDA      zp_screen_ptr_70_high
+    ADC      zp_calc_ptr_72_high
+    STA      object_screen_high_by_index,X
+    LDA      #&7
+    RTS
 
 .set_item_graphic_and_random_place
-    LDX      logical_item_slot_index    ; &1DCC
-    STA      item_graphic_id_alias_object_14,X    ; &1DCE
+    LDX      logical_item_slot_index
+    STA      item_graphic_id_alias_object_14,X
 
 .random_place_item
-    JSR      rng_next_byte    ; &1DD1
-    LDX      logical_item_slot_index    ; &1DD4
-    AND      #&1f    ; &1DD6
-    STA      item_x_alias_object_14,X    ; &1DD8
-    JSR      rng_next_byte    ; &1DDB
-    LDX      logical_item_slot_index    ; &1DDE
-    AND      #&f    ; &1DE0
-    CLC    ; &1DE2
-    ADC      item_x_alias_object_14,X    ; &1DE3
-    ADC      #&f    ; &1DE6
-    STA      item_x_alias_object_14,X    ; &1DE8
-    JSR      rng_next_byte    ; &1DEB
-    LDX      logical_item_slot_index    ; &1DEE
-    AND      #&1f    ; &1DF0
-    CLC    ; &1DF2
-    ADC      #&f    ; &1DF3
-    STA      item_y_alias_object_14,X    ; &1DF5
-    LDA      player_x_first_cell    ; &1DF8
-    SBC      item_x_alias_object_14,X    ; &1DFB
-    BPL      addr_1E02    ; &1DFE
-    EOR      #&ff    ; &1E00
+    JSR      rng_next_byte
+    LDX      logical_item_slot_index
+    AND      #&1f
+    STA      item_x_alias_object_14,X
+    JSR      rng_next_byte
+    LDX      logical_item_slot_index
+    AND      #&f
+    CLC
+    ADC      item_x_alias_object_14,X
+    ADC      #&f
+    STA      item_x_alias_object_14,X
+    JSR      rng_next_byte
+    LDX      logical_item_slot_index
+    AND      #&1f
+    CLC
+    ADC      #&f
+    STA      item_y_alias_object_14,X
+    LDA      player_x_first_cell
+    SBC      item_x_alias_object_14,X
+    BPL      addr_1E02
+    EOR      #&ff
 
 .addr_1E02
-    CMP      #&8    ; &1E02
-    BPL      addr_1E15    ; &1E04
-    LDA      player_y_first_cell    ; &1E06
-    SEC    ; &1E09
-    SBC      item_y_alias_object_14,X    ; &1E0A
-    BPL      addr_1E11    ; &1E0D
-    EOR      #&ff    ; &1E0F
+    CMP      #&8
+    BPL      addr_1E15
+    LDA      player_y_first_cell
+    SEC
+    SBC      item_y_alias_object_14,X
+    BPL      addr_1E11
+    EOR      #&ff
 
 .addr_1E11
-    CMP      #&5    ; &1E11
-    BMI      random_place_item    ; &1E13
+    CMP      #&5
+    BMI      random_place_item
 
 .addr_1E15
-    TXA    ; &1E15
-    CLC    ; &1E16
-    ADC      #&14    ; &1E17
-    TAX    ; &1E19
-    STX      zp_scratch_77    ; &1E1A
-    JSR      compute_item_screen_ptr    ; &1E1C
-    LDA      #&0    ; &1E1F
-    STA      renderer_collision_accumulator    ; &1E21
-    LDA      #&5    ; &1E23
-    STA      render_mode_or_text_scratch    ; &1E25
-    JSR      draw_object_by_index    ; &1E27
-    LDA      renderer_collision_accumulator    ; &1E2A
-    BNE      random_place_item    ; &1E2C
-    LDA      #&0    ; &1E2E
-    STA      render_mode_or_text_scratch    ; &1E30
-    LDX      zp_scratch_77    ; &1E32
-    JSR      draw_object_by_index    ; &1E34
-    INC      logical_item_slot_index    ; &1E37
-    RTS    ; &1E39
+    TXA
+    CLC
+    ADC      #&14
+    TAX
+    STX      zp_scratch_77
+    JSR      compute_item_screen_ptr
+    LDA      #&0
+    STA      renderer_collision_accumulator
+    LDA      #&5
+    STA      render_mode_or_text_scratch
+    JSR      draw_object_by_index
+    LDA      renderer_collision_accumulator
+    BNE      random_place_item
+    LDA      #&0
+    STA      render_mode_or_text_scratch
+    LDX      zp_scratch_77
+    JSR      draw_object_by_index
+    INC      logical_item_slot_index
+    RTS
 
 .setup_spinner_clone_cyberdroid_counts
-    LDA      #&2e    ; &1E3A
-    STA      spook_graphic_id_first_cell    ; &1E3C
-    LDA      #&2f    ; &1E3F
-    STA      spook_graphic_id_second_cell    ; &1E41
-    LDX      level_index_and_hazard_gate    ; &1E44
-    LDA      spook_release_timer_by_level_index_1e3a,X    ; &1E46
-    STA      spook_release_timer    ; &1E49
-    LDA      spinner_count_by_level_index_1e3a,X    ; &1E4C
-    STA      pending_spinner_count    ; &1E4F
-    LDA      clone_count_by_level_index_1e3a,X    ; &1E52
-    STA      pending_clone_count    ; &1E55
-    LDA      cyberdroid_count_by_level_index_1e3a,X    ; &1E58
-    STA      pending_cyberdroid_count    ; &1E5B
-    LDX      #&2b    ; &1E5E
-    LDA      #&0    ; &1E60
+    LDA      #&2e
+    STA      spook_graphic_id_first_cell
+    LDA      #&2f
+    STA      spook_graphic_id_second_cell
+    LDX      level_index_and_hazard_gate
+    LDA      spook_release_timer_by_level_index_1e3a,X
+    STA      spook_release_timer
+    LDA      spinner_count_by_level_index_1e3a,X
+    STA      pending_spinner_count
+    LDA      clone_count_by_level_index_1e3a,X
+    STA      pending_clone_count
+    LDA      cyberdroid_count_by_level_index_1e3a,X
+    STA      pending_cyberdroid_count
+    LDX      #&2b
+    LDA      #&0
 
 .addr_1E62
-    STA      item_state_alias_object_14,X    ; &1E62
-    STA      item_delta_x_by_slot,X    ; &1E65
-    STA      item_delta_y_by_slot,X    ; &1E68
-    DEX    ; &1E6B
-    BPL      addr_1E62    ; &1E6C
-    LDA      pending_spinner_count    ; &1E6E
-    CLC    ; &1E71
-    ADC      pending_clone_count    ; &1E72
-    ADC      pending_cyberdroid_count    ; &1E75
-    STA      logical_item_slot_index    ; &1E78
-    STA      remaining_active_object_count    ; &1E7A
-    TAX    ; &1E7C
-    DEX    ; &1E7D
-    LDA      #&1    ; &1E7E
+    STA      item_state_alias_object_14,X
+    STA      item_delta_x_by_slot,X
+    STA      item_delta_y_by_slot,X
+    DEX
+    BPL      addr_1E62
+    LDA      pending_spinner_count
+    CLC
+    ADC      pending_clone_count
+    ADC      pending_cyberdroid_count
+    STA      logical_item_slot_index
+    STA      remaining_active_object_count
+    TAX
+    DEX
+    LDA      #&1
 
 .addr_1E80
-    STA      item_state_alias_object_14,X    ; &1E80
-    DEX    ; &1E83
-    BPL      addr_1E80    ; &1E84
-    LDA      #&0    ; &1E86
-    STA      logical_item_slot_index    ; &1E88
+    STA      item_state_alias_object_14,X
+    DEX
+    BPL      addr_1E80
+    LDA      #&0
+    STA      logical_item_slot_index
 
 .addr_1E8A
-    DEC      pending_spinner_count    ; &1E8A
-    BMI      addr_1E97    ; &1E8D
-    LDA      #&2a    ; &1E8F
-    JSR      set_item_graphic_and_random_place    ; &1E91
-    JMP      addr_1E8A    ; &1E94
+    DEC      pending_spinner_count
+    BMI      addr_1E97
+    LDA      #&2a
+    JSR      set_item_graphic_and_random_place
+    JMP      addr_1E8A
 
 .addr_1E97
-    DEC      pending_clone_count    ; &1E97
-    BMI      addr_1EA4    ; &1E9A
-    LDA      #&2b    ; &1E9C
-    JSR      set_item_graphic_and_random_place    ; &1E9E
-    JMP      addr_1E97    ; &1EA1
+    DEC      pending_clone_count
+    BMI      addr_1EA4
+    LDA      #&2b
+    JSR      set_item_graphic_and_random_place
+    JMP      addr_1E97
 
 .addr_1EA4
-    DEC      pending_cyberdroid_count    ; &1EA4
-    BMI      addr_1EB1    ; &1EA7
-    LDA      #&2c    ; &1EA9
-    JSR      set_item_graphic_and_random_place    ; &1EAB
-    JMP      addr_1EA4    ; &1EAE
+    DEC      pending_cyberdroid_count
+    BMI      addr_1EB1
+    LDA      #&2c
+    JSR      set_item_graphic_and_random_place
+    JMP      addr_1EA4
 
 .addr_1EB1
-    RTS    ; &1EB1
+    RTS
 
 .read_object0_screen_byte_at_temp_position
-    LDX      #&0    ; &1EB2
-    JSR      compute_item_screen_ptr    ; &1EB4
-    LDA      object_screen_low_by_index    ; &1EB7
-    STA      zp_screen_ptr_70_low    ; &1EBA
-    LDA      object_screen_high_by_index    ; &1EBC
-    STA      zp_screen_ptr_70_high    ; &1EBF
-    LDY      #&0    ; &1EC1
-    LDA      (zp_screen_ptr_70_low),Y    ; &1EC3
-    STA      renderer_collision_accumulator    ; &1EC5
-    RTS    ; &1EC7
+    LDX      #&0
+    JSR      compute_item_screen_ptr
+    LDA      object_screen_low_by_index
+    STA      zp_screen_ptr_70_low
+    LDA      object_screen_high_by_index
+    STA      zp_screen_ptr_70_high
+    LDY      #&0
+    LDA      (zp_screen_ptr_70_low),Y
+    STA      renderer_collision_accumulator
+    RTS
 
 .fill_room_masked_forward_screen_gaps
-    LDX      room_area    ; &1EC8
-    LDA      initial_screen_room_feature_mask_1ec8_1f19,X    ; &1ECA
-    BNE      addr_1ED0    ; &1ECD
-    RTS    ; &1ECF
+    LDX      room_area
+    LDA      initial_screen_room_feature_mask_1ec8_1f19,X
+    BNE      addr_1ED0
+    RTS
 
 .addr_1ED0
-    LDA      room_tile_column_or_fill_index    ; &1ED0
-    CLC    ; &1ED2
-    ADC      room_tile_column_or_fill_index    ; &1ED3
-    ADC      room_tile_column_or_fill_index    ; &1ED5
-    ADC      #&1    ; &1ED7
-    STA      object_x_by_index    ; &1ED9
-    LDA      #&2d    ; &1EDC
-    STA      object_graphic_id_by_index    ; &1EDE
-    LDA      #&6    ; &1EE1
-    STA      object_y_by_index    ; &1EE3
-    LDA      #&0    ; &1EE6
-    STA      &0C93    ; &1EE8
-    STA      &0C94    ; &1EEB
+    LDA      room_tile_column_or_fill_index
+    CLC
+    ADC      room_tile_column_or_fill_index
+    ADC      room_tile_column_or_fill_index
+    ADC      #&1
+    STA      object_x_by_index
+    LDA      #&2d
+    STA      object_graphic_id_by_index
+    LDA      #&6
+    STA      object_y_by_index
+    LDA      #&0
+    STA      &0C93
+    STA      &0C94
 
 .addr_1EEE
-    JSR      read_object0_screen_byte_at_temp_position    ; &1EEE
-    BEQ      addr_1EFE    ; &1EF1
-    LDA      &0C93    ; &1EF3
-    EOR      #&1    ; &1EF6
-    STA      &0C93    ; &1EF8
-    JMP      addr_1F06    ; &1EFB
+    JSR      read_object0_screen_byte_at_temp_position
+    BEQ      addr_1EFE
+    LDA      &0C93
+    EOR      #&1
+    STA      &0C93
+    JMP      addr_1F06
 
 .addr_1EFE
-    LDA      &0C93    ; &1EFE
-    BEQ      addr_1F06    ; &1F01
-    JSR      copy_level_modulo_24byte_fill_pattern    ; &1F03
+    LDA      &0C93
+    BEQ      addr_1F06
+    JSR      copy_level_modulo_24byte_fill_pattern
 
 .addr_1F06
-    LDA      renderer_collision_accumulator    ; &1F06
-    STA      &0C94    ; &1F08
-    INC      object_y_by_index    ; &1F0B
-    INC      object_y_by_index    ; &1F0E
-    LDA      object_y_by_index    ; &1F11
-    CMP      #&3a    ; &1F14
-    BMI      addr_1EEE    ; &1F16
+    LDA      renderer_collision_accumulator
+    STA      &0C94
+    INC      object_y_by_index
+    INC      object_y_by_index
+    LDA      object_y_by_index
+    CMP      #&3a
+    BMI      addr_1EEE
 
 .addr_1F18
-    RTS    ; &1F18
+    RTS
 
 .fill_room_masked_offset_screen_gaps
-    LDX      room_area    ; &1F19
-    LDA      initial_screen_room_feature_mask_1ec8_1f19,X    ; &1F1B
-    BEQ      addr_1F18    ; &1F1E
-    LDA      room_tile_column_or_fill_index    ; &1F20
-    BEQ      addr_1F18    ; &1F22
-    LDA      room_tile_column_or_fill_index    ; &1F24
-    CLC    ; &1F26
-    ADC      room_tile_column_or_fill_index    ; &1F27
-    ADC      room_tile_column_or_fill_index    ; &1F29
-    SEC    ; &1F2B
-    SBC      #&2    ; &1F2C
-    STA      object_x_by_index    ; &1F2E
-    LDA      #&2d    ; &1F31
-    STA      object_graphic_id_by_index    ; &1F33
-    LDA      #&6    ; &1F36
-    STA      object_y_by_index    ; &1F38
+    LDX      room_area
+    LDA      initial_screen_room_feature_mask_1ec8_1f19,X
+    BEQ      addr_1F18
+    LDA      room_tile_column_or_fill_index
+    BEQ      addr_1F18
+    LDA      room_tile_column_or_fill_index
+    CLC
+    ADC      room_tile_column_or_fill_index
+    ADC      room_tile_column_or_fill_index
+    SEC
+    SBC      #&2
+    STA      object_x_by_index
+    LDA      #&2d
+    STA      object_graphic_id_by_index
+    LDA      #&6
+    STA      object_y_by_index
 
 .addr_1F3B
-    JSR      read_object0_screen_byte_at_temp_position    ; &1F3B
-    BEQ      addr_1F58    ; &1F3E
-    LDA      #&18    ; &1F40
-    JSR      add_a_to_pointer_70    ; &1F42
-    LDA      zp_screen_ptr_70_low    ; &1F45
-    STA      object_screen_low_by_index    ; &1F47
-    LDA      zp_screen_ptr_70_high    ; &1F4A
-    STA      object_screen_high_by_index    ; &1F4C
-    LDY      #&0    ; &1F4F
-    LDA      (zp_screen_ptr_70_low),Y    ; &1F51
-    BNE      addr_1F58    ; &1F53
-    JSR      copy_level_modulo_24byte_fill_pattern    ; &1F55
+    JSR      read_object0_screen_byte_at_temp_position
+    BEQ      addr_1F58
+    LDA      #&18
+    JSR      add_a_to_pointer_70
+    LDA      zp_screen_ptr_70_low
+    STA      object_screen_low_by_index
+    LDA      zp_screen_ptr_70_high
+    STA      object_screen_high_by_index
+    LDY      #&0
+    LDA      (zp_screen_ptr_70_low),Y
+    BNE      addr_1F58
+    JSR      copy_level_modulo_24byte_fill_pattern
 
 .addr_1F58
-    INC      object_y_by_index    ; &1F58
-    INC      object_y_by_index    ; &1F5B
-    LDA      object_y_by_index    ; &1F5E
-    CMP      #&3a    ; &1F61
-    BMI      addr_1F3B    ; &1F63
-    RTS    ; &1F65
+    INC      object_y_by_index
+    INC      object_y_by_index
+    LDA      object_y_by_index
+    CMP      #&3a
+    BMI      addr_1F3B
+    RTS
 
 .clear_all_palette_entries
-    LDX      #&f    ; &1F66
-    LDA      #&0    ; &1F68
+    LDX      #&f
+    LDA      #&0
 
 .clear_palette_entry_loop_1f66
-    JSR      vdu19_set_palette_or_colour    ; &1F6A
-    DEX    ; &1F6D
-    BPL      clear_palette_entry_loop_1f66    ; &1F6E
-    RTS    ; &1F70
+    JSR      vdu19_set_palette_or_colour
+    DEX
+    BPL      clear_palette_entry_loop_1f66
+    RTS
 
 .apply_level_palette
-    LDX      #&f    ; &1F71
+    LDX      #&f
 
 .apply_base_palette_entry_loop_1f71
-    LDA      base_palette_table_1f71,X    ; &1F73
-    JSR      vdu19_set_palette_or_colour    ; &1F76
-    DEX    ; &1F79
-    BPL      apply_base_palette_entry_loop_1f71    ; &1F7A
-    LDA      level_units_digit    ; &1F7C
-    AND      #&7    ; &1F7F
-    LDX      #&9    ; &1F81
-    JSR      vdu19_set_palette_or_colour    ; &1F83
-    LDA      level_units_digit    ; &1F86
-    AND      #&7    ; &1F89
-    TAX    ; &1F8B
-    LDA      level_palette_logical8_by_level_units_mod8,X    ; &1F8C
-    LDX      #&8    ; &1F8F
-    JMP      vdu19_set_palette_or_colour    ; &1F91
+    LDA      base_palette_table_1f71,X
+    JSR      vdu19_set_palette_or_colour
+    DEX
+    BPL      apply_base_palette_entry_loop_1f71
+    LDA      level_units_digit
+    AND      #&7
+    LDX      #&9
+    JSR      vdu19_set_palette_or_colour
+    LDA      level_units_digit
+    AND      #&7
+    TAX
+    LDA      level_palette_logical8_by_level_units_mod8,X
+    LDX      #&8
+    JMP      vdu19_set_palette_or_colour
 
 .byte_decoded_code_1f94
-    LDA      #&0    ; &1F94
-    STA      render_mode_or_text_scratch    ; &1F96
-    JSR      draw_object_by_index    ; &1F98
-    LDX      active_object_index    ; &1F9B
-    LDA      #&5    ; &1F9D
-    STA      render_mode_or_text_scratch    ; &1F9F
+    LDA      #&0
+    STA      render_mode_or_text_scratch
+    JSR      draw_object_by_index
+    LDX      active_object_index
+    LDA      #&5
+    STA      render_mode_or_text_scratch
 
 .restore_object_position_and_ptr
-    LDA      saved_object_y_by_index,X    ; &1FA1
-    STA      object_y_by_index,X    ; &1FA4
-    LDA      saved_object_screen_low_by_index,X    ; &1FA7
-    STA      object_screen_low_by_index,X    ; &1FAA
-    LDA      saved_object_screen_high_by_index,X    ; &1FAD
-    STA      object_screen_high_by_index,X    ; &1FB0
-    LDA      object_x_by_index,X    ; &1FB3
-    SEC    ; &1FB6
-    SBC      movement_delta_x    ; &1FB7
-    STA      object_x_by_index,X    ; &1FB9
-    RTS    ; &1FBC
+    LDA      saved_object_y_by_index,X
+    STA      object_y_by_index,X
+    LDA      saved_object_screen_low_by_index,X
+    STA      object_screen_low_by_index,X
+    LDA      saved_object_screen_high_by_index,X
+    STA      object_screen_high_by_index,X
+    LDA      object_x_by_index,X
+    SEC
+    SBC      movement_delta_x
+    STA      object_x_by_index,X
+    RTS
 
 .test_object_inside_playfield
-    LDA      #&0    ; &1FBD
-    STA      bounds_or_outside_flag    ; &1FBF
-    LDA      object_x_by_index,X    ; &1FC1
-    CMP      #&4    ; &1FC4
-    BMI      addr_1FD8    ; &1FC6
-    CMP      #&4a    ; &1FC8
-    BPL      addr_1FD8    ; &1FCA
-    LDA      object_y_by_index,X    ; &1FCC
-    CMP      #&8    ; &1FCF
-    BMI      addr_1FD8    ; &1FD1
-    CMP      #&37    ; &1FD3
-    BPL      addr_1FD8    ; &1FD5
-    RTS    ; &1FD7
+    LDA      #&0
+    STA      bounds_or_outside_flag
+    LDA      object_x_by_index,X
+    CMP      #&4
+    BMI      addr_1FD8
+    CMP      #&4a
+    BPL      addr_1FD8
+    LDA      object_y_by_index,X
+    CMP      #&8
+    BMI      addr_1FD8
+    CMP      #&37
+    BPL      addr_1FD8
+    RTS
 
 .addr_1FD8
-    INC      bounds_or_outside_flag    ; &1FD8
-    RTS    ; &1FDA
+    INC      bounds_or_outside_flag
+    RTS
 
 .begin_target_enemy_move_test
-    LDA      #&0    ; &1FDB
-    STA      render_mode_or_text_scratch    ; &1FDD
-    STA      movement_delta_x    ; &1FDF
-    STA      movement_delta_y    ; &1FE1
-    JSR      draw_object_by_index    ; &1FE3
-    LDX      active_object_index    ; &1FE6
-    LDA      #&5    ; &1FE8
-    STA      render_mode_or_text_scratch    ; &1FEA
-    RTS    ; &1FEC
+    LDA      #&0
+    STA      render_mode_or_text_scratch
+    STA      movement_delta_x
+    STA      movement_delta_y
+    JSR      draw_object_by_index
+    LDX      active_object_index
+    LDA      #&5
+    STA      render_mode_or_text_scratch
+    RTS
 
 .end_target_enemy_move_test
-    LDX      active_object_index    ; &1FED
-    LDA      #&0    ; &1FEF
-    STA      render_mode_or_text_scratch    ; &1FF1
-    JSR      draw_object_by_index    ; &1FF3
-    RTS    ; &1FF6
+    LDX      active_object_index
+    LDA      #&0
+    STA      render_mode_or_text_scratch
+    JSR      draw_object_by_index
+    RTS
 
 .move_spinner_towards_player_x_then_y
-    JSR      delta_towards_player_for_object_x    ; &1FF7
-    JSR      try_move_object_with_collision    ; &1FFA
-    LDA      object_movement_success_flag    ; &1FFD
-    BEQ      addr_2003    ; &2000
-    RTS    ; &2002
+    JSR      delta_towards_player_for_object_x
+    JSR      try_move_object_with_collision
+    LDA      object_movement_success_flag
+    BEQ      addr_2003
+    RTS
 
 .addr_2003
-    LDX      active_object_index    ; &2003
-    JSR      restore_object_position_and_ptr    ; &2005
-    LDA      #&0    ; &2008
-    STA      movement_delta_x    ; &200A
-    STA      movement_delta_y    ; &200C
-    LDA      player_x_first_cell    ; &200E
-    CMP      object_x_by_index,X    ; &2011
-    BEQ      addr_2023    ; &2014
-    BMI      addr_201F    ; &2016
-    LDA      #&1    ; &2018
-    STA      movement_delta_x    ; &201A
-    JMP      addr_2023    ; &201C
+    LDX      active_object_index
+    JSR      restore_object_position_and_ptr
+    LDA      #&0
+    STA      movement_delta_x
+    STA      movement_delta_y
+    LDA      player_x_first_cell
+    CMP      object_x_by_index,X
+    BEQ      addr_2023
+    BMI      addr_201F
+    LDA      #&1
+    STA      movement_delta_x
+    JMP      addr_2023
 
 .addr_201F
-    LDA      #&ff    ; &201F
-    STA      movement_delta_x    ; &2021
+    LDA      #&ff
+    STA      movement_delta_x
 
 .addr_2023
-    JSR      try_move_object_with_collision    ; &2023
-    LDA      object_movement_success_flag    ; &2026
-    BEQ      addr_202C    ; &2029
-    RTS    ; &202B
+    JSR      try_move_object_with_collision
+    LDA      object_movement_success_flag
+    BEQ      addr_202C
+    RTS
 
 .addr_202C
-    LDX      active_object_index    ; &202C
-    JSR      restore_object_position_and_ptr    ; &202E
-    LDA      #&0    ; &2031
-    STA      movement_delta_x    ; &2033
-    STA      movement_delta_y    ; &2035
-    LDA      player_y_first_cell    ; &2037
-    CLC    ; &203A
-    ADC      #&1    ; &203B
-    CMP      object_y_by_index,X    ; &203D
-    BEQ      addr_204F    ; &2040
-    BMI      addr_204B    ; &2042
-    LDA      #&1    ; &2044
-    STA      movement_delta_y    ; &2046
-    JMP      addr_204F    ; &2048
+    LDX      active_object_index
+    JSR      restore_object_position_and_ptr
+    LDA      #&0
+    STA      movement_delta_x
+    STA      movement_delta_y
+    LDA      player_y_first_cell
+    CLC
+    ADC      #&1
+    CMP      object_y_by_index,X
+    BEQ      addr_204F
+    BMI      addr_204B
+    LDA      #&1
+    STA      movement_delta_y
+    JMP      addr_204F
 
 .addr_204B
-    LDA      #&ff    ; &204B
-    STA      movement_delta_y    ; &204D
+    LDA      #&ff
+    STA      movement_delta_y
 
 .addr_204F
-    JSR      try_move_object_with_collision    ; &204F
-    LDA      object_movement_success_flag    ; &2052
-    BEQ      addr_2058    ; &2055
-    RTS    ; &2057
+    JSR      try_move_object_with_collision
+    LDA      object_movement_success_flag
+    BEQ      addr_2058
+    RTS
 
 .addr_2058
-    LDX      active_object_index    ; &2058
-    JMP      restore_object_position_and_ptr    ; &205A
+    LDX      active_object_index
+    JMP      restore_object_position_and_ptr
 
 .try_move_object_with_collision
-    LDA      #&0    ; &205D
-    STA      object_movement_success_flag    ; &205F
-    STA      renderer_collision_accumulator    ; &2062
-    JSR      move_object_and_update_screen_ptr    ; &2064
-    LDX      active_object_index    ; &2067
-    JSR      draw_object_by_index    ; &2069
-    LDA      renderer_collision_accumulator    ; &206C
-    BNE      addr_207F    ; &206E
-    LDX      active_object_index    ; &2070
-    JSR      test_object_inside_playfield    ; &2072
-    LDA      bounds_or_outside_flag    ; &2075
-    BNE      addr_207F    ; &2077
-    LDA      #&1    ; &2079
-    STA      object_movement_success_flag    ; &207B
-    RTS    ; &207E
+    LDA      #&0
+    STA      object_movement_success_flag
+    STA      renderer_collision_accumulator
+    JSR      move_object_and_update_screen_ptr
+    LDX      active_object_index
+    JSR      draw_object_by_index
+    LDA      renderer_collision_accumulator
+    BNE      addr_207F
+    LDX      active_object_index
+    JSR      test_object_inside_playfield
+    LDA      bounds_or_outside_flag
+    BNE      addr_207F
+    LDA      #&1
+    STA      object_movement_success_flag
+    RTS
 
 .addr_207F
-    RTS    ; &207F
+    RTS
 
 .move_clone_continue_or_random
-    JSR      rng_next_byte    ; &2080
-    AND      #&7    ; &2083
-    BEQ      addr_20A1    ; &2085
-    LDX      active_object_index    ; &2087
-    LDA      item_delta_x_by_slot,X    ; &2089
-    STA      movement_delta_x    ; &208C
-    LDA      item_delta_y_by_slot,X    ; &208E
-    STA      movement_delta_y    ; &2091
-    JSR      try_move_object_with_collision    ; &2093
-    LDA      object_movement_success_flag    ; &2096
-    BEQ      addr_209C    ; &2099
-    RTS    ; &209B
+    JSR      rng_next_byte
+    AND      #&7
+    BEQ      addr_20A1
+    LDX      active_object_index
+    LDA      item_delta_x_by_slot,X
+    STA      movement_delta_x
+    LDA      item_delta_y_by_slot,X
+    STA      movement_delta_y
+    JSR      try_move_object_with_collision
+    LDA      object_movement_success_flag
+    BEQ      addr_209C
+    RTS
 
 .addr_209C
-    LDX      active_object_index    ; &209C
-    JSR      restore_object_position_and_ptr    ; &209E
+    LDX      active_object_index
+    JSR      restore_object_position_and_ptr
 
 .addr_20A1
-    JSR      random_direction_delta    ; &20A1
-    JSR      try_move_object_with_collision    ; &20A4
-    LDA      object_movement_success_flag    ; &20A7
-    BEQ      addr_20AD    ; &20AA
-    RTS    ; &20AC
+    JSR      random_direction_delta
+    JSR      try_move_object_with_collision
+    LDA      object_movement_success_flag
+    BEQ      addr_20AD
+    RTS
 
 .addr_20AD
-    LDX      active_object_index    ; &20AD
-    JSR      restore_object_position_and_ptr    ; &20AF
-    RTS    ; &20B2
+    LDX      active_object_index
+    JSR      restore_object_position_and_ptr
+    RTS
 
 .random_direction_delta
-    JSR      rng_next_byte    ; &20B3
-    AND      #&1    ; &20B6
-    STA      movement_delta_x    ; &20B8
-    JSR      rng_next_byte    ; &20BA
-    AND      #&1    ; &20BD
-    SEC    ; &20BF
-    SBC      movement_delta_x    ; &20C0
-    STA      movement_delta_x    ; &20C2
-    LDX      active_object_index    ; &20C4
-    STA      item_delta_x_by_slot,X    ; &20C6
-    JSR      rng_next_byte    ; &20C9
-    AND      #&1    ; &20CC
-    STA      movement_delta_y    ; &20CE
-    JSR      rng_next_byte    ; &20D0
-    AND      #&1    ; &20D3
-    SEC    ; &20D5
-    SBC      movement_delta_y    ; &20D6
-    STA      movement_delta_y    ; &20D8
-    LDX      active_object_index    ; &20DA
-    STA      item_delta_y_by_slot,X    ; &20DC
-    RTS    ; &20DF
+    JSR      rng_next_byte
+    AND      #&1
+    STA      movement_delta_x
+    JSR      rng_next_byte
+    AND      #&1
+    SEC
+    SBC      movement_delta_x
+    STA      movement_delta_x
+    LDX      active_object_index
+    STA      item_delta_x_by_slot,X
+    JSR      rng_next_byte
+    AND      #&1
+    STA      movement_delta_y
+    JSR      rng_next_byte
+    AND      #&1
+    SEC
+    SBC      movement_delta_y
+    STA      movement_delta_y
+    LDX      active_object_index
+    STA      item_delta_y_by_slot,X
+    RTS
 
 .move_cyberdroid_persistent
-    LDA      item_delta_x_by_slot,X    ; &20E0
-    BNE      addr_2104    ; &20E3
-    LDA      item_delta_y_by_slot,X    ; &20E5
-    BNE      addr_2104    ; &20E8
-    JSR      random_direction_delta    ; &20EA
-    JSR      try_move_object_with_collision    ; &20ED
-    LDA      object_movement_success_flag    ; &20F0
-    BEQ      addr_20F6    ; &20F3
-    RTS    ; &20F5
+    LDA      item_delta_x_by_slot,X
+    BNE      addr_2104
+    LDA      item_delta_y_by_slot,X
+    BNE      addr_2104
+    JSR      random_direction_delta
+    JSR      try_move_object_with_collision
+    LDA      object_movement_success_flag
+    BEQ      addr_20F6
+    RTS
 
 .addr_20F6
-    LDX      active_object_index    ; &20F6
-    JSR      restore_object_position_and_ptr    ; &20F8
-    LDA      #&0    ; &20FB
-    STA      item_delta_x_by_slot,X    ; &20FD
-    STA      item_delta_y_by_slot,X    ; &2100
-    RTS    ; &2103
+    LDX      active_object_index
+    JSR      restore_object_position_and_ptr
+    LDA      #&0
+    STA      item_delta_x_by_slot,X
+    STA      item_delta_y_by_slot,X
+    RTS
 
 .addr_2104
-    LDA      player_x_first_cell    ; &2104
-    CMP      object_x_by_index,X    ; &2107
-    BEQ      addr_211A    ; &210A
-    LDA      player_y_first_cell    ; &210C
-    CLC    ; &210F
-    ADC      #&1    ; &2110
-    CMP      object_y_by_index,X    ; &2112
-    BEQ      addr_2133    ; &2115
-    JMP      addr_2150    ; &2117
+    LDA      player_x_first_cell
+    CMP      object_x_by_index,X
+    BEQ      addr_211A
+    LDA      player_y_first_cell
+    CLC
+    ADC      #&1
+    CMP      object_y_by_index,X
+    BEQ      addr_2133
+    JMP      addr_2150
 
 .addr_211A
-    LDA      player_y_first_cell    ; &211A
-    CLC    ; &211D
-    ADC      #&1    ; &211E
-    CMP      object_y_by_index,X    ; &2120
-    BMI      addr_212C    ; &2123
-    LDA      #&1    ; &2125
-    STA      movement_delta_y    ; &2127
-    JMP      addr_2146    ; &2129
+    LDA      player_y_first_cell
+    CLC
+    ADC      #&1
+    CMP      object_y_by_index,X
+    BMI      addr_212C
+    LDA      #&1
+    STA      movement_delta_y
+    JMP      addr_2146
 
 .addr_212C
-    LDA      #&ff    ; &212C
-    STA      movement_delta_y    ; &212E
-    JMP      addr_2146    ; &2130
+    LDA      #&ff
+    STA      movement_delta_y
+    JMP      addr_2146
 
 .addr_2133
-    LDA      player_x_first_cell    ; &2133
-    CMP      object_x_by_index,X    ; &2136
-    BMI      addr_2142    ; &2139
-    LDA      #&1    ; &213B
-    STA      movement_delta_x    ; &213D
-    JMP      addr_2146    ; &213F
+    LDA      player_x_first_cell
+    CMP      object_x_by_index,X
+    BMI      addr_2142
+    LDA      #&1
+    STA      movement_delta_x
+    JMP      addr_2146
 
 .addr_2142
-    LDA      #&ff    ; &2142
-    STA      movement_delta_x    ; &2144
+    LDA      #&ff
+    STA      movement_delta_x
 
 .addr_2146
-    LDA      movement_delta_x    ; &2146
-    STA      item_delta_x_by_slot,X    ; &2148
-    LDA      movement_delta_y    ; &214B
-    STA      item_delta_y_by_slot,X    ; &214D
+    LDA      movement_delta_x
+    STA      item_delta_x_by_slot,X
+    LDA      movement_delta_y
+    STA      item_delta_y_by_slot,X
 
 .addr_2150
-    LDA      item_delta_x_by_slot,X    ; &2150
-    STA      movement_delta_x    ; &2153
-    LDA      item_delta_y_by_slot,X    ; &2155
-    STA      movement_delta_y    ; &2158
-    JSR      try_move_object_with_collision    ; &215A
-    LDA      object_movement_success_flag    ; &215D
-    BEQ      addr_20F6    ; &2160
-    RTS    ; &2162
+    LDA      item_delta_x_by_slot,X
+    STA      movement_delta_x
+    LDA      item_delta_y_by_slot,X
+    STA      movement_delta_y
+    JSR      try_move_object_with_collision
+    LDA      object_movement_success_flag
+    BEQ      addr_20F6
+    RTS
 
 .handle_shot_or_hazard_overlap_collisions
-    LDA      transition_delay    ; &2163
-    BNE      addr_2187    ; &2165
-    LDA      shot_x_by_slot,X    ; &2167
-    SEC    ; &216A
-    SBC      player_x_first_cell    ; &216B
-    BMI      addr_2187    ; &216E
-    CMP      #&3    ; &2170
-    BPL      addr_2187    ; &2172
-    LDA      shot_y_by_slot,X    ; &2174
-    SEC    ; &2177
-    SBC      player_y_first_cell    ; &2178
-    BMI      addr_2187    ; &217B
-    CMP      #&4    ; &217D
-    BPL      addr_2187    ; &217F
-    JSR      deactivate_and_erase_shot_or_hazard    ; &2181
-    JMP      handle_player_hit_from_active_object    ; &2184
+    LDA      transition_delay
+    BNE      addr_2187
+    LDA      shot_x_by_slot,X
+    SEC
+    SBC      player_x_first_cell
+    BMI      addr_2187
+    CMP      #&3
+    BPL      addr_2187
+    LDA      shot_y_by_slot,X
+    SEC
+    SBC      player_y_first_cell
+    BMI      addr_2187
+    CMP      #&4
+    BPL      addr_2187
+    JSR      deactivate_and_erase_shot_or_hazard
+    JMP      handle_player_hit_from_active_object
 
 .addr_2187
-    LDY      #&14    ; &2187
+    LDY      #&14
 
 .addr_2189
-    LDA      object_lifecycle_base_for_indexed_refs,Y    ; &2189
-    CMP      #&1    ; &218C
-    BNE      addr_21D2    ; &218E
-    LDA      shot_x_by_slot,X    ; &2190
-    SEC    ; &2193
-    SBC      object_x_by_index,Y    ; &2194
-    BMI      addr_21D2    ; &2197
-    CMP      #&3    ; &2199
-    BPL      addr_21D2    ; &219B
-    LDA      shot_y_by_slot,X    ; &219D
-    SEC    ; &21A0
-    SBC      object_y_by_index,Y    ; &21A1
-    BMI      addr_21D2    ; &21A4
-    CMP      #&2    ; &21A6
-    BPL      addr_21D2    ; &21A8
-    LDA      #&2    ; &21AA
-    STA      object_lifecycle_base_for_indexed_refs,Y    ; &21AC
-    CPX      #&4    ; &21AF
-    BPL      addr_21C2    ; &21B1
-    LDA      object_graphic_id_by_index,Y    ; &21B3
-    SEC    ; &21B6
-    SBC      #&29    ; &21B7
-    ASL      A    ; &21B9
-    JSR      increment_four_char_score_or_counter    ; &21BA
-    DEC      remaining_active_object_count    ; &21BD
-    JMP      addr_21C8    ; &21BF
+    LDA      object_lifecycle_base_for_indexed_refs,Y
+    CMP      #&1
+    BNE      addr_21D2
+    LDA      shot_x_by_slot,X
+    SEC
+    SBC      object_x_by_index,Y
+    BMI      addr_21D2
+    CMP      #&3
+    BPL      addr_21D2
+    LDA      shot_y_by_slot,X
+    SEC
+    SBC      object_y_by_index,Y
+    BMI      addr_21D2
+    CMP      #&2
+    BPL      addr_21D2
+    LDA      #&2
+    STA      object_lifecycle_base_for_indexed_refs,Y
+    CPX      #&4
+    BPL      addr_21C2
+    LDA      object_graphic_id_by_index,Y
+    SEC
+    SBC      #&29
+    ASL      A
+    JSR      increment_four_char_score_or_counter
+    DEC      remaining_active_object_count
+    JMP      addr_21C8
 
 .addr_21C2
-    LDA      object_graphic_id_by_index,Y    ; &21C2
-    JSR      place_graphic_in_free_item_slot    ; &21C5
+    LDA      object_graphic_id_by_index,Y
+    JSR      place_graphic_in_free_item_slot
 
 .addr_21C8
-    LDX      active_object_index    ; &21C8
-    JSR      deactivate_and_erase_shot_or_hazard    ; &21CA
-    LDA      #&2    ; &21CD
-    JMP      play_sound_id_if_enabled    ; &21CF
+    LDX      active_object_index
+    JSR      deactivate_and_erase_shot_or_hazard
+    LDA      #&2
+    JMP      play_sound_id_if_enabled
 
 .addr_21D2
-    INY    ; &21D2
-    CPY      #&2c    ; &21D3
-    BNE      addr_2189    ; &21D5
-    RTS    ; &21D7
+    INY
+    CPY      #&2c
+    BNE      addr_2189
+    RTS
 
 .deactivate_and_erase_shot_or_hazard
-    LDA      shot_screen_low_current,X    ; &21D8
-    STA      shot_screen_low_previous,X    ; &21DB
-    LDA      shot_screen_high_current,X    ; &21DE
-    STA      shot_screen_high_previous,X    ; &21E1
-    JSR      deactivate_shot_or_hazard_slot    ; &21E4
-    JMP      erase_visible_shot_or_hazard_previous_bytes    ; &21E7
+    LDA      shot_screen_low_current,X
+    STA      shot_screen_low_previous,X
+    LDA      shot_screen_high_current,X
+    STA      shot_screen_high_previous,X
+    JSR      deactivate_shot_or_hazard_slot
+    JMP      erase_visible_shot_or_hazard_previous_bytes
 
 .play_sound_id_if_enabled
-    STA      zp_screen_ptr_70_low    ; &21EA
-    LDA      sound_disabled_flag    ; &21EC
-    BEQ      addr_21F2    ; &21EF
-    RTS    ; &21F1
+    STA      zp_screen_ptr_70_low
+    LDA      sound_disabled_flag
+    BEQ      addr_21F2
+    RTS
 
 .addr_21F2
-    LDA      #&0    ; &21F2
-    STA      zp_screen_ptr_70_high    ; &21F4
-    LDX      #&3    ; &21F6
-    JSR      shift_pointer_70_left_x_times    ; &21F8
-    LDX      zp_screen_ptr_70_low    ; &21FB
-    LDA      #&b    ; &21FD
-    ADC      zp_screen_ptr_70_high    ; &21FF
-    TAY    ; &2201
-    LDA      #&7    ; &2202
-    JMP      MOS_OSWORD    ; &2204
+    LDA      #&0
+    STA      zp_screen_ptr_70_high
+    LDX      #&3
+    JSR      shift_pointer_70_left_x_times
+    LDX      zp_screen_ptr_70_low
+    LDA      #&b
+    ADC      zp_screen_ptr_70_high
+    TAY
+    LDA      #&7
+    JMP      MOS_OSWORD
 
 .direction_from_delta_xy
-    CPX      #&0    ; &2207
-    BEQ      addr_222B    ; &2209
-    BPL      addr_221C    ; &220B
-    CPY      #&0    ; &220D
-    BNE      addr_2214    ; &220F
-    LDA      #&3    ; &2211
-    RTS    ; &2213
+    CPX      #&0
+    BEQ      addr_222B
+    BPL      addr_221C
+    CPY      #&0
+    BNE      addr_2214
+    LDA      #&3
+    RTS
 
 .addr_2214
-    BPL      addr_2219    ; &2214
-    LDA      #&6    ; &2216
-    RTS    ; &2218
+    BPL      addr_2219
+    LDA      #&6
+    RTS
 
 .addr_2219
-    LDA      #&7    ; &2219
-    RTS    ; &221B
+    LDA      #&7
+    RTS
 
 .addr_221C
-    CPY      #&0    ; &221C
-    BNE      addr_2223    ; &221E
-    LDA      #&2    ; &2220
-    RTS    ; &2222
+    CPY      #&0
+    BNE      addr_2223
+    LDA      #&2
+    RTS
 
 .addr_2223
-    BPL      addr_2228    ; &2223
-    LDA      #&4    ; &2225
-    RTS    ; &2227
+    BPL      addr_2228
+    LDA      #&4
+    RTS
 
 .addr_2228
-    LDA      #&5    ; &2228
-    RTS    ; &222A
+    LDA      #&5
+    RTS
 
 .addr_222B
-    CPY      #&0    ; &222B
-    BPL      addr_2232    ; &222D
-    LDA      #&1    ; &222F
-    RTS    ; &2231
+    CPY      #&0
+    BPL      addr_2232
+    LDA      #&1
+    RTS
 
 .addr_2232
-    LDA      #&0    ; &2232
-    RTS    ; &2234
+    LDA      #&0
+    RTS
 
 .maybe_spawn_hazard_from_moving_object
-    LDA      active_spawned_hazard_count    ; &2235
-    CMP      #&4    ; &2238
-    BPL      addr_2262    ; &223A
-    JSR      rng_next_byte    ; &223C
-    AND      #&7    ; &223F
-    CMP      level_index_and_hazard_gate    ; &2241
-    BPL      addr_2262    ; &2243
-    JSR      rng_next_byte    ; &2245
-    AND      #&f    ; &2248
-    CLC    ; &224A
-    ADC      #&19    ; &224B
-    STA      hazard_spawn_source_object_index    ; &224D
-    TAX    ; &2250
-    LDA      object_lifecycle_base_for_indexed_refs,X    ; &2251
-    CMP      #&1    ; &2254
-    BNE      addr_2262    ; &2256
-    LDA      item_delta_x_by_slot,X    ; &2258
-    BNE      addr_2263    ; &225B
-    LDY      item_delta_y_by_slot,X    ; &225D
-    BNE      addr_2263    ; &2260
+    LDA      active_spawned_hazard_count
+    CMP      #&4
+    BPL      addr_2262
+    JSR      rng_next_byte
+    AND      #&7
+    CMP      level_index_and_hazard_gate
+    BPL      addr_2262
+    JSR      rng_next_byte
+    AND      #&f
+    CLC
+    ADC      #&19
+    STA      hazard_spawn_source_object_index
+    TAX
+    LDA      object_lifecycle_base_for_indexed_refs,X
+    CMP      #&1
+    BNE      addr_2262
+    LDA      item_delta_x_by_slot,X
+    BNE      addr_2263
+    LDY      item_delta_y_by_slot,X
+    BNE      addr_2263
 
 .addr_2262
-    RTS    ; &2262
+    RTS
 
 .addr_2263
-    LDY      item_delta_y_by_slot,X    ; &2263
-    TAX    ; &2266
-    JSR      direction_from_delta_xy    ; &2267
-    STA      hazard_spawn_direction    ; &226A
-    LDY      #&3    ; &226D
+    LDY      item_delta_y_by_slot,X
+    TAX
+    JSR      direction_from_delta_xy
+    STA      hazard_spawn_direction
+    LDY      #&3
 
 .addr_226F
-    INY    ; &226F
-    LDA      shot_direction_or_inactive_by_slot,Y    ; &2270
-    BPL      addr_226F    ; &2273
-    LDA      shot_visible_flag_by_slot,Y    ; &2275
-    BNE      addr_2262    ; &2278
-    STY      hazard_spawn_slot_index    ; &227A
-    LDA      #&0    ; &227D
-    STA      shot_visible_flag_by_slot,Y    ; &227F
-    LDA      hazard_spawn_direction    ; &2282
-    STA      shot_direction_or_inactive_by_slot,Y    ; &2285
-    LDX      hazard_spawn_source_object_index    ; &2288
-    TAY    ; &228B
-    LDA      hazard_spawn_y_offsets_2235,Y    ; &228C
-    CLC    ; &228F
-    ADC      object_y_by_index,X    ; &2290
-    LDY      hazard_spawn_slot_index    ; &2293
-    STA      shot_y_by_slot,Y    ; &2296
-    LDY      hazard_spawn_direction    ; &2299
-    LDA      hazard_spawn_x_offsets_2235,Y    ; &229C
-    CLC    ; &229F
-    ADC      object_x_by_index,X    ; &22A0
-    LDY      hazard_spawn_slot_index    ; &22A3
-    STA      shot_x_by_slot,Y    ; &22A6
-    TYA    ; &22A9
-    TAX    ; &22AA
-    JSR      compute_shot_screen_ptr    ; &22AB
-    INC      active_spawned_hazard_count    ; &22AE
+    INY
+    LDA      shot_direction_or_inactive_by_slot,Y
+    BPL      addr_226F
+    LDA      shot_visible_flag_by_slot,Y
+    BNE      addr_2262
+    STY      hazard_spawn_slot_index
+    LDA      #&0
+    STA      shot_visible_flag_by_slot,Y
+    LDA      hazard_spawn_direction
+    STA      shot_direction_or_inactive_by_slot,Y
+    LDX      hazard_spawn_source_object_index
+    TAY
+    LDA      hazard_spawn_y_offsets_2235,Y
+    CLC
+    ADC      object_y_by_index,X
+    LDY      hazard_spawn_slot_index
+    STA      shot_y_by_slot,Y
+    LDY      hazard_spawn_direction
+    LDA      hazard_spawn_x_offsets_2235,Y
+    CLC
+    ADC      object_x_by_index,X
+    LDY      hazard_spawn_slot_index
+    STA      shot_x_by_slot,Y
+    TYA
+    TAX
+    JSR      compute_shot_screen_ptr
+    INC      active_spawned_hazard_count
 
 .hazard_spawn_escape_pulse_mode_check
-    LDA      bootstrap_osbyte81_x_result_flag    ; &22B1
-    BNE      play_hazard_spawn_sound    ; &22B4
+    LDA      bootstrap_osbyte81_x_result_flag
+    BNE      play_hazard_spawn_sound
 
 .hazard_spawn_set_escape_condition
-    LDA      #&7d    ; &22B6
-    JSR      MOS_OSBYTE    ; &22B8
+    LDA      #&7d
+    JSR      MOS_OSBYTE
 
 .hazard_spawn_acknowledge_escape_condition
-    LDA      #&7e    ; &22BB
-    JSR      MOS_OSBYTE    ; &22BD
+    LDA      #&7e
+    JSR      MOS_OSBYTE
 
 .play_hazard_spawn_sound
-    LDA      #&b    ; &22C0
-    JMP      play_sound_id_if_enabled    ; &22C2
+    LDA      #&b
+    JMP      play_sound_id_if_enabled
 
 .find_free_item_slot
-    LDX      #&ff    ; &22C5
+    LDX      #&ff
 
 .find_free_item_slot_scan_loop_22c5
-    INX    ; &22C7
-    LDA      item_state_alias_object_14,X    ; &22C8
-    BNE      find_free_item_slot_scan_loop_22c5    ; &22CB
-    STX      logical_item_slot_index    ; &22CD
+    INX
+    LDA      item_state_alias_object_14,X
+    BNE      find_free_item_slot_scan_loop_22c5
+    STX      logical_item_slot_index
 
 .return_from_find_or_place_item_slot_22c5
-    RTS    ; &22CF
+    RTS
 
 .place_graphic_in_free_item_slot
-    TAY    ; &22D0
-    JSR      find_free_item_slot    ; &22D1
-    CPX      #&c    ; &22D4
-    BPL      return_from_find_or_place_item_slot_22c5    ; &22D6
-    TYA    ; &22D8
-    STA      item_graphic_id_alias_object_14,X    ; &22D9
-    LDA      #&1    ; &22DC
-    STA      item_state_alias_object_14,X    ; &22DE
-    STX      logical_item_slot_index    ; &22E1
-    JMP      random_place_item    ; &22E3
+    TAY
+    JSR      find_free_item_slot
+    CPX      #&c
+    BPL      return_from_find_or_place_item_slot_22c5
+    TYA
+    STA      item_graphic_id_alias_object_14,X
+    LDA      #&1
+    STA      item_state_alias_object_14,X
+    STX      logical_item_slot_index
+    JMP      random_place_item
 
 .increment_four_char_score_or_counter
-    STA      zp_scratch_76    ; &22E6
+    STA      zp_scratch_76
 
 .score_increment_outer_loop_22e6
-    LDX      #&0    ; &22E8
+    LDX      #&0
 
 .score_increment_digit_carry_loop_22e6
-    INC      score_counter_chars,X    ; &22EA
-    LDA      score_counter_chars,X    ; &22ED
-    CMP      #&2a    ; &22F0
-    BNE      score_upper_wrap_check_setup_22e6    ; &22F2
-    LDA      #&20    ; &22F4
-    STA      score_counter_chars,X    ; &22F6
-    INX    ; &22F9
-    CPX      #&4    ; &22FA
-    BNE      score_increment_digit_carry_loop_22e6    ; &22FC
+    INC      score_counter_chars,X
+    LDA      score_counter_chars,X
+    CMP      #&2a
+    BNE      score_upper_wrap_check_setup_22e6
+    LDA      #&20
+    STA      score_counter_chars,X
+    INX
+    CPX      #&4
+    BNE      score_increment_digit_carry_loop_22e6
 
 .score_upper_wrap_check_setup_22e6
-    LDY      #&2    ; &22FE
+    LDY      #&2
 
 .score_upper_wrap_check_loop_22e6
-    LDA      score_counter_chars,Y    ; &2300
-    CMP      #&20    ; &2303
-    BNE      score_increment_next_unit_22e6    ; &2305
-    DEY    ; &2307
-    BPL      score_upper_wrap_check_loop_22e6    ; &2308
-    LDA      #&15    ; &230A
-    JSR      play_sound_id_if_enabled    ; &230C
-    INC      lives_status_count    ; &230F
-    JSR      draw_lives_or_target_status    ; &2312
+    LDA      score_counter_chars,Y
+    CMP      #&20
+    BNE      score_increment_next_unit_22e6
+    DEY
+    BPL      score_upper_wrap_check_loop_22e6
+    LDA      #&15
+    JSR      play_sound_id_if_enabled
+    INC      lives_status_count
+    JSR      draw_lives_or_target_status
 
 .score_increment_next_unit_22e6
-    DEC      zp_scratch_76    ; &2315
-    BNE      score_increment_outer_loop_22e6    ; &2317
+    DEC      zp_scratch_76
+    BNE      score_increment_outer_loop_22e6
 
 .draw_score_counter_digits
-    LDA      #&33    ; &2319
-    STA      object_screen_high_by_index    ; &231B
-    LDA      #&18    ; &231E
-    STA      object_screen_low_by_index    ; &2320
-    STA      object_y_by_index    ; &2323
-    LDX      #&3    ; &2326
+    LDA      #&33
+    STA      object_screen_high_by_index
+    LDA      #&18
+    STA      object_screen_low_by_index
+    STA      object_y_by_index
+    LDX      #&3
 
 .draw_score_digits_loop_2319
-    STX      zp_scratch_76    ; &2328
-    LDA      score_counter_chars,X    ; &232A
-    JSR      draw_status_glyph_at_current_ptr    ; &232D
-    LDX      zp_scratch_76    ; &2330
-    DEX    ; &2332
-    BPL      draw_score_digits_loop_2319    ; &2333
-    LDA      #&20    ; &2335
-    JMP      draw_status_glyph_at_current_ptr    ; &2337
+    STX      zp_scratch_76
+    LDA      score_counter_chars,X
+    JSR      draw_status_glyph_at_current_ptr
+    LDX      zp_scratch_76
+    DEX
+    BPL      draw_score_digits_loop_2319
+    LDA      #&20
+    JMP      draw_status_glyph_at_current_ptr
 
 .load_object_screen_ptr
-    LDA      object_screen_low_by_index,X    ; &233A
-    STA      zp_screen_ptr_70_low    ; &233D
-    LDA      object_screen_high_by_index,X    ; &233F
-    STA      zp_screen_ptr_70_high    ; &2342
-    RTS    ; &2344
+    LDA      object_screen_low_by_index,X
+    STA      zp_screen_ptr_70_low
+    LDA      object_screen_high_by_index,X
+    STA      zp_screen_ptr_70_high
+    RTS
 
 .draw_lives_or_target_status
-    LDA      #&7b    ; &2345
-    STA      object_screen_high_by_index    ; &2347
-    LDA      #&8    ; &234A
-    STA      object_screen_low_by_index    ; &234C
-    STA      object_y_by_index    ; &234F
-    LDX      lives_status_count    ; &2352
-    BEQ      clear_empty_life_status_cell_2345    ; &2355
-    BMI      target_status_scan_setup_2345    ; &2357
+    LDA      #&7b
+    STA      object_screen_high_by_index
+    LDA      #&8
+    STA      object_screen_low_by_index
+    STA      object_y_by_index
+    LDX      lives_status_count
+    BEQ      clear_empty_life_status_cell_2345
+    BMI      target_status_scan_setup_2345
 
 .draw_life_status_marker_loop_2345
-    STX      zp_scratch_76    ; &2359
-    LDA      #&39    ; &235B
-    JSR      draw_status_glyph_at_current_ptr    ; &235D
-    LDX      zp_scratch_76    ; &2360
-    DEX    ; &2362
-    BNE      draw_life_status_marker_loop_2345    ; &2363
+    STX      zp_scratch_76
+    LDA      #&39
+    JSR      draw_status_glyph_at_current_ptr
+    LDX      zp_scratch_76
+    DEX
+    BNE      draw_life_status_marker_loop_2345
 
 .clear_empty_life_status_cell_2345
-    JSR      load_object_screen_ptr    ; &2365
-    LDY      #&17    ; &2368
-    LDA      #&0    ; &236A
+    JSR      load_object_screen_ptr
+    LDY      #&17
+    LDA      #&0
 
 .clear_status_cell_byte_loop_2345
-    STA      (zp_screen_ptr_70_low),Y    ; &236C
-    DEY    ; &236E
-    BPL      clear_status_cell_byte_loop_2345    ; &236F
+    STA      (zp_screen_ptr_70_low),Y
+    DEY
+    BPL      clear_status_cell_byte_loop_2345
 
 .target_status_scan_setup_2345
-    LDA      #&7d    ; &2371
-    STA      object_screen_high_by_index    ; &2373
-    LDA      #&60    ; &2376
-    STA      object_screen_low_by_index    ; &2378
-    LDX      #&0    ; &237B
+    LDA      #&7d
+    STA      object_screen_high_by_index
+    LDA      #&60
+    STA      object_screen_low_by_index
+    LDX      #&0
 
 .target_status_scan_loop_2345
-    INX    ; &237D
-    STX      zp_scratch_76    ; &237E
-    LDA      target_collected_status,X    ; &2380
-    BEQ      target_status_scan_next_2345    ; &2383
-    LDA      target_status_graphic_ids_2345,X    ; &2385
-    JSR      draw_status_glyph_at_current_ptr    ; &2388
-    SEC    ; &238B
-    LDA      object_screen_low_by_index    ; &238C
-    SBC      #&38    ; &238F
-    STA      object_screen_low_by_index    ; &2391
-    LDA      object_screen_high_by_index    ; &2394
-    SBC      #&0    ; &2397
-    STA      object_screen_high_by_index    ; &2399
+    INX
+    STX      zp_scratch_76
+    LDA      target_collected_status,X
+    BEQ      target_status_scan_next_2345
+    LDA      target_status_graphic_ids_2345,X
+    JSR      draw_status_glyph_at_current_ptr
+    SEC
+    LDA      object_screen_low_by_index
+    SBC      #&38
+    STA      object_screen_low_by_index
+    LDA      object_screen_high_by_index
+    SBC      #&0
+    STA      object_screen_high_by_index
 
 .target_status_scan_next_2345
-    LDX      zp_scratch_76    ; &239C
-    CPX      highest_required_target_slot    ; &239E
-    BMI      target_status_scan_loop_2345    ; &23A0
-    RTS    ; &23A2
+    LDX      zp_scratch_76
+    CPX      highest_required_target_slot
+    BMI      target_status_scan_loop_2345
+    RTS
 
 .delta_towards_player_for_object_x
-    LDA      player_x_first_cell    ; &23A3
-    CMP      object_x_by_index,X    ; &23A6
-    BEQ      delta_towards_player_compare_y_23a3    ; &23A9
-    BMI      delta_towards_player_set_x_negative_23a3    ; &23AB
-    LDA      #&1    ; &23AD
-    STA      movement_delta_x    ; &23AF
-    JMP      delta_towards_player_compare_y_23a3    ; &23B1
+    LDA      player_x_first_cell
+    CMP      object_x_by_index,X
+    BEQ      delta_towards_player_compare_y_23a3
+    BMI      delta_towards_player_set_x_negative_23a3
+    LDA      #&1
+    STA      movement_delta_x
+    JMP      delta_towards_player_compare_y_23a3
 
 .delta_towards_player_set_x_negative_23a3
-    LDA      #&ff    ; &23B4
-    STA      movement_delta_x    ; &23B6
+    LDA      #&ff
+    STA      movement_delta_x
 
 .delta_towards_player_compare_y_23a3
-    LDA      player_y_first_cell    ; &23B8
-    CLC    ; &23BB
-    ADC      #&1    ; &23BC
-    CMP      object_y_by_index,X    ; &23BE
-    BEQ      return_from_delta_towards_player_23a3    ; &23C1
-    BMI      delta_towards_player_set_y_negative_23a3    ; &23C3
-    LDA      #&1    ; &23C5
-    STA      movement_delta_y    ; &23C7
-    RTS    ; &23C9
+    LDA      player_y_first_cell
+    CLC
+    ADC      #&1
+    CMP      object_y_by_index,X
+    BEQ      return_from_delta_towards_player_23a3
+    BMI      delta_towards_player_set_y_negative_23a3
+    LDA      #&1
+    STA      movement_delta_y
+    RTS
 
 .delta_towards_player_set_y_negative_23a3
-    LDA      #&ff    ; &23CA
-    STA      movement_delta_y    ; &23CC
+    LDA      #&ff
+    STA      movement_delta_y
 
 .return_from_delta_towards_player_23a3
-    RTS    ; &23CE
+    RTS
 
 .release_spook_pair_when_timer_expires
-    DEC      spook_release_timer    ; &23CF
-    BNE      return_from_spook_release_or_draw_23cf    ; &23D2
-    LDA      #&0    ; &23D4
-    STA      spook_pause_counter    ; &23D6
-    STA      spook_first_cell_x    ; &23D9
-    STA      spook_first_cell_y    ; &23DC
-    STA      &0A8E    ; &23DF
-    STA      &0A0F    ; &23E2
-    LDA      #&30    ; &23E5
-    STA      &0ACE    ; &23E7
-    LDA      #&32    ; &23EA
-    STA      &0ACF    ; &23EC
-    LDA      #&80    ; &23EF
-    STA      &0A8F    ; &23F1
-    LDA      #&2    ; &23F4
-    STA      &0A4F    ; &23F6
-    JSR      draw_spook_pair_if_released    ; &23F9
+    DEC      spook_release_timer
+    BNE      return_from_spook_release_or_draw_23cf
+    LDA      #&0
+    STA      spook_pause_counter
+    STA      spook_first_cell_x
+    STA      spook_first_cell_y
+    STA      &0A8E
+    STA      &0A0F
+    LDA      #&30
+    STA      &0ACE
+    LDA      #&32
+    STA      &0ACF
+    LDA      #&80
+    STA      &0A8F
+    LDA      #&2
+    STA      &0A4F
+    JSR      draw_spook_pair_if_released
 
 .return_from_spook_release_or_draw_23cf
-    RTS    ; &23FC
+    RTS
 
 .draw_spook_pair_if_released
-    LDA      spook_release_timer    ; &23FD
-    BNE      return_from_spook_release_or_draw_23cf    ; &2400
-    LDA      #&0    ; &2402
-    STA      render_mode_or_text_scratch    ; &2404
-    LDX      #&e    ; &2406
-    JSR      draw_object_by_index    ; &2408
-    LDX      #&f    ; &240B
-    JMP      draw_object_by_index    ; &240D
+    LDA      spook_release_timer
+    BNE      return_from_spook_release_or_draw_23cf
+    LDA      #&0
+    STA      render_mode_or_text_scratch
+    LDX      #&e
+    JSR      draw_object_by_index
+    LDX      #&f
+    JMP      draw_object_by_index
 
 .move_spook_pair_towards_player
-    LDA      frame_phase    ; &2410
-    AND      #&1    ; &2412
-    BEQ      return_from_spook_release_or_draw_23cf    ; &2414
-    LDA      spook_release_timer    ; &2416
-    BNE      return_from_spook_release_or_draw_23cf    ; &2419
-    LDA      spook_pause_counter    ; &241B
-    BEQ      move_spook_pair_active_step_2410    ; &241E
-    DEC      spook_pause_counter    ; &2420
-    RTS    ; &2423
+    LDA      frame_phase
+    AND      #&1
+    BEQ      return_from_spook_release_or_draw_23cf
+    LDA      spook_release_timer
+    BNE      return_from_spook_release_or_draw_23cf
+    LDA      spook_pause_counter
+    BEQ      move_spook_pair_active_step_2410
+    DEC      spook_pause_counter
+    RTS
 
 .move_spook_pair_active_step_2410
-    LDA      #&7    ; &2424
-    LDX      #&c    ; &2426
-    JSR      vdu19_set_palette_or_colour    ; &2428
-    JSR      draw_spook_pair_if_released    ; &242B
-    LDX      #&e    ; &242E
-    JSR      delta_towards_player_for_object_x    ; &2430
-    JSR      move_object_and_update_screen_ptr    ; &2433
-    LDX      #&f    ; &2436
-    JSR      move_object_and_update_screen_ptr    ; &2438
-    JMP      draw_spook_pair_if_released    ; &243B
+    LDA      #&7
+    LDX      #&c
+    JSR      vdu19_set_palette_or_colour
+    JSR      draw_spook_pair_if_released
+    LDX      #&e
+    JSR      delta_towards_player_for_object_x
+    JSR      move_object_and_update_screen_ptr
+    LDX      #&f
+    JSR      move_object_and_update_screen_ptr
+    JMP      draw_spook_pair_if_released
 
 .place_target_code_objects_for_room
-    LDX      highest_required_target_slot    ; &243E
+    LDX      highest_required_target_slot
 
 .place_target_code_object_scan_loop_243e
-    JSR      place_one_target_code_object_if_due    ; &2440
-    LDX      active_object_index    ; &2443
-    DEX    ; &2445
-    BPL      place_target_code_object_scan_loop_243e    ; &2446
-    LDX      #&6    ; &2448
+    JSR      place_one_target_code_object_if_due
+    LDX      active_object_index
+    DEX
+    BPL      place_target_code_object_scan_loop_243e
+    LDX      #&6
 
 .place_one_target_code_object_if_due
-    STX      active_object_index    ; &244A
-    LDA      room_area    ; &244C
-    AND      #&f    ; &244E
-    CMP      target_room_code,X    ; &2450
-    BNE      return_from_place_target_code_object_244a    ; &2453
-    LDA      target_collected_status,X    ; &2455
-    BNE      return_from_place_target_code_object_244a    ; &2458
-    TXA    ; &245A
-    CLC    ; &245B
-    ADC      #&22    ; &245C
-    STA      logical_item_slot_index    ; &245E
-    JMP      random_place_item    ; &2460
+    STX      active_object_index
+    LDA      room_area
+    AND      #&f
+    CMP      target_room_code,X
+    BNE      return_from_place_target_code_object_244a
+    LDA      target_collected_status,X
+    BNE      return_from_place_target_code_object_244a
+    TXA
+    CLC
+    ADC      #&22
+    STA      logical_item_slot_index
+    JMP      random_place_item
 
 .return_from_place_target_code_object_244a
-    RTS    ; &2463
+    RTS
 
 .scan_escape_key
-    LDX      #&8f    ; &2464
+    LDX      #&8f
 
 .scan_inkey_current_x
-    LDA      #&81    ; &2466
-    LDY      #&ff    ; &2468
-    JSR      MOS_OSBYTE    ; &246A
-    CPX      #&0    ; &246D
-    RTS    ; &246F
+    LDA      #&81
+    LDY      #&ff
+    JSR      MOS_OSBYTE
+    CPX      #&0
+    RTS
 
 .handle_sound_on_off_keys
-    LDX      #&ae    ; &2470
-    JSR      scan_inkey_current_x    ; &2472
-    BEQ      sound_toggle_check_sound_off_key_2470    ; &2475
-    LDA      #&0    ; &2477
-    STA      sound_disabled_flag    ; &2479
+    LDX      #&ae
+    JSR      scan_inkey_current_x
+    BEQ      sound_toggle_check_sound_off_key_2470
+    LDA      #&0
+    STA      sound_disabled_flag
 
 .sound_toggle_check_sound_off_key_2470
-    LDX      #&ef    ; &247C
-    JSR      scan_inkey_current_x    ; &247E
-    BEQ      return_from_sound_toggle_2470    ; &2481
-    LDA      #&c    ; &2483
-    JSR      play_sound_id_if_enabled    ; &2485
-    LDA      #&10    ; &2488
-    JSR      play_sound_id_if_enabled    ; &248A
-    LDA      #&1    ; &248D
-    STA      sound_disabled_flag    ; &248F
+    LDX      #&ef
+    JSR      scan_inkey_current_x
+    BEQ      return_from_sound_toggle_2470
+    LDA      #&c
+    JSR      play_sound_id_if_enabled
+    LDA      #&10
+    JSR      play_sound_id_if_enabled
+    LDA      #&1
+    STA      sound_disabled_flag
 
 .return_from_sound_toggle_2470
-    RTS    ; &2492
+    RTS
 
 .redraw_player_with_saved_graphic_pair
-    LDA      player_graphic_id_first_cell    ; &2493
-    STA      temp_player_graphic_id_first    ; &2496
-    LDA      player_graphic_id_second_cell    ; &2498
-    STA      temp_player_graphic_id_second    ; &249B
-    LDA      saved_visible_player_graphic_id_second    ; &249D
-    STA      player_graphic_id_second_cell    ; &249F
-    LDA      saved_visible_player_graphic_id_first    ; &24A2
-    STA      player_graphic_id_first_cell    ; &24A4
-    LDA      #&0    ; &24A7
-    STA      render_mode_or_text_scratch    ; &24A9
-    LDX      #&10    ; &24AB
-    JSR      draw_object_using_saved_screen_ptr    ; &24AD
-    LDX      #&11    ; &24B0
-    JSR      draw_object_using_saved_screen_ptr    ; &24B2
-    LDA      temp_player_graphic_id_first    ; &24B5
-    STA      player_graphic_id_first_cell    ; &24B7
-    LDA      temp_player_graphic_id_second    ; &24BA
-    STA      player_graphic_id_second_cell    ; &24BC
-    RTS    ; &24BF
+    LDA      player_graphic_id_first_cell
+    STA      temp_player_graphic_id_first
+    LDA      player_graphic_id_second_cell
+    STA      temp_player_graphic_id_second
+    LDA      saved_visible_player_graphic_id_second
+    STA      player_graphic_id_second_cell
+    LDA      saved_visible_player_graphic_id_first
+    STA      player_graphic_id_first_cell
+    LDA      #&0
+    STA      render_mode_or_text_scratch
+    LDX      #&10
+    JSR      draw_object_using_saved_screen_ptr
+    LDX      #&11
+    JSR      draw_object_using_saved_screen_ptr
+    LDA      temp_player_graphic_id_first
+    STA      player_graphic_id_first_cell
+    LDA      temp_player_graphic_id_second
+    STA      player_graphic_id_second_cell
+    RTS
 
 .vdu19_set_palette_or_colour
-    PHA    ; &24C0
-    LDA      #&13    ; &24C1
-    JSR      MOS_OSWRCH    ; &24C3
-    TXA    ; &24C6
-    JSR      MOS_OSWRCH    ; &24C7
-    PLA    ; &24CA
-    JSR      MOS_OSWRCH    ; &24CB
-    LDA      #&0    ; &24CE
-    JSR      MOS_OSWRCH    ; &24D0
-    JSR      MOS_OSWRCH    ; &24D3
-    JMP      MOS_OSWRCH    ; &24D6
+    PHA
+    LDA      #&13
+    JSR      MOS_OSWRCH
+    TXA
+    JSR      MOS_OSWRCH
+    PLA
+    JSR      MOS_OSWRCH
+    LDA      #&0
+    JSR      MOS_OSWRCH
+    JSR      MOS_OSWRCH
+    JMP      MOS_OSWRCH
 
 .runtime_data_padding_24d9
     ; zero padding/workspace tail between runtime code and resident data tables
-    EQUB &00,&00,&00,&00,&00,&00,&00,&00    ; &24D9
-    EQUB &00,&00,&00,&00,&00,&00,&00,&00    ; &24E1
-    EQUB &00,&00,&00,&00,&00,&00,&00,&00    ; &24E9
-    EQUB &00,&00,&00,&00,&00,&00,&00,&00    ; &24F1
-    EQUB &00,&00,&00,&00,&00,&00,&00    ; &24F9
+    EQUB &00,&00,&00,&00,&00,&00,&00,&00
+    EQUB &00,&00,&00,&00,&00,&00,&00,&00
+    EQUB &00,&00,&00,&00,&00,&00,&00,&00
+    EQUB &00,&00,&00,&00,&00,&00,&00,&00
+    EQUB &00,&00,&00,&00,&00,&00,&00
 
 .screen_copy_control_streams
     ; byte stream consumed by screen/text copy helpers; not executable code
-    EQUB &00,&00,&00,&00,&00,&00,&00,&00    ; &2500
-    EQUB &00,&00,&00,&00,&00,&00,&00,&00    ; &2508
-    EQUB &00,&00,&00,&00,&00,&00,&00,&00    ; &2510
-    EQUB &00,&00,&00,&00,&00,&00,&00,&00    ; &2518
-    EQUB &00,&00,&00,&00,&00,&00,&00,&00    ; &2520
-    EQUB &00,&00,&00,&00,&00,&00,&00,&00    ; &2528
-    EQUB &00,&00,&00,&00,&00,&00,&00,&00    ; &2530
-    EQUB &00,&00,&00,&00,&00,&00,&00,&00    ; &2538
-    EQUB &70,&34,&20,&4C,&44,&58,&73,&78    ; &2540
-    EQUB &3A,&4C,&44    ; &2548
+    EQUB &00,&00,&00,&00,&00,&00,&00,&00
+    EQUB &00,&00,&00,&00,&00,&00,&00,&00
+    EQUB &00,&00,&00,&00,&00,&00,&00,&00
+    EQUB &00,&00,&00,&00,&00,&00,&00,&00
+    EQUB &00,&00,&00,&00,&00,&00,&00,&00
+    EQUB &00,&00,&00,&00,&00,&00,&00,&00
+    EQUB &00,&00,&00,&00,&00,&00,&00,&00
+    EQUB &00,&00,&00,&00,&00,&00,&00,&00
+    EQUB &70,&34,&20,&4C,&44,&58,&73,&78
+    EQUB &3A,&4C,&44
 
 .player_start_second_graphic_by_exit_1735
     ; four-entry player start/reset table indexed by room-exit direction
@@ -3500,7 +3500,7 @@ org runtime_start
     ; start_exit_1 first_gfx=&0C second_gfx=&0E dir_seed=&03
     ; start_exit_2 first_gfx=&04 second_gfx=&06 dir_seed=&01
     ; start_exit_3 first_gfx=&00 second_gfx=&02 dir_seed=&00
-    EQUB &0A,&0E,&06,&02    ; &254B
+    EQUB &0A,&0E,&06,&02
 
 .player_start_first_graphic_by_exit_1735
     ; four-entry player start/reset table indexed by room-exit direction
@@ -3508,7 +3508,7 @@ org runtime_start
     ; start_exit_1 first_gfx=&0C second_gfx=&0E dir_seed=&03
     ; start_exit_2 first_gfx=&04 second_gfx=&06 dir_seed=&01
     ; start_exit_3 first_gfx=&00 second_gfx=&02 dir_seed=&00
-    EQUB &08,&0C,&04,&00    ; &254F
+    EQUB &08,&0C,&04,&00
 
 .player_start_direction_by_exit_1735
     ; four-entry player start/reset table indexed by room-exit direction
@@ -3516,13 +3516,13 @@ org runtime_start
     ; start_exit_1 first_gfx=&0C second_gfx=&0E dir_seed=&03
     ; start_exit_2 first_gfx=&04 second_gfx=&06 dir_seed=&01
     ; start_exit_3 first_gfx=&00 second_gfx=&02 dir_seed=&00
-    EQUB &02,&03,&01,&00    ; &2553
+    EQUB &02,&03,&01,&00
 
 .object_legend_graphic_ids_1175
     ; legend_graphic_ids index0=SPINNER:$2A index1=CLONE:$2B index2=CYBERDROID:$2C index3=SAFE:$3D index4=KEY:$3F index5=POT_OF_GOLD:$32 index6=RING:$3E
     ; legend_graphic_screens index0=&4490 index1=&4C10 index2=&5390 index3=&5B10 index4=&6290 index5=&6A10 index6=&7190
     ; SPOOK uses immediate graphic ids $2E/$2F at $11E1/$11F5, outside this table
-    EQUB &2A,&2B,&2C,&3D,&3F,&32,&3E    ; &2557
+    EQUB &2A,&2B,&2C,&3D,&3F,&32,&3E
 
 .object_legend_text_stream_offsets_1175
     ; legend text offset table paired with $2568/$2572 screen pointer bytes
@@ -3536,8 +3536,8 @@ org runtime_start
     ; legend_text_row_7 screen=&6980 stream=&25C6 text=POT_OF_GOLD
     ; legend_text_row_8 screen=&7100 stream=&25D8 text=RING
     ; extra_text_table_entry_9 screen=&7B00 stream=&2587 text=PRESS_SPACE_TO_START; $1175 exits after row 8
-    EQUB &7C,&9D,&A4,&AD,&B4,&C0,&D3,&C6    ; &255E
-    EQUB &D8,&87    ; &2566
+    EQUB &7C,&9D,&A4,&AD,&B4,&C0,&D3,&C6
+    EQUB &D8,&87
 
 .object_legend_screen_high_bytes_1175
     ; legend_screen_pointer_bytes pair with text offsets; report object_legend_text_table_1175 has full screen addresses
@@ -3551,8 +3551,8 @@ org runtime_start
     ; legend_text_row_7 screen=&6980 stream=&25C6 text=POT_OF_GOLD
     ; legend_text_row_8 screen=&7100 stream=&25D8 text=RING
     ; extra_text_table_entry_9 screen=&7B00 stream=&2587 text=PRESS_SPACE_TO_START; $1175 exits after row 8
-    EQUB &30,&3C,&44,&4B,&53,&5A,&62,&69    ; &2568
-    EQUB &71,&7B    ; &2570
+    EQUB &30,&3C,&44,&4B,&53,&5A,&62,&69
+    EQUB &71,&7B
 
 .object_legend_screen_low_bytes_1175
     ; legend_screen_pointer_bytes pair with text offsets; report object_legend_text_table_1175 has full screen addresses
@@ -3566,228 +3566,228 @@ org runtime_start
     ; legend_text_row_7 screen=&6980 stream=&25C6 text=POT_OF_GOLD
     ; legend_text_row_8 screen=&7100 stream=&25D8 text=RING
     ; extra_text_table_entry_9 screen=&7B00 stream=&2587 text=PRESS_SPACE_TO_START; $1175 exits after row 8
-    EQUB &00,&80,&00,&80,&00,&80,&00,&80    ; &2572
-    EQUB &00,&00    ; &257A
+    EQUB &00,&80,&00,&80,&00,&80,&00,&80
+    EQUB &00,&00
 
 .encoded_text_stream_cybertron
     ; encoded text stream: first byte is colour/position control, $FF terminates
     ; decoded_text control=&05 text="CYBERTRON"
-    EQUB &05,&23,&39,&22,&25,&32,&34,&32    ; &257C
-    EQUB &2F,&2E,&FF    ; &2584
+    EQUB &05,&23,&39,&22,&25,&32,&34,&32
+    EQUB &2F,&2E,&FF
 
 .encoded_text_stream_press_space_to_start
     ; encoded text stream: first byte is colour/position control, $FF terminates
     ; decoded_text control=&00 text="PRESS SPACE TO START"
-    EQUB &00,&30,&32,&25,&33,&33,&00,&33    ; &2587
-    EQUB &30,&21,&23,&25,&00,&34,&2F,&00    ; &258F
-    EQUB &33,&34,&21,&32,&34,&FF    ; &2597
+    EQUB &00,&30,&32,&25,&33,&33,&00,&33
+    EQUB &30,&21,&23,&25,&00,&34,&2F,&00
+    EQUB &33,&34,&21,&32,&34,&FF
 
 .encoded_text_stream_spook
     ; encoded text stream: first byte is colour/position control, $FF terminates
     ; decoded_text control=&06 text="SPOOK"
-    EQUB &06,&33,&30,&2F,&2F,&2B,&FF    ; &259D
+    EQUB &06,&33,&30,&2F,&2F,&2B,&FF
 
 .encoded_text_stream_spinner
     ; encoded text stream: first byte is colour/position control, $FF terminates
     ; decoded_text control=&06 text="SPINNER"
-    EQUB &06,&33,&30,&29,&2E,&2E,&25,&32    ; &25A4
-    EQUB &FF    ; &25AC
+    EQUB &06,&33,&30,&29,&2E,&2E,&25,&32
+    EQUB &FF
 
 .encoded_text_stream_clone
     ; encoded text stream: first byte is colour/position control, $FF terminates
     ; decoded_text control=&06 text="CLONE"
-    EQUB &06,&23,&2C,&2F,&2E,&25,&FF    ; &25AD
+    EQUB &06,&23,&2C,&2F,&2E,&25,&FF
 
 .encoded_text_stream_cyberdroid
     ; encoded text stream: first byte is colour/position control, $FF terminates
     ; decoded_text control=&06 text="CYBERDROID"
-    EQUB &06,&23,&39,&22,&25,&32,&24,&32    ; &25B4
-    EQUB &2F,&29,&24,&FF    ; &25BC
+    EQUB &06,&23,&39,&22,&25,&32,&24,&32
+    EQUB &2F,&29,&24,&FF
 
 .encoded_text_stream_safe
     ; encoded text stream: first byte is colour/position control, $FF terminates
     ; decoded_text control=&06 text="SAFE"
-    EQUB &06,&33,&21,&26,&25,&FF    ; &25C0
+    EQUB &06,&33,&21,&26,&25,&FF
 
 .encoded_text_stream_pot_of_gold
     ; encoded text stream: first byte is colour/position control, $FF terminates
     ; decoded_text control=&06 text="POT OF GOLD"
-    EQUB &06,&30,&2F,&34,&00,&2F,&26,&00    ; &25C6
-    EQUB &27,&2F,&2C,&24,&FF    ; &25CE
+    EQUB &06,&30,&2F,&34,&00,&2F,&26,&00
+    EQUB &27,&2F,&2C,&24,&FF
 
 .encoded_text_stream_key
     ; encoded text stream: first byte is colour/position control, $FF terminates
     ; decoded_text control=&06 text="KEY"
-    EQUB &06,&2B,&25,&39,&FF    ; &25D3
+    EQUB &06,&2B,&25,&39,&FF
 
 .encoded_text_stream_ring
     ; encoded text stream: first byte is colour/position control, $FF terminates
     ; decoded_text control=&06 text="RING"
-    EQUB &06,&32,&29,&2E,&27,&FF    ; &25D8
+    EQUB &06,&32,&29,&2E,&27,&FF
 
 .encoded_text_stream_level
     ; encoded text stream: first byte is colour/position control, $FF terminates
     ; decoded_text control=&06 text="LEVEL"
-    EQUB &06,&2C,&25,&36,&25,&2C,&FF    ; &25DE
+    EQUB &06,&2C,&25,&36,&25,&2C,&FF
 
 .encoded_text_stream_end_of_game
     ; encoded text stream: first byte is colour/position control, $FF terminates
     ; decoded_text control=&04 text="END OF GAME"
-    EQUB &04,&25,&2E,&24,&00,&2F,&26,&00    ; &25E5
-    EQUB &27,&21,&2D,&25,&FF    ; &25ED
+    EQUB &04,&25,&2E,&24,&00,&2F,&26,&00
+    EQUB &27,&21,&2D,&25,&FF
 
 .encoded_text_stream_keys
     ; encoded text stream: first byte is colour/position control, $FF terminates
     ; decoded_text control=&08 text="KEYS"
-    EQUB &08,&2B,&25,&39,&33,&FF    ; &25F2
+    EQUB &08,&2B,&25,&39,&33,&FF
 
 .encoded_text_stream_status
     ; encoded text stream: first byte is colour/position control, $FF terminates
     ; decoded_text control=&07 text="STATUS"
-    EQUB &07,&33,&34,&21,&34,&35,&33,&FF    ; &25F8
+    EQUB &07,&33,&34,&21,&34,&35,&33,&FF
 
 .control_help_text
     ; raw VDU/text stream for the controls screen
     ; printable_text_runs "UP" "DOWN" "LEFT" "RIGHT" "FIRE" "SOUND" "ON" "SOUND" "OFF" "PAUSE" "RESUME" "OR FIRE BUTTON"
-    EQUB &11,&01,&1F,&03,&06,&41,&09,&09    ; &2600
-    EQUB &55,&50,&1F,&03,&08,&5A,&09,&09    ; &2608
-    EQUB &44,&4F,&57,&4E,&1F,&03,&0A,&3C    ; &2610
-    EQUB &09,&09,&4C,&45,&46,&54,&1F,&03    ; &2618
-    EQUB &0C,&3E,&09,&09,&52,&49,&47,&48    ; &2620
-    EQUB &54,&1F,&03,&0E,&4D,&09,&09,&46    ; &2628
-    EQUB &49,&52,&45,&1F,&03,&10,&53,&09    ; &2630
-    EQUB &09,&53,&4F,&55,&4E,&44,&09,&4F    ; &2638
-    EQUB &4E,&1F,&03,&12,&51,&09,&09,&53    ; &2640
-    EQUB &4F,&55,&4E,&44,&09,&4F,&46,&46    ; &2648
-    EQUB &1F,&03,&14,&50,&09,&09,&50,&41    ; &2650
-    EQUB &55,&53,&45,&1F,&03,&16,&52,&09    ; &2658
-    EQUB &09,&52,&45,&53,&55,&4D,&45,&1F    ; &2660
-    EQUB &03,&1C,&4F,&52,&20,&46,&49,&52    ; &2668
-    EQUB &45,&20,&42,&55,&54,&54,&4F,&4E    ; &2670
+    EQUB &11,&01,&1F,&03,&06,&41,&09,&09
+    EQUB &55,&50,&1F,&03,&08,&5A,&09,&09
+    EQUB &44,&4F,&57,&4E,&1F,&03,&0A,&3C
+    EQUB &09,&09,&4C,&45,&46,&54,&1F,&03
+    EQUB &0C,&3E,&09,&09,&52,&49,&47,&48
+    EQUB &54,&1F,&03,&0E,&4D,&09,&09,&46
+    EQUB &49,&52,&45,&1F,&03,&10,&53,&09
+    EQUB &09,&53,&4F,&55,&4E,&44,&09,&4F
+    EQUB &4E,&1F,&03,&12,&51,&09,&09,&53
+    EQUB &4F,&55,&4E,&44,&09,&4F,&46,&46
+    EQUB &1F,&03,&14,&50,&09,&09,&50,&41
+    EQUB &55,&53,&45,&1F,&03,&16,&52,&09
+    EQUB &09,&52,&45,&53,&55,&4D,&45,&1F
+    EQUB &03,&1C,&4F,&52,&20,&46,&49,&52
+    EQUB &45,&20,&42,&55,&54,&54,&4F,&4E
 
 .scroll_or_animation_seed_table
     ; raw_printable_view ",!34" "3#/2%"
-    EQUB &00,&00,&00,&2C,&21,&33,&34,&00    ; &2678
-    EQUB &33,&23,&2F,&32,&25,&00    ; &2680
+    EQUB &00,&00,&00,&2C,&21,&33,&34,&00
+    EQUB &33,&23,&2F,&32,&25,&00
 
 .current_score_title_digits
     ; title score/glyph buffer updated by $0D9C; bytes are renderer glyph ids, not plain text
     ; raw_printable_view "()'(" "3#/2%"
-    EQUB &10,&10,&10,&10,&10,&00,&00,&00    ; &2686
-    EQUB &28,&29,&27,&28,&00,&33,&23,&2F    ; &268E
-    EQUB &32,&25,&00    ; &2696
+    EQUB &10,&10,&10,&10,&10,&00,&00,&00
+    EQUB &28,&29,&27,&28,&00,&33,&23,&2F
+    EQUB &32,&25,&00
 
 .best_score_title_digits
     ; title best-score/glyph buffer updated by $0D80/$0D9C; bytes are renderer glyph ids, not plain text
     ; raw_printable_view "0ROGRAM" "0OWER" "#9"%242/."
-    EQUB &10,&10,&10,&10,&10,&00,&00,&30    ; &2699
-    EQUB &52,&4F,&47,&52,&41,&4D,&00,&30    ; &26A1
-    EQUB &4F,&57,&45,&52,&00,&23,&39,&22    ; &26A9
-    EQUB &25,&32,&34,&32,&2F,&2E,&00    ; &26B1
+    EQUB &10,&10,&10,&10,&10,&00,&00,&30
+    EQUB &52,&4F,&47,&52,&41,&4D,&00,&30
+    EQUB &4F,&57,&45,&52,&00,&23,&39,&22
+    EQUB &25,&32,&34,&32,&2F,&2E,&00
 
 .zero_terminated_text_entering
     ; raw VDU/text stream terminated by $00
     ; printable_text_runs "ENTERING"
-    EQUB &11,&04,&1F,&06,&06,&45,&4E,&54    ; &26B8
-    EQUB &45,&52,&49,&4E,&47,&00    ; &26C0
+    EQUB &11,&04,&1F,&06,&06,&45,&4E,&54
+    EQUB &45,&52,&49,&4E,&47,&00
 
 .zero_terminated_text_find_the_following
     ; raw VDU/text stream terminated by $00
     ; printable_text_runs "FIND THE FOLLOWING"
-    EQUB &11,&04,&1F,&01,&11,&46,&49,&4E    ; &26C6
-    EQUB &44,&20,&54,&48,&45,&20,&46,&4F    ; &26CE
-    EQUB &4C,&4C,&4F,&57,&49,&4E,&47,&00    ; &26D6
+    EQUB &11,&04,&1F,&01,&11,&46,&49,&4E
+    EQUB &44,&20,&54,&48,&45,&20,&46,&4F
+    EQUB &4C,&4C,&4F,&57,&49,&4E,&47,&00
 
 .hazard_spawn_y_offsets_2235
     ; signed_values +3, -2, +1, +1, -2, +3, -2, +3
-    EQUB &03,&FE,&01,&01,&FE,&03,&FE,&03    ; &26DE
+    EQUB &03,&FE,&01,&01,&FE,&03,&FE,&03
 
 .hazard_spawn_x_offsets_2235
     ; signed_values +1, +1, +4, -2, +4, +4, -2, -2
-    EQUB &01,&01,&04,&FE,&04,&04,&FE,&FE    ; &26E6
+    EQUB &01,&01,&04,&FE,&04,&04,&FE,&FE
 
 .unclassified_data_26ee
     ; raw_printable_view "IN"
-    EQUB &49,&4E    ; &26EE
+    EQUB &49,&4E
 
 .base_palette_table_1f71
     ; palette data table; values are logical colour/palette bytes
-    EQUB &00,&01,&02,&03,&04,&05,&00,&07    ; &26F0
-    EQUB &07,&00,&07,&03,&07,&01,&00,&00    ; &26F8
+    EQUB &00,&01,&02,&03,&04,&05,&00,&07
+    EQUB &07,&00,&07,&03,&07,&01,&00,&00
 
 .level_intro_required_graphic_table_11fe
     ; required_target_graphics level_index_0=$3F:KEY level_index_1=$3E:RING level_index_2=$32:POT_OF_GOLD level_index_3=$3E:RING level_index_4=$32:POT_OF_GOLD level_index_5=$32:POT_OF_GOLD
-    EQUB &3F,&3E,&32,&3E,&32,&32    ; &2700
+    EQUB &3F,&3E,&32,&3E,&32,&32
 
 .text_render_colour_value
-    EQUB &01    ; &2706
+    EQUB &01
 
 .unclassified_palette_data_2707
     ; palette data table; values are logical colour/palette bytes
-    EQUB &04,&05,&10,&11,&14,&15,&00    ; &2707
+    EQUB &04,&05,&10,&11,&14,&15,&00
 
 .palette_cycle_logical15_values_17e4
     ; palette data table; values are logical colour/palette bytes
-    EQUB &00,&00,&01    ; &270E
+    EQUB &00,&00,&01
 
 .palette_cycle_logical14_values_17e4
     ; palette data table; values are logical colour/palette bytes
-    EQUB &00,&01,&00    ; &2711
+    EQUB &00,&01,&00
 
 .palette_cycle_logical13_values_17e4
     ; palette data table; values are logical colour/palette bytes
-    EQUB &01,&00,&00    ; &2714
+    EQUB &01,&00,&00
 
 .palette_data_2717
     ; palette data table; values are logical colour/palette bytes
-    EQUB &00,&01,&02,&03,&04,&05,&06,&07    ; &2717
-    EQUB &07,&06,&05,&04,&03,&02,&01,&00    ; &271F
+    EQUB &00,&01,&02,&03,&04,&05,&06,&07
+    EQUB &07,&06,&05,&04,&03,&02,&01,&00
 
 .early_init_vdu_bytes_13b4
     ; early init byte stream output by $13B4 through OSWRCH
-    EQUB &00,&00,&00,&00,&00,&00,&20,&0A    ; &2727
-    EQUB &00,&17,&02,&16,&00,&00,&00,&00    ; &272F
+    EQUB &00,&00,&00,&00,&00,&00,&20,&0A
+    EQUB &00,&17,&02,&16,&00,&00,&00,&00
 
 .target_collection_score_add_table_0fd6
     ; target collection score additions by target/status slot; slot0 and slot6 have special non-score paths
     ; score_add_slots slot0=0 slot1=10 slot2=50 slot3=100 slot4=50 slot5=100 slot6=0 slot7=0
-    EQUB &00,&0A,&32,&64,&32,&64,&00,&00    ; &2737
+    EQUB &00,&0A,&32,&64,&32,&64,&00,&00
 
 .unclassified_level_render_data_273f
     ; raw_printable_view "Rbprint"
-    EQUB &00,&52,&62,&70,&72,&69,&6E,&74    ; &273F
-    EQUB &04,&08,&00,&04,&04,&00,&08,&08    ; &2747
-    EQUB &00    ; &274F
+    EQUB &00,&52,&62,&70,&72,&69,&6E,&74
+    EQUB &04,&08,&00,&04,&04,&00,&08,&08
+    EQUB &00
 
 .level_palette_logical8_by_level_units_mod8
     ; palette data table; values are logical colour/palette bytes
     ; logical colour 8 value selected by current level low three bits after $1F71 base palette setup
-    EQUB &07,&07,&04,&05,&01,&02,&01,&04    ; &2750
+    EQUB &07,&07,&04,&05,&01,&02,&01,&04
 
 .unclassified_level_render_data_2758
-    EQUB &1C,&09,&09,&09,&09,&09,&09,&1C    ; &2758
-    EQUB &FF,&FF,&FF,&FF,&FF,&FF,&FF,&FF    ; &2760
-    EQUB &23,&FF,&FF,&FF,&FF,&FF,&FF,&23    ; &2768
+    EQUB &1C,&09,&09,&09,&09,&09,&09,&1C
+    EQUB &FF,&FF,&FF,&FF,&FF,&FF,&FF,&FF
+    EQUB &23,&FF,&FF,&FF,&FF,&FF,&FF,&23
 
 .spook_release_timer_by_level_index_1e3a
     ; level-indexed setup/count table used by $1E3A
     ; level_index_values level0=60 level1=80 level2=100 level3=100 level4=120 level5=120
-    EQUB &3C,&50,&64,&64,&78,&78    ; &2770
+    EQUB &3C,&50,&64,&64,&78,&78
 
 .cyberdroid_count_by_level_index_1e3a
     ; level-indexed setup/count table used by $1E3A
     ; level_index_values level0=0 level1=0 level2=2 level3=3 level4=4 level5=5
-    EQUB &00,&00,&02,&03,&04,&05    ; &2776
+    EQUB &00,&00,&02,&03,&04,&05
 
 .clone_count_by_level_index_1e3a
     ; level-indexed setup/count table used by $1E3A
     ; level_index_values level0=0 level1=3 level2=3 level3=3 level4=4 level5=5
-    EQUB &00,&03,&03,&03,&04,&05    ; &277C
+    EQUB &00,&03,&03,&03,&04,&05
 
 .spinner_count_by_level_index_1e3a
     ; level-indexed setup/count table used by $1E3A
     ; level_index_values level0=6 level1=3 level2=3 level3=2 level4=2 level5=2
-    EQUB &06,&03,&03,&02,&02,&02    ; &2782
+    EQUB &06,&03,&03,&02,&02,&02
 
 .player_shot_y_offsets_1c4d
     ; direction-indexed signed projectile/player-shot delta table
@@ -3800,32 +3800,32 @@ org runtime_start
     ; dir5 +4 +3 +4 +3 +1 +1 +12 0
     ; dir6 -1 +1 -2 -2 -1 -1 -12 -1
     ; dir7 -2 +3 -2 +3 -1 +1 -4 -1
-    EQUB &04,&FF,&02,&02,&01,&03,&01,&03    ; &2788
+    EQUB &04,&FF,&02,&02,&01,&03,&01,&03
 
 .player_shot_x_offsets_1c4d
     ; direction-indexed signed projectile/player-shot delta table
     ; signed_values +1, +1, +3, -1, +3, +4, -1, -2
-    EQUB &01,&01,&03,&FF,&03,&04,&FF,&FE    ; &2790
+    EQUB &01,&01,&03,&FF,&03,&04,&FF,&FE
 
 .projectile_grid_y_delta_by_dir_1b87
     ; direction-indexed signed projectile/player-shot delta table
     ; signed_values +1, -1, 0, 0, -1, +1, -1, +1
-    EQUB &01,&FF,&00,&00,&FF,&01,&FF,&01    ; &2798
+    EQUB &01,&FF,&00,&00,&FF,&01,&FF,&01
 
 .projectile_grid_x_delta_by_dir_1b87
     ; direction-indexed signed projectile/player-shot delta table
     ; signed_values 0, 0, +1, -1, +1, +1, -1, -1
-    EQUB &00,&00,&01,&FF,&01,&01,&FF,&FF    ; &27A0
+    EQUB &00,&00,&01,&FF,&01,&01,&FF,&FF
 
 .projectile_ptr_high_delta_by_dir_1b87
     ; direction-indexed signed projectile/player-shot delta table
     ; signed_values 0, -1, 0, -1, 0, 0, -1, -1
-    EQUB &00,&FF,&00,&FF,&00,&00,&FF,&FF    ; &27A8
+    EQUB &00,&FF,&00,&FF,&00,&00,&FF,&FF
 
 .projectile_ptr_low_delta_by_dir_1b87
     ; direction-indexed signed projectile/player-shot delta table
     ; signed_values +4, -4, +8, -8, +4, +12, -12, -4
-    EQUB &04,&FC,&08,&F8,&04,&0C,&F4,&FC    ; &27B0
+    EQUB &04,&FC,&08,&F8,&04,&0C,&F4,&FC
 
 .player_start_y_by_exit_1735
     ; four-entry player start/reset table indexed by room-exit direction
@@ -3834,45 +3834,45 @@ org runtime_start
     ; start_exit_1 x=&45 y=&1E gfx=&0C/&0E dir=&03 screen=&57A8/&5A28
     ; start_exit_2 x=&27 y=&32 gfx=&04/&06 dir=&01 screen=&6FB8/&7238
     ; start_exit_3 x=&27 y=&0A gfx=&00/&02 dir=&00 screen=&3DB8/&4038
-    EQUB &1E,&1E,&32,&0A    ; &27B8
+    EQUB &1E,&1E,&32,&0A
 
 .player_start_x_by_exit_1735
     ; four-entry player start/reset table indexed by room-exit direction
-    EQUB &07,&45,&27,&27    ; &27BC
+    EQUB &07,&45,&27,&27
 
 .player_start_second_screen_high_by_exit_1735
     ; four-entry player start/reset table indexed by room-exit direction
-    EQUB &58,&5A,&72,&40    ; &27C0
+    EQUB &58,&5A,&72,&40
 
 .player_start_second_screen_low_by_exit_1735
     ; four-entry player start/reset table indexed by room-exit direction
-    EQUB &38,&28,&38,&38    ; &27C4
+    EQUB &38,&28,&38,&38
 
 .player_start_first_screen_high_by_exit_1735
     ; four-entry player start/reset table indexed by room-exit direction
-    EQUB &55,&57,&6F,&3D    ; &27C8
+    EQUB &55,&57,&6F,&3D
 
 .player_start_first_screen_low_by_exit_1735
     ; four-entry player start/reset table indexed by room-exit direction
-    EQUB &B8,&A8,&B8,&B8    ; &27CC
+    EQUB &B8,&A8,&B8,&B8
 
 .player_direction_graphic_delta_table_16e1
     ; signed_values +1, -1, -4, +4
-    EQUB &01,&FF,&FC,&04    ; &27D0
+    EQUB &01,&FF,&FC,&04
 
 .keyboard_input_delta_y_table_1609
     ; keyboard direction table used by the $1609 input scanner
     ; signed_values -1, +1, 0, 0
-    EQUB &FF,&01,&00,&00    ; &27D4
+    EQUB &FF,&01,&00,&00
 
 .keyboard_input_delta_x_table_1609
     ; keyboard direction table used by the $1609 input scanner
     ; signed_values 0, 0, -1, +1
-    EQUB &00,&00,&FF,&01    ; &27D8
+    EQUB &00,&00,&FF,&01
 
 .keyboard_inkey_codes_table_1609
     ; keyboard direction table used by the $1609 input scanner
-    EQUB &BE,&9E,&99,&98    ; &27DC
+    EQUB &BE,&9E,&99,&98
 
 .room_layout_bank0_runtime
     ; 18-byte packed room record decoded by $14B9 as a 6x6 nibble grid
@@ -3882,9 +3882,9 @@ org runtime_start
     ; room_row_3 b 6 9 5 a 6
     ; room_row_4 3 9 6 a 5 3
     ; room_row_5 9 c 5 9 c 5
-    EQUB &CA,&CC,&6C,&A3,&CC,&36,&5B,&6A    ; &27E0
-    EQUB &59,&6B,&59,&6A,&93,&A6,&35,&C9    ; &27E8
-    EQUB &95,&5C    ; &27F0
+    EQUB &CA,&CC,&6C,&A3,&CC,&36,&5B,&6A
+    EQUB &59,&6B,&59,&6A,&93,&A6,&35,&C9
+    EQUB &95,&5C
 
 .room_layout_record_01
     ; 18-byte packed room record decoded by $14B9 as a 6x6 nibble grid
@@ -3894,9 +3894,9 @@ org runtime_start
     ; room_row_3 a c 5 3 0 2
     ; room_row_4 3 0 a 5 0 3
     ; room_row_5 9 c 5 8 c 5
-    EQUB &CA,&CC,&6C,&A3,&CC,&36,&59,&6A    ; &27F2
-    EQUB &59,&CA,&35,&20,&03,&5A,&30,&C9    ; &27FA
-    EQUB &85,&5C    ; &2802
+    EQUB &CA,&CC,&6C,&A3,&CC,&36,&59,&6A
+    EQUB &59,&CA,&35,&20,&03,&5A,&30,&C9
+    EQUB &85,&5C
 
 .room_layout_record_02
     ; 18-byte packed room record decoded by $14B9 as a 6x6 nibble grid
@@ -3906,9 +3906,9 @@ org runtime_start
     ; room_row_3 a 6 0 0 a 6
     ; room_row_4 3 9 c c 5 3
     ; room_row_5 9 c c c c 5
-    EQUB &CA,&CC,&6C,&A3,&CC,&36,&59,&00    ; &2804
-    EQUB &59,&6A,&00,&6A,&93,&CC,&35,&C9    ; &280C
-    EQUB &CC,&5C    ; &2814
+    EQUB &CA,&CC,&6C,&A3,&CC,&36,&59,&00
+    EQUB &59,&6A,&00,&6A,&93,&CC,&35,&C9
+    EQUB &CC,&5C
 
 .room_layout_record_03
     ; 18-byte packed room record decoded by $14B9 as a 6x6 nibble grid
@@ -3918,9 +3918,9 @@ org runtime_start
     ; room_row_3 2 8 6 a 4 3
     ; room_row_4 9 6 1 1 a 5
     ; room_row_5 0 9 4 8 5 0
-    EQUB &A0,&CC,&06,&5A,&22,&69,&81,&95    ; &2816
-    EQUB &34,&82,&A6,&34,&69,&11,&5A,&90    ; &281E
-    EQUB &84,&05    ; &2826
+    EQUB &A0,&CC,&06,&5A,&22,&69,&81,&95
+    EQUB &34,&82,&A6,&34,&69,&11,&5A,&90
+    EQUB &84,&05
 
 .room_layout_record_04
     ; 18-byte packed room record decoded by $14B9 as a 6x6 nibble grid
@@ -3930,9 +3930,9 @@ org runtime_start
     ; room_row_3 3 8 c c 5 3
     ; room_row_4 b c 4 0 0 3
     ; room_row_5 9 c 4 8 c 5
-    EQUB &EA,&A4,&6C,&93,&34,&32,&03,&10    ; &2828
-    EQUB &33,&83,&CC,&35,&CB,&04,&30,&C9    ; &2830
-    EQUB &84,&5C    ; &2838
+    EQUB &EA,&A4,&6C,&93,&34,&32,&03,&10
+    EQUB &33,&83,&CC,&35,&CB,&04,&30,&C9
+    EQUB &84,&5C
 
 .room_layout_record_05
     ; 18-byte packed room record decoded by $14B9 as a 6x6 nibble grid
@@ -3942,9 +3942,9 @@ org runtime_start
     ; room_row_3 3 3 8 5 3 2
     ; room_row_4 3 9 c 6 1 3
     ; room_row_5 9 c 4 9 c 5
-    EQUB &CA,&A4,&6C,&A3,&5C,&32,&33,&68    ; &283A
-    EQUB &13,&33,&58,&23,&93,&6C,&31,&C9    ; &2842
-    EQUB &94,&5C    ; &284A
+    EQUB &CA,&A4,&6C,&A3,&5C,&32,&33,&68
+    EQUB &13,&33,&58,&23,&93,&6C,&31,&C9
+    EQUB &94,&5C
 
 .room_layout_record_06
     ; 18-byte packed room record decoded by $14B9 as a 6x6 nibble grid
@@ -3954,9 +3954,9 @@ org runtime_start
     ; room_row_3 2 8 e c 5 2
     ; room_row_4 3 0 1 a 4 3
     ; room_row_5 9 c 4 9 c 5
-    EQUB &CA,&CC,&6C,&83,&A6,&34,&01,&59    ; &284C
-    EQUB &12,&82,&CE,&25,&03,&A1,&34,&C9    ; &2854
-    EQUB &94,&5C    ; &285C
+    EQUB &CA,&CC,&6C,&83,&A6,&34,&01,&59
+    EQUB &12,&82,&CE,&25,&03,&A1,&34,&C9
+    EQUB &94,&5C
 
 .room_layout_record_07
     ; 18-byte packed room record decoded by $14B9 as a 6x6 nibble grid
@@ -3966,9 +3966,9 @@ org runtime_start
     ; room_row_3 a 5 0 3 1 3
     ; room_row_4 b c c 5 0 3
     ; room_row_5 9 c 4 8 c 5
-    EQUB &CA,&A6,&6C,&CB,&95,&7E,&A1,&6C    ; &285E
-    EQUB &33,&5A,&30,&31,&CB,&5C,&30,&C9    ; &2866
-    EQUB &84,&5C    ; &286E
+    EQUB &CA,&A6,&6C,&CB,&95,&7E,&A1,&6C
+    EQUB &33,&5A,&30,&31,&CB,&5C,&30,&C9
+    EQUB &84,&5C
 
 .room_layout_record_08
     ; 18-byte packed room record decoded by $14B9 as a 6x6 nibble grid
@@ -3978,9 +3978,9 @@ org runtime_start
     ; room_row_3 3 9 6 a c 6
     ; room_row_4 3 0 3 3 0 3
     ; room_row_5 9 c 5 9 c 5
-    EQUB &CA,&A6,&6C,&03,&33,&30,&A3,&95    ; &2870
-    EQUB &5C,&93,&A6,&6C,&03,&33,&30,&C9    ; &2878
-    EQUB &95,&5C    ; &2880
+    EQUB &CA,&A6,&6C,&03,&33,&30,&A3,&95
+    EQUB &5C,&93,&A6,&6C,&03,&33,&30,&C9
+    EQUB &95,&5C
 
 .room_layout_record_09
     ; 18-byte packed room record decoded by $14B9 as a 6x6 nibble grid
@@ -3990,9 +3990,9 @@ org runtime_start
     ; room_row_3 2 a 5 9 6 2
     ; room_row_4 3 9 4 8 5 3
     ; room_row_5 9 c 4 8 c 5
-    EQUB &CA,&84,&6C,&A3,&84,&36,&91,&A6    ; &2882
-    EQUB &15,&A2,&95,&26,&93,&84,&35,&C9    ; &288A
-    EQUB &84,&5C    ; &2892
+    EQUB &CA,&84,&6C,&A3,&84,&36,&91,&A6
+    EQUB &15,&A2,&95,&26,&93,&84,&35,&C9
+    EQUB &84,&5C
 
 .room_layout_record_0a
     ; 18-byte packed room record decoded by $14B9 as a 6x6 nibble grid
@@ -4002,9 +4002,9 @@ org runtime_start
     ; room_row_3 2 a 7 3 3 3
     ; room_row_4 3 9 5 9 5 3
     ; room_row_5 9 c c c c 5
-    EQUB &CA,&A6,&6C,&CB,&97,&7C,&01,&A3    ; &2894
-    EQUB &36,&A2,&37,&33,&93,&95,&35,&C9    ; &289C
-    EQUB &CC,&5C    ; &28A4
+    EQUB &CA,&A6,&6C,&CB,&97,&7C,&01,&A3
+    EQUB &36,&A2,&37,&33,&93,&95,&35,&C9
+    EQUB &CC,&5C
 
 .room_layout_record_0b
     ; 18-byte packed room record decoded by $14B9 as a 6x6 nibble grid
@@ -4014,9 +4014,9 @@ org runtime_start
     ; room_row_3 3 3 3 3 3 3
     ; room_row_4 3 1 3 3 1 3
     ; room_row_5 9 c 5 9 c 5
-    EQUB &CA,&84,&6C,&A3,&CC,&36,&33,&22    ; &28A6
-    EQUB &33,&33,&33,&33,&13,&33,&31,&C9    ; &28AE
-    EQUB &95,&5C    ; &28B6
+    EQUB &CA,&84,&6C,&A3,&CC,&36,&33,&22
+    EQUB &33,&33,&33,&33,&13,&33,&31,&C9
+    EQUB &95,&5C
 
 .room_layout_record_0c
     ; 18-byte packed room record decoded by $14B9 as a 6x6 nibble grid
@@ -4026,9 +4026,9 @@ org runtime_start
     ; room_row_3 3 9 6 3 0 2
     ; room_row_4 3 0 1 1 0 3
     ; room_row_5 9 c c c c 5
-    EQUB &CA,&84,&6C,&A3,&04,&30,&33,&E8    ; &28B8
-    EQUB &5C,&93,&36,&20,&03,&11,&30,&C9    ; &28C0
-    EQUB &CC,&5C    ; &28C8
+    EQUB &CA,&84,&6C,&A3,&04,&30,&33,&E8
+    EQUB &5C,&93,&36,&20,&03,&11,&30,&C9
+    EQUB &CC,&5C
 
 .room_layout_record_0d
     ; 18-byte packed room record decoded by $14B9 as a 6x6 nibble grid
@@ -4038,9 +4038,9 @@ org runtime_start
     ; room_row_3 a 6 0 0 3 3
     ; room_row_4 3 9 c c 5 3
     ; room_row_5 9 c c c c 5
-    EQUB &CA,&A6,&6C,&A3,&95,&36,&59,&00    ; &28CA
-    EQUB &33,&6A,&00,&33,&93,&CC,&35,&C9    ; &28D2
-    EQUB &CC,&5C    ; &28DA
+    EQUB &CA,&A6,&6C,&A3,&95,&36,&59,&00
+    EQUB &33,&6A,&00,&33,&93,&CC,&35,&C9
+    EQUB &CC,&5C
 
 .room_layout_record_0e
     ; 18-byte packed room record decoded by $14B9 as a 6x6 nibble grid
@@ -4050,9 +4050,9 @@ org runtime_start
     ; room_row_3 b c c 5 3 2
     ; room_row_4 3 8 c c 5 3
     ; room_row_5 9 c c c c 5
-    EQUB &CA,&CC,&6E,&A3,&6C,&33,&93,&34    ; &28DC
-    EQUB &13,&CB,&5C,&23,&83,&CC,&35,&C9    ; &28E4
-    EQUB &CC,&5C    ; &28EC
+    EQUB &CA,&CC,&6E,&A3,&6C,&33,&93,&34
+    EQUB &13,&CB,&5C,&23,&83,&CC,&35,&C9
+    EQUB &CC,&5C
 
 .room_layout_record_0f
     ; 18-byte packed room record decoded by $14B9 as a 6x6 nibble grid
@@ -4062,9 +4062,9 @@ org runtime_start
     ; room_row_3 a c c 5 0 3
     ; room_row_4 3 0 0 0 0 3
     ; room_row_5 9 c c c c 5
-    EQUB &CA,&A6,&6C,&03,&33,&30,&C9,&35    ; &28EE
-    EQUB &30,&CA,&5C,&30,&03,&00,&30,&C9    ; &28F6
-    EQUB &CC,&5C    ; &28FE
+    EQUB &CA,&A6,&6C,&03,&33,&30,&C9,&35
+    EQUB &30,&CA,&5C,&30,&03,&00,&30,&C9
+    EQUB &CC,&5C
 
 .graphic_record_00
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4074,9 +4074,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 3000 / 1010 / 1010 / 0000 / 0210 / 0210 / 2200
     ; graphic_strip_1_pixels 3300 / 1111 / 1111 / 1111 / 1111 / 0011 / 0011 / 1100
     ; graphic_strip_2_pixels 0000 / 0300 / 0101 / 0101 / 0000 / 2001 / 2001 / 2200
-    EQUB &00,&11,&05,&05,&00,&24,&24,&30    ; &2900
-    EQUB &33,&0F,&0F,&0F,&0F,&0C,&0C,&03    ; &2908
-    EQUB &00,&22,&0A,&0A,&00,&18,&18,&30    ; &2910
+    EQUB &00,&11,&05,&05,&00,&24,&24,&30
+    EQUB &33,&0F,&0F,&0F,&0F,&0C,&0C,&03
+    EQUB &00,&22,&0A,&0A,&00,&18,&18,&30
 
 .graphic_record_01
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4086,9 +4086,9 @@ org runtime_start
     ; graphic_strip_0_pixels 2000 / 0010 / 0011 / 0011 / 0000 / 0000 / 0000 / 2211
     ; graphic_strip_1_pixels 1100 / 1100 / 1100 / 1100 / 0000 / 0000 / 0000 / 0000
     ; graphic_strip_2_pixels 0200 / 0001 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
-    EQUB &10,&04,&0C,&0C,&00,&00,&00,&3C    ; &2918
-    EQUB &03,&03,&03,&03,&00,&00,&00,&00    ; &2920
-    EQUB &20,&08,&08,&08,&08,&08,&0C,&0C    ; &2928
+    EQUB &10,&04,&0C,&0C,&00,&00,&00,&3C
+    EQUB &03,&03,&03,&03,&00,&00,&00,&00
+    EQUB &20,&08,&08,&08,&08,&08,&0C,&0C
 
 .graphic_record_02
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4098,9 +4098,9 @@ org runtime_start
     ; graphic_strip_0_pixels 2000 / 0010 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
     ; graphic_strip_1_pixels 1100 / 1100 / 1100 / 1100 / 0000 / 0000 / 0000 / 0000
     ; graphic_strip_2_pixels 0200 / 0001 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
-    EQUB &10,&04,&04,&04,&04,&04,&0C,&0C    ; &2930
-    EQUB &03,&03,&03,&03,&00,&00,&00,&00    ; &2938
-    EQUB &20,&08,&08,&08,&08,&08,&0C,&0C    ; &2940
+    EQUB &10,&04,&04,&04,&04,&04,&0C,&0C
+    EQUB &03,&03,&03,&03,&00,&00,&00,&00
+    EQUB &20,&08,&08,&08,&08,&08,&0C,&0C
 
 .graphic_record_03
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4110,9 +4110,9 @@ org runtime_start
     ; graphic_strip_0_pixels 2000 / 0010 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
     ; graphic_strip_1_pixels 1100 / 1100 / 1100 / 1100 / 0000 / 0000 / 0000 / 0000
     ; graphic_strip_2_pixels 0200 / 0001 / 0011 / 0011 / 0000 / 0000 / 0000 / 2211
-    EQUB &10,&04,&04,&04,&04,&04,&0C,&0C    ; &2948
-    EQUB &03,&03,&03,&03,&00,&00,&00,&00    ; &2950
-    EQUB &20,&08,&0C,&0C,&00,&00,&00,&3C    ; &2958
+    EQUB &10,&04,&04,&04,&04,&04,&0C,&0C
+    EQUB &03,&03,&03,&03,&00,&00,&00,&00
+    EQUB &20,&08,&0C,&0C,&00,&00,&00,&3C
 
 .graphic_record_04
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4122,9 +4122,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 3000 / 3000 / 1010 / 0000 / 0210 / 0210 / 0210
     ; graphic_strip_1_pixels 3300 / 3300 / 3300 / 1111 / 1111 / 0011 / 0011 / 0011
     ; graphic_strip_2_pixels 0000 / 0300 / 0300 / 0101 / 0000 / 2001 / 2001 / 2001
-    EQUB &00,&11,&11,&05,&00,&24,&24,&24    ; &2960
-    EQUB &33,&33,&33,&0F,&0F,&0C,&0C,&0C    ; &2968
-    EQUB &00,&22,&22,&0A,&00,&18,&18,&18    ; &2970
+    EQUB &00,&11,&11,&05,&00,&24,&24,&24
+    EQUB &33,&33,&33,&0F,&0F,&0C,&0C,&0C
+    EQUB &00,&22,&22,&0A,&00,&18,&18,&18
 
 .graphic_record_05
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4134,9 +4134,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0010 / 0010 / 0011 / 0011 / 0000 / 0000 / 0000 / 2211
     ; graphic_strip_1_pixels 0011 / 0011 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
     ; graphic_strip_2_pixels 0001 / 0001 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
-    EQUB &04,&04,&0C,&0C,&00,&00,&00,&3C    ; &2978
-    EQUB &0C,&0C,&00,&00,&00,&00,&00,&00    ; &2980
-    EQUB &08,&08,&08,&08,&08,&08,&0C,&0C    ; &2988
+    EQUB &04,&04,&0C,&0C,&00,&00,&00,&3C
+    EQUB &0C,&0C,&00,&00,&00,&00,&00,&00
+    EQUB &08,&08,&08,&08,&08,&08,&0C,&0C
 
 .graphic_record_06
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4146,9 +4146,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0010 / 0010 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
     ; graphic_strip_1_pixels 0011 / 0011 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
     ; graphic_strip_2_pixels 0001 / 0001 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
-    EQUB &04,&04,&04,&04,&04,&04,&0C,&0C    ; &2990
-    EQUB &0C,&0C,&00,&00,&00,&00,&00,&00    ; &2998
-    EQUB &08,&08,&08,&08,&08,&08,&0C,&0C    ; &29A0
+    EQUB &04,&04,&04,&04,&04,&04,&0C,&0C
+    EQUB &0C,&0C,&00,&00,&00,&00,&00,&00
+    EQUB &08,&08,&08,&08,&08,&08,&0C,&0C
 
 .graphic_record_07
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4158,9 +4158,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0010 / 0010 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
     ; graphic_strip_1_pixels 0011 / 0011 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
     ; graphic_strip_2_pixels 0001 / 0001 / 0011 / 0011 / 0000 / 0000 / 0000 / 2211
-    EQUB &04,&04,&04,&04,&04,&04,&0C,&0C    ; &29A8
-    EQUB &0C,&0C,&00,&00,&00,&00,&00,&00    ; &29B0
-    EQUB &08,&08,&0C,&0C,&00,&00,&00,&3C    ; &29B8
+    EQUB &04,&04,&04,&04,&04,&04,&0C,&0C
+    EQUB &0C,&0C,&00,&00,&00,&00,&00,&00
+    EQUB &08,&08,&0C,&0C,&00,&00,&00,&3C
 
 .graphic_record_08
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4170,9 +4170,9 @@ org runtime_start
     ; graphic_strip_0_pixels 3000 / 1310 / 1310 / 1111 / 1010 / 2000 / 0210 / 0210
     ; graphic_strip_1_pixels 0300 / 1111 / 1111 / 1111 / 0101 / 0001 / 0011 / 0011
     ; graphic_strip_2_pixels 0000 / 0000 / 2211 / 0000 / 0000 / 0000 / 0000 / 0000
-    EQUB &11,&27,&27,&0F,&05,&10,&24,&24    ; &29C0
-    EQUB &22,&0F,&0F,&0F,&0A,&08,&0C,&0C    ; &29C8
-    EQUB &00,&00,&3C,&00,&00,&00,&00,&00    ; &29D0
+    EQUB &11,&27,&27,&0F,&05,&10,&24,&24
+    EQUB &22,&0F,&0F,&0F,&0A,&08,&0C,&0C
+    EQUB &00,&00,&3C,&00,&00,&00,&00,&00
 
 .graphic_record_09
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4182,9 +4182,9 @@ org runtime_start
     ; graphic_strip_0_pixels 2200 / 2200 / 0010 / 0010 / 0010 / 0011 / 0011 / 0000
     ; graphic_strip_1_pixels 1200 / 1200 / 0001 / 0011 / 0011 / 0010 / 0010 / 0010
     ; graphic_strip_2_pixels 1100 / 1100 / 0000 / 0000 / 0000 / 0000 / 0001 / 0001
-    EQUB &30,&30,&04,&04,&04,&0C,&0C,&00    ; &29D8
-    EQUB &21,&21,&08,&0C,&0C,&04,&04,&04    ; &29E0
-    EQUB &03,&03,&00,&00,&00,&00,&08,&08    ; &29E8
+    EQUB &30,&30,&04,&04,&04,&0C,&0C,&00
+    EQUB &21,&21,&08,&0C,&0C,&04,&04,&04
+    EQUB &03,&03,&00,&00,&00,&00,&08,&08
 
 .graphic_record_0a
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4194,9 +4194,9 @@ org runtime_start
     ; graphic_strip_0_pixels 2200 / 2200 / 0010 / 0010 / 0010 / 0010 / 0010 / 0010
     ; graphic_strip_1_pixels 1200 / 1200 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
     ; graphic_strip_2_pixels 1100 / 1100 / 0000 / 0000 / 0000 / 0000 / 0000 / 2211
-    EQUB &30,&30,&04,&04,&04,&04,&04,&04    ; &29F0
-    EQUB &21,&21,&08,&08,&08,&08,&0C,&0C    ; &29F8
-    EQUB &03,&03,&00,&00,&00,&00,&00,&3C    ; &2A00
+    EQUB &30,&30,&04,&04,&04,&04,&04,&04
+    EQUB &21,&21,&08,&08,&08,&08,&0C,&0C
+    EQUB &03,&03,&00,&00,&00,&00,&00,&3C
 
 .graphic_record_0b
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4206,9 +4206,9 @@ org runtime_start
     ; graphic_strip_0_pixels 2200 / 2200 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
     ; graphic_strip_1_pixels 1200 / 1200 / 0001 / 0011 / 0011 / 0010 / 0010 / 0000
     ; graphic_strip_2_pixels 1100 / 1100 / 0000 / 0000 / 0000 / 0001 / 0001 / 0000
-    EQUB &30,&30,&04,&04,&04,&04,&0C,&0C    ; &2A08
-    EQUB &21,&21,&08,&0C,&0C,&04,&04,&00    ; &2A10
-    EQUB &03,&03,&00,&00,&00,&08,&08,&00    ; &2A18
+    EQUB &30,&30,&04,&04,&04,&04,&0C,&0C
+    EQUB &21,&21,&08,&0C,&0C,&04,&04,&00
+    EQUB &03,&03,&00,&00,&00,&08,&08,&00
 
 .graphic_record_0c
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4218,9 +4218,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 2211 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
     ; graphic_strip_1_pixels 3000 / 1111 / 1111 / 1111 / 1010 / 0010 / 0011 / 0011
     ; graphic_strip_2_pixels 0300 / 3101 / 3101 / 1111 / 0101 / 0200 / 2001 / 2001
-    EQUB &00,&3C,&00,&00,&00,&00,&00,&00    ; &2A20
-    EQUB &11,&0F,&0F,&0F,&05,&04,&0C,&0C    ; &2A28
-    EQUB &22,&1B,&1B,&0F,&0A,&20,&18,&18    ; &2A30
+    EQUB &00,&3C,&00,&00,&00,&00,&00,&00
+    EQUB &11,&0F,&0F,&0F,&05,&04,&0C,&0C
+    EQUB &22,&1B,&1B,&0F,&0A,&20,&18,&18
 
 .graphic_record_0d
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4230,9 +4230,9 @@ org runtime_start
     ; graphic_strip_0_pixels 1100 / 1100 / 0000 / 0000 / 0000 / 0000 / 0010 / 0010
     ; graphic_strip_1_pixels 2100 / 2100 / 0010 / 0011 / 0011 / 0001 / 0001 / 0001
     ; graphic_strip_2_pixels 2200 / 2200 / 0001 / 0001 / 0001 / 0011 / 0011 / 0000
-    EQUB &03,&03,&00,&00,&00,&00,&04,&04    ; &2A38
-    EQUB &12,&12,&04,&0C,&0C,&08,&08,&08    ; &2A40
-    EQUB &30,&30,&08,&08,&08,&0C,&0C,&00    ; &2A48
+    EQUB &03,&03,&00,&00,&00,&00,&04,&04
+    EQUB &12,&12,&04,&0C,&0C,&08,&08,&08
+    EQUB &30,&30,&08,&08,&08,&0C,&0C,&00
 
 .graphic_record_0e
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4242,9 +4242,9 @@ org runtime_start
     ; graphic_strip_0_pixels 1100 / 1100 / 0000 / 0000 / 0000 / 0000 / 0000 / 2211
     ; graphic_strip_1_pixels 2100 / 2100 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
     ; graphic_strip_2_pixels 2200 / 2200 / 0001 / 0001 / 0001 / 0001 / 0001 / 0001
-    EQUB &03,&03,&00,&00,&00,&00,&00,&3C    ; &2A50
-    EQUB &12,&12,&04,&04,&04,&04,&0C,&0C    ; &2A58
-    EQUB &30,&30,&08,&08,&08,&08,&08,&08    ; &2A60
+    EQUB &03,&03,&00,&00,&00,&00,&00,&3C
+    EQUB &12,&12,&04,&04,&04,&04,&0C,&0C
+    EQUB &30,&30,&08,&08,&08,&08,&08,&08
 
 .graphic_record_0f
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4254,9 +4254,9 @@ org runtime_start
     ; graphic_strip_0_pixels 1100 / 1100 / 0000 / 0000 / 0000 / 0010 / 0010 / 0000
     ; graphic_strip_1_pixels 2100 / 2100 / 0010 / 0011 / 0011 / 0001 / 0001 / 0000
     ; graphic_strip_2_pixels 2200 / 2200 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
-    EQUB &03,&03,&00,&00,&00,&04,&04,&00    ; &2A68
-    EQUB &12,&12,&04,&0C,&0C,&08,&08,&00    ; &2A70
-    EQUB &30,&30,&08,&08,&08,&08,&0C,&0C    ; &2A78
+    EQUB &03,&03,&00,&00,&00,&04,&04,&00
+    EQUB &12,&12,&04,&0C,&0C,&08,&08,&00
+    EQUB &30,&30,&08,&08,&08,&08,&0C,&0C
 
 .graphic_record_10
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4266,9 +4266,9 @@ org runtime_start
     ; graphic_strip_0_pixels 3000 / 1310 / 1310 / 1111 / 1010 / 2000 / 0210 / 2200
     ; graphic_strip_1_pixels 0300 / 1111 / 1111 / 1111 / 0101 / 0001 / 1200 / 1200
     ; graphic_strip_2_pixels 0000 / 0000 / 2211 / 0000 / 1000 / 1100 / 0100 / 0000
-    EQUB &11,&27,&27,&0F,&05,&10,&24,&30    ; &2A80
-    EQUB &22,&0F,&0F,&0F,&0A,&08,&21,&21    ; &2A88
-    EQUB &00,&00,&3C,&00,&01,&03,&02,&00    ; &2A90
+    EQUB &11,&27,&27,&0F,&05,&10,&24,&30
+    EQUB &22,&0F,&0F,&0F,&0A,&08,&21,&21
+    EQUB &00,&00,&3C,&00,&01,&03,&02,&00
 
 .graphic_record_11
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4278,9 +4278,9 @@ org runtime_start
     ; graphic_strip_0_pixels 2200 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011 / 0000
     ; graphic_strip_1_pixels 0011 / 0011 / 0001 / 0011 / 0011 / 0010 / 0010 / 0010
     ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0001 / 0001
-    EQUB &30,&04,&04,&04,&04,&0C,&0C,&00    ; &2A98
-    EQUB &0C,&0C,&08,&0C,&0C,&04,&04,&04    ; &2AA0
-    EQUB &00,&00,&00,&00,&00,&00,&08,&08    ; &2AA8
+    EQUB &30,&04,&04,&04,&04,&0C,&0C,&00
+    EQUB &0C,&0C,&08,&0C,&0C,&04,&04,&04
+    EQUB &00,&00,&00,&00,&00,&00,&08,&08
 
 .graphic_record_12
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4290,9 +4290,9 @@ org runtime_start
     ; graphic_strip_0_pixels 2200 / 0010 / 0010 / 0010 / 0010 / 0010 / 0010 / 0010
     ; graphic_strip_1_pixels 0011 / 0011 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
     ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 2211
-    EQUB &30,&04,&04,&04,&04,&04,&04,&04    ; &2AB0
-    EQUB &0C,&0C,&08,&08,&08,&08,&0C,&0C    ; &2AB8
-    EQUB &00,&00,&00,&00,&00,&00,&00,&3C    ; &2AC0
+    EQUB &30,&04,&04,&04,&04,&04,&04,&04
+    EQUB &0C,&0C,&08,&08,&08,&08,&0C,&0C
+    EQUB &00,&00,&00,&00,&00,&00,&00,&3C
 
 .graphic_record_13
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4302,9 +4302,9 @@ org runtime_start
     ; graphic_strip_0_pixels 2200 / 0010 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
     ; graphic_strip_1_pixels 0011 / 0011 / 0001 / 0011 / 0011 / 0010 / 0010 / 0000
     ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0001 / 0001 / 0000
-    EQUB &30,&04,&04,&04,&04,&04,&0C,&0C    ; &2AC8
-    EQUB &0C,&0C,&08,&0C,&0C,&04,&04,&00    ; &2AD0
-    EQUB &00,&00,&00,&00,&00,&08,&08,&00    ; &2AD8
+    EQUB &30,&04,&04,&04,&04,&04,&0C,&0C
+    EQUB &0C,&0C,&08,&0C,&0C,&04,&04,&00
+    EQUB &00,&00,&00,&00,&00,&08,&08,&00
 
 .graphic_record_14
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4314,9 +4314,9 @@ org runtime_start
     ; graphic_strip_0_pixels 3000 / 1310 / 1310 / 1111 / 1010 / 2000 / 0210 / 2200
     ; graphic_strip_1_pixels 0300 / 1111 / 1111 / 1111 / 0101 / 0001 / 0011 / 0011
     ; graphic_strip_2_pixels 0000 / 0000 / 2211 / 0000 / 0000 / 0000 / 0000 / 0000
-    EQUB &11,&27,&27,&0F,&05,&10,&24,&30    ; &2AE0
-    EQUB &22,&0F,&0F,&0F,&0A,&08,&0C,&0C    ; &2AE8
-    EQUB &00,&00,&3C,&00,&00,&00,&00,&00    ; &2AF0
+    EQUB &11,&27,&27,&0F,&05,&10,&24,&30
+    EQUB &22,&0F,&0F,&0F,&0A,&08,&0C,&0C
+    EQUB &00,&00,&3C,&00,&00,&00,&00,&00
 
 .graphic_record_15
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4326,9 +4326,9 @@ org runtime_start
     ; graphic_strip_0_pixels 2200 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011 / 0000
     ; graphic_strip_1_pixels 1200 / 1200 / 0001 / 0011 / 0011 / 0010 / 0010 / 0010
     ; graphic_strip_2_pixels 0000 / 0100 / 1100 / 1000 / 0000 / 0000 / 0001 / 0001
-    EQUB &30,&04,&04,&04,&04,&0C,&0C,&00    ; &2AF8
-    EQUB &21,&21,&08,&0C,&0C,&04,&04,&04    ; &2B00
-    EQUB &00,&02,&03,&01,&00,&00,&08,&08    ; &2B08
+    EQUB &30,&04,&04,&04,&04,&0C,&0C,&00
+    EQUB &21,&21,&08,&0C,&0C,&04,&04,&04
+    EQUB &00,&02,&03,&01,&00,&00,&08,&08
 
 .graphic_record_16
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4338,9 +4338,9 @@ org runtime_start
     ; graphic_strip_0_pixels 2200 / 0010 / 0010 / 0010 / 0010 / 0010 / 0010 / 0010
     ; graphic_strip_1_pixels 1200 / 1200 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
     ; graphic_strip_2_pixels 0000 / 0100 / 1100 / 1000 / 0000 / 0000 / 0000 / 2211
-    EQUB &30,&04,&04,&04,&04,&04,&04,&04    ; &2B10
-    EQUB &21,&21,&08,&08,&08,&08,&0C,&0C    ; &2B18
-    EQUB &00,&02,&03,&01,&00,&00,&00,&3C    ; &2B20
+    EQUB &30,&04,&04,&04,&04,&04,&04,&04
+    EQUB &21,&21,&08,&08,&08,&08,&0C,&0C
+    EQUB &00,&02,&03,&01,&00,&00,&00,&3C
 
 .graphic_record_17
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4350,9 +4350,9 @@ org runtime_start
     ; graphic_strip_0_pixels 2200 / 0010 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
     ; graphic_strip_1_pixels 1200 / 1200 / 0001 / 0011 / 0011 / 0010 / 0010 / 0000
     ; graphic_strip_2_pixels 0000 / 0100 / 1100 / 1000 / 0000 / 0001 / 0001 / 0000
-    EQUB &30,&04,&04,&04,&04,&04,&0C,&0C    ; &2B28
-    EQUB &21,&21,&08,&0C,&0C,&04,&04,&00    ; &2B30
-    EQUB &00,&02,&03,&01,&00,&08,&08,&00    ; &2B38
+    EQUB &30,&04,&04,&04,&04,&04,&0C,&0C
+    EQUB &21,&21,&08,&0C,&0C,&04,&04,&00
+    EQUB &00,&02,&03,&01,&00,&08,&08,&00
 
 .graphic_record_18
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4362,9 +4362,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 0000 / 2211 / 0000 / 0100 / 1100 / 1000 / 0000
     ; graphic_strip_1_pixels 3000 / 1111 / 1111 / 1111 / 1010 / 0010 / 2100 / 2100
     ; graphic_strip_2_pixels 0300 / 3101 / 3101 / 1111 / 0101 / 0200 / 2001 / 2200
-    EQUB &00,&00,&3C,&00,&02,&03,&01,&00    ; &2B40
-    EQUB &11,&0F,&0F,&0F,&05,&04,&12,&12    ; &2B48
-    EQUB &22,&1B,&1B,&0F,&0A,&20,&18,&30    ; &2B50
+    EQUB &00,&00,&3C,&00,&02,&03,&01,&00
+    EQUB &11,&0F,&0F,&0F,&05,&04,&12,&12
+    EQUB &22,&1B,&1B,&0F,&0A,&20,&18,&30
 
 .graphic_record_19
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4374,9 +4374,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0010 / 0010
     ; graphic_strip_1_pixels 0011 / 0011 / 0010 / 0011 / 0011 / 0001 / 0001 / 0001
     ; graphic_strip_2_pixels 2200 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011 / 0000
-    EQUB &00,&00,&00,&00,&00,&00,&04,&04    ; &2B58
-    EQUB &0C,&0C,&04,&0C,&0C,&08,&08,&08    ; &2B60
-    EQUB &30,&08,&08,&08,&08,&0C,&0C,&00    ; &2B68
+    EQUB &00,&00,&00,&00,&00,&00,&04,&04
+    EQUB &0C,&0C,&04,&0C,&0C,&08,&08,&08
+    EQUB &30,&08,&08,&08,&08,&0C,&0C,&00
 
 .graphic_record_1a
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4386,9 +4386,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 2211
     ; graphic_strip_1_pixels 0011 / 0011 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
     ; graphic_strip_2_pixels 2200 / 0001 / 0001 / 0001 / 0001 / 0001 / 0001 / 0001
-    EQUB &00,&00,&00,&00,&00,&00,&00,&3C    ; &2B70
-    EQUB &0C,&0C,&04,&04,&04,&04,&0C,&0C    ; &2B78
-    EQUB &30,&08,&08,&08,&08,&08,&08,&08    ; &2B80
+    EQUB &00,&00,&00,&00,&00,&00,&00,&3C
+    EQUB &0C,&0C,&04,&04,&04,&04,&0C,&0C
+    EQUB &30,&08,&08,&08,&08,&08,&08,&08
 
 .graphic_record_1b
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4398,9 +4398,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0010 / 0010 / 0000
     ; graphic_strip_1_pixels 0011 / 0011 / 0010 / 0011 / 0011 / 0001 / 0001 / 0000
     ; graphic_strip_2_pixels 2200 / 0001 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
-    EQUB &00,&00,&00,&00,&00,&04,&04,&00    ; &2B88
-    EQUB &0C,&0C,&04,&0C,&0C,&08,&08,&00    ; &2B90
-    EQUB &30,&08,&08,&08,&08,&08,&0C,&0C    ; &2B98
+    EQUB &00,&00,&00,&00,&00,&04,&04,&00
+    EQUB &0C,&0C,&04,&0C,&0C,&08,&08,&00
+    EQUB &30,&08,&08,&08,&08,&08,&0C,&0C
 
 .graphic_record_1c
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4410,9 +4410,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 0000 / 2211 / 0000 / 0000 / 0000 / 0000 / 0000
     ; graphic_strip_1_pixels 3000 / 1111 / 1111 / 1111 / 1010 / 0010 / 0011 / 0011
     ; graphic_strip_2_pixels 0300 / 3101 / 3101 / 1111 / 0101 / 0200 / 2001 / 2200
-    EQUB &00,&00,&3C,&00,&00,&00,&00,&00    ; &2BA0
-    EQUB &11,&0F,&0F,&0F,&05,&04,&0C,&0C    ; &2BA8
-    EQUB &22,&1B,&1B,&0F,&0A,&20,&18,&30    ; &2BB0
+    EQUB &00,&00,&3C,&00,&00,&00,&00,&00
+    EQUB &11,&0F,&0F,&0F,&05,&04,&0C,&0C
+    EQUB &22,&1B,&1B,&0F,&0A,&20,&18,&30
 
 .graphic_record_1d
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4422,9 +4422,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 1000 / 1100 / 0100 / 0000 / 0000 / 0010 / 0010
     ; graphic_strip_1_pixels 2100 / 2100 / 0010 / 0011 / 0011 / 0001 / 0001 / 0001
     ; graphic_strip_2_pixels 2200 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011 / 0000
-    EQUB &00,&01,&03,&02,&00,&00,&04,&04    ; &2BB8
-    EQUB &12,&12,&04,&0C,&0C,&08,&08,&08    ; &2BC0
-    EQUB &30,&08,&08,&08,&08,&0C,&0C,&00    ; &2BC8
+    EQUB &00,&01,&03,&02,&00,&00,&04,&04
+    EQUB &12,&12,&04,&0C,&0C,&08,&08,&08
+    EQUB &30,&08,&08,&08,&08,&0C,&0C,&00
 
 .graphic_record_1e
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4434,9 +4434,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 1000 / 1100 / 0100 / 0000 / 0000 / 0000 / 2211
     ; graphic_strip_1_pixels 2100 / 2100 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
     ; graphic_strip_2_pixels 2200 / 0001 / 0001 / 0001 / 0001 / 0001 / 0001 / 0001
-    EQUB &00,&01,&03,&02,&00,&00,&00,&3C    ; &2BD0
-    EQUB &12,&12,&04,&04,&04,&04,&0C,&0C    ; &2BD8
-    EQUB &30,&08,&08,&08,&08,&08,&08,&08    ; &2BE0
+    EQUB &00,&01,&03,&02,&00,&00,&00,&3C
+    EQUB &12,&12,&04,&04,&04,&04,&0C,&0C
+    EQUB &30,&08,&08,&08,&08,&08,&08,&08
 
 .graphic_record_1f
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4446,9 +4446,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 1000 / 1100 / 0100 / 0000 / 0010 / 0010 / 0000
     ; graphic_strip_1_pixels 2100 / 2100 / 0010 / 0011 / 0011 / 0001 / 0001 / 0000
     ; graphic_strip_2_pixels 2200 / 0001 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
-    EQUB &00,&01,&03,&02,&00,&04,&04,&00    ; &2BE8
-    EQUB &12,&12,&04,&0C,&0C,&08,&08,&00    ; &2BF0
-    EQUB &30,&08,&08,&08,&08,&08,&0C,&0C    ; &2BF8
+    EQUB &00,&01,&03,&02,&00,&04,&04,&00
+    EQUB &12,&12,&04,&0C,&0C,&08,&08,&00
+    EQUB &30,&08,&08,&08,&08,&08,&0C,&0C
 
 .graphic_record_20
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4458,9 +4458,9 @@ org runtime_start
     ; graphic_strip_0_pixels 3311 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 3311
     ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 0000 / 3010 / 3010 / 3010 / 3311
     ; graphic_strip_2_pixels 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301
-    EQUB &3F,&2A,&2A,&2A,&2A,&2A,&2A,&3F    ; &2C00
-    EQUB &3F,&00,&00,&00,&15,&15,&15,&3F    ; &2C08
-    EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A    ; &2C10
+    EQUB &3F,&2A,&2A,&2A,&2A,&2A,&2A,&3F
+    EQUB &3F,&00,&00,&00,&15,&15,&15,&3F
+    EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A
 
 .graphic_record_21
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4470,9 +4470,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
     ; graphic_strip_1_pixels 3010 / 3010 / 3010 / 3010 / 3311 / 3311 / 3311 / 3311
     ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
-    EQUB &00,&00,&00,&00,&00,&00,&00,&00    ; &2C18
-    EQUB &15,&15,&15,&15,&3F,&3F,&3F,&3F    ; &2C20
-    EQUB &00,&00,&00,&00,&00,&00,&00,&00    ; &2C28
+    EQUB &00,&00,&00,&00,&00,&00,&00,&00
+    EQUB &15,&15,&15,&15,&3F,&3F,&3F,&3F
+    EQUB &00,&00,&00,&00,&00,&00,&00,&00
 
 .graphic_record_22
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4482,9 +4482,9 @@ org runtime_start
     ; graphic_strip_0_pixels 3311 / 0000 / 0000 / 3311 / 3311 / 3311 / 3311 / 3311
     ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 3311 / 0000 / 0000 / 3311 / 3311
     ; graphic_strip_2_pixels 0301 / 0301 / 0301 / 0301 / 0000 / 0000 / 0301 / 0301
-    EQUB &3F,&00,&00,&3F,&3F,&3F,&3F,&3F    ; &2C30
-    EQUB &3F,&00,&00,&3F,&00,&00,&3F,&3F    ; &2C38
-    EQUB &2A,&2A,&2A,&2A,&00,&00,&2A,&2A    ; &2C40
+    EQUB &3F,&00,&00,&3F,&3F,&3F,&3F,&3F
+    EQUB &3F,&00,&00,&3F,&00,&00,&3F,&3F
+    EQUB &2A,&2A,&2A,&2A,&00,&00,&2A,&2A
 
 .graphic_record_23
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4494,9 +4494,9 @@ org runtime_start
     ; graphic_strip_0_pixels 3311 / 0000 / 0000 / 3311 / 0000 / 0000 / 3311 / 3311
     ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 3311 / 3010 / 3010 / 3311 / 3311
     ; graphic_strip_2_pixels 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301
-    EQUB &3F,&00,&00,&3F,&00,&00,&3F,&3F    ; &2C48
-    EQUB &3F,&00,&00,&3F,&15,&15,&3F,&3F    ; &2C50
-    EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A    ; &2C58
+    EQUB &3F,&00,&00,&3F,&00,&00,&3F,&3F
+    EQUB &3F,&00,&00,&3F,&15,&15,&3F,&3F
+    EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A
 
 .graphic_record_24
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4506,9 +4506,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0301 / 0301 / 0301 / 0301 / 3311 / 0000 / 0000 / 0000
     ; graphic_strip_1_pixels 0000 / 0000 / 3311 / 3311 / 3311 / 3311 / 3311 / 3311
     ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0000 / 0301 / 0000 / 0000 / 0000
-    EQUB &2A,&2A,&2A,&2A,&3F,&00,&00,&00    ; &2C60
-    EQUB &00,&00,&3F,&3F,&3F,&3F,&3F,&3F    ; &2C68
-    EQUB &00,&00,&00,&00,&2A,&00,&00,&00    ; &2C70
+    EQUB &2A,&2A,&2A,&2A,&3F,&00,&00,&00
+    EQUB &00,&00,&3F,&3F,&3F,&3F,&3F,&3F
+    EQUB &00,&00,&00,&00,&2A,&00,&00,&00
 
 .graphic_record_25
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4518,9 +4518,9 @@ org runtime_start
     ; graphic_strip_0_pixels 3311 / 0301 / 0301 / 3311 / 0000 / 0000 / 3311 / 3311
     ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 3311 / 3010 / 3010 / 3311 / 3311
     ; graphic_strip_2_pixels 0301 / 0000 / 0000 / 0301 / 0301 / 0301 / 0301 / 0301
-    EQUB &3F,&2A,&2A,&3F,&00,&00,&3F,&3F    ; &2C78
-    EQUB &3F,&00,&00,&3F,&15,&15,&3F,&3F    ; &2C80
-    EQUB &2A,&00,&00,&2A,&2A,&2A,&2A,&2A    ; &2C88
+    EQUB &3F,&2A,&2A,&3F,&00,&00,&3F,&3F
+    EQUB &3F,&00,&00,&3F,&15,&15,&3F,&3F
+    EQUB &2A,&00,&00,&2A,&2A,&2A,&2A,&2A
 
 .graphic_record_26
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4530,9 +4530,9 @@ org runtime_start
     ; graphic_strip_0_pixels 3311 / 0301 / 0301 / 3311 / 3311 / 3311 / 3311 / 3311
     ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 3311 / 0000 / 0000 / 3311 / 3311
     ; graphic_strip_2_pixels 0301 / 0000 / 0000 / 0301 / 0301 / 0301 / 0301 / 0301
-    EQUB &3F,&2A,&2A,&3F,&3F,&3F,&3F,&3F    ; &2C90
-    EQUB &3F,&00,&00,&3F,&00,&00,&3F,&3F    ; &2C98
-    EQUB &2A,&00,&00,&2A,&2A,&2A,&2A,&2A    ; &2CA0
+    EQUB &3F,&2A,&2A,&3F,&3F,&3F,&3F,&3F
+    EQUB &3F,&00,&00,&3F,&00,&00,&3F,&3F
+    EQUB &2A,&00,&00,&2A,&2A,&2A,&2A,&2A
 
 .graphic_record_27
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4542,9 +4542,9 @@ org runtime_start
     ; graphic_strip_0_pixels 3311 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
     ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 0000 / 3010 / 3010 / 3010 / 3010
     ; graphic_strip_2_pixels 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301
-    EQUB &3F,&00,&00,&00,&00,&00,&00,&00    ; &2CA8
-    EQUB &3F,&00,&00,&00,&15,&15,&15,&15    ; &2CB0
-    EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A    ; &2CB8
+    EQUB &3F,&00,&00,&00,&00,&00,&00,&00
+    EQUB &3F,&00,&00,&00,&15,&15,&15,&15
+    EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A
 
 .graphic_record_28
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4554,9 +4554,9 @@ org runtime_start
     ; graphic_strip_0_pixels 3010 / 3010 / 3010 / 3311 / 3311 / 3311 / 3311 / 3311
     ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 3311 / 0000 / 0000 / 3311 / 3311
     ; graphic_strip_2_pixels 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301
-    EQUB &15,&15,&15,&3F,&3F,&3F,&3F,&3F    ; &2CC0
-    EQUB &3F,&00,&00,&3F,&00,&00,&3F,&3F    ; &2CC8
-    EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A    ; &2CD0
+    EQUB &15,&15,&15,&3F,&3F,&3F,&3F,&3F
+    EQUB &3F,&00,&00,&3F,&00,&00,&3F,&3F
+    EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A
 
 .graphic_record_29
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4566,9 +4566,9 @@ org runtime_start
     ; graphic_strip_0_pixels 3311 / 0301 / 0301 / 3311 / 0000 / 0000 / 0000 / 0000
     ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 3311 / 3010 / 3010 / 3010 / 3010
     ; graphic_strip_2_pixels 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301
-    EQUB &3F,&2A,&2A,&3F,&00,&00,&00,&00    ; &2CD8
-    EQUB &3F,&00,&00,&3F,&15,&15,&15,&15    ; &2CE0
-    EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A    ; &2CE8
+    EQUB &3F,&2A,&2A,&3F,&00,&00,&00,&00
+    EQUB &3F,&00,&00,&3F,&15,&15,&15,&15
+    EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A
 
 .graphic_record_2a
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4578,9 +4578,9 @@ org runtime_start
     ; graphic_strip_0_pixels 3322 / 0303 / 3333 / 0203 / 2233 / 0302 / 3322 / 3333
     ; graphic_strip_1_pixels 2233 / 0203 / 0011 / 0011 / 0011 / 0011 / 2030 / 2233
     ; graphic_strip_2_pixels 3333 / 3322 / 3020 / 2233 / 2030 / 3333 / 3030 / 3322
-    EQUB &F3,&AA,&FF,&A8,&FC,&A2,&F3,&FF    ; &2CF0
-    EQUB &FC,&A8,&0C,&0C,&0C,&0C,&54,&FC    ; &2CF8
-    EQUB &FF,&F3,&51,&FC,&54,&FF,&55,&F3    ; &2D00
+    EQUB &F3,&AA,&FF,&A8,&FC,&A2,&F3,&FF
+    EQUB &FC,&A8,&0C,&0C,&0C,&0C,&54,&FC
+    EQUB &FF,&F3,&51,&FC,&54,&FF,&55,&F3
 
 .graphic_record_2b
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4590,9 +4590,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 2000 / 2200 / 2332 / 2332 / 2200 / 2000 / 0000
     ; graphic_strip_1_pixels 2200 / 2200 / 2200 / 3323 / 3323 / 2200 / 2200 / 2200
     ; graphic_strip_2_pixels 0000 / 0200 / 2200 / 3233 / 3233 / 2200 / 0200 / 0000
-    EQUB &00,&10,&30,&F6,&F6,&30,&10,&00    ; &2D08
-    EQUB &30,&30,&30,&FB,&FB,&30,&30,&30    ; &2D10
-    EQUB &00,&20,&30,&FD,&FD,&30,&20,&00    ; &2D18
+    EQUB &00,&10,&30,&F6,&F6,&30,&10,&00
+    EQUB &30,&30,&30,&FB,&FB,&30,&30,&30
+    EQUB &00,&20,&30,&FD,&FD,&30,&20,&00
 
 .graphic_record_2c
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4602,9 +4602,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 1010 / 2302 / 2203 / 0303 / 3000 / 2300 / 3000
     ; graphic_strip_1_pixels 0033 / 1111 / 1111 / 2200 / 1111 / 3300 / 2200 / 3300
     ; graphic_strip_2_pixels 0000 / 0101 / 3220 / 2230 / 3030 / 0300 / 3200 / 0300
-    EQUB &00,&05,&B2,&B8,&AA,&11,&32,&11    ; &2D20
-    EQUB &CC,&0F,&0F,&30,&0F,&33,&30,&33    ; &2D28
-    EQUB &00,&0A,&71,&74,&55,&22,&31,&22    ; &2D30
+    EQUB &00,&05,&B2,&B8,&AA,&11,&32,&11
+    EQUB &CC,&0F,&0F,&30,&0F,&33,&30,&33
+    EQUB &00,&0A,&71,&74,&55,&22,&31,&22
 
 .graphic_record_2d
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4614,9 +4614,9 @@ org runtime_start
     ; graphic_strip_0_pixels 1133 / 1030 / 1030 / 0103 / 3123 / 0103 / 2133 / 1030
     ; graphic_strip_1_pixels 0000 / 0000 / 0303 / 2030 / 0303 / 2030 / 3332 / 1133
     ; graphic_strip_2_pixels 1133 / 0103 / 0103 / 1030 / 1030 / 1332 / 1030 / 0103
-    EQUB &CF,&45,&45,&8A,&DB,&8A,&DE,&45    ; &2D38
-    EQUB &00,&00,&AA,&54,&AA,&54,&F7,&CF    ; &2D40
-    EQUB &CF,&8A,&8A,&45,&45,&E7,&45,&8A    ; &2D48
+    EQUB &CF,&45,&45,&8A,&DB,&8A,&DE,&45
+    EQUB &00,&00,&AA,&54,&AA,&54,&F7,&CF
+    EQUB &CF,&8A,&8A,&45,&45,&E7,&45,&8A
 
 .graphic_record_2e
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4626,9 +4626,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 0000 / 2020 / 2020 / 2020 / 2222 / 2222 / 0202
     ; graphic_strip_1_pixels 2020 / 2222 / 2222 / 2020 / 2020 / 2222 / 2222 / 2222
     ; graphic_strip_2_pixels 0000 / 0202 / 2222 / 2020 / 2020 / 2222 / 2222 / 2222
-    EQUB &00,&00,&50,&50,&50,&F0,&F0,&A0    ; &2D50
-    EQUB &50,&F0,&F0,&50,&50,&F0,&F0,&F0    ; &2D58
-    EQUB &00,&A0,&F0,&50,&50,&F0,&F0,&F0    ; &2D60
+    EQUB &00,&00,&50,&50,&50,&F0,&F0,&A0
+    EQUB &50,&F0,&F0,&50,&50,&F0,&F0,&F0
+    EQUB &00,&A0,&F0,&50,&50,&F0,&F0,&F0
 
 .graphic_record_2f
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4638,9 +4638,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0202 / 0000 / 0000 / 2020 / 2020 / 2020 / 2222 / 0202
     ; graphic_strip_1_pixels 2222 / 2222 / 2222 / 0202 / 0202 / 0000 / 0000 / 0000
     ; graphic_strip_2_pixels 2020 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
-    EQUB &A0,&00,&00,&50,&50,&50,&F0,&A0    ; &2D68
-    EQUB &F0,&F0,&F0,&A0,&A0,&00,&00,&00    ; &2D70
-    EQUB &50,&00,&00,&00,&00,&00,&00,&00    ; &2D78
+    EQUB &A0,&00,&00,&50,&50,&50,&F0,&A0
+    EQUB &F0,&F0,&F0,&A0,&A0,&00,&00,&00
+    EQUB &50,&00,&00,&00,&00,&00,&00,&00
 
 .graphic_record_30
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4650,9 +4650,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 3010 / 3010 / 3010 / 0000 / 3311 / 0000 / 0301
     ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 3311 / 0000 / 3311 / 0000 / 3311
     ; graphic_strip_2_pixels 0000 / 0301 / 0301 / 0301 / 0000 / 3311 / 0000 / 3010
-    EQUB &00,&15,&15,&15,&00,&3F,&00,&2A    ; &2D80
-    EQUB &3F,&00,&00,&3F,&00,&3F,&00,&3F    ; &2D88
-    EQUB &00,&2A,&2A,&2A,&00,&3F,&00,&15    ; &2D90
+    EQUB &00,&15,&15,&15,&00,&3F,&00,&2A
+    EQUB &3F,&00,&00,&3F,&00,&3F,&00,&3F
+    EQUB &00,&2A,&2A,&2A,&00,&3F,&00,&15
 
 .graphic_record_31
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4662,9 +4662,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0301 / 0000 / 0000 / 3010 / 0000 / 3010 / 3010 / 3311
     ; graphic_strip_1_pixels 0000 / 3311 / 0000 / 3311 / 0000 / 0000 / 0000 / 0000
     ; graphic_strip_2_pixels 3010 / 0000 / 0000 / 0301 / 0000 / 0301 / 0301 / 3311
-    EQUB &2A,&00,&00,&15,&00,&15,&15,&3F    ; &2D98
-    EQUB &00,&3F,&00,&3F,&00,&00,&00,&00    ; &2DA0
-    EQUB &15,&00,&00,&2A,&00,&2A,&2A,&3F    ; &2DA8
+    EQUB &2A,&00,&00,&15,&00,&15,&15,&3F
+    EQUB &00,&3F,&00,&3F,&00,&00,&00,&00
+    EQUB &15,&00,&00,&2A,&00,&2A,&2A,&3F
 
 .graphic_record_32
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4674,9 +4674,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 1030 / 0000 / 1030 / 1133 / 1133 / 1030 / 0000
     ; graphic_strip_1_pixels 0000 / 1133 / 1133 / 1133 / 1133 / 1133 / 1133 / 1133
     ; graphic_strip_2_pixels 0000 / 0103 / 0000 / 0103 / 1133 / 1133 / 0103 / 0000
-    EQUB &00,&45,&00,&45,&CF,&CF,&45,&00    ; &2DB0
-    EQUB &00,&CF,&CF,&CF,&CF,&CF,&CF,&CF    ; &2DB8
-    EQUB &00,&8A,&00,&8A,&CF,&CF,&8A,&00    ; &2DC0
+    EQUB &00,&45,&00,&45,&CF,&CF,&45,&00
+    EQUB &00,&CF,&CF,&CF,&CF,&CF,&CF,&CF
+    EQUB &00,&8A,&00,&8A,&CF,&CF,&8A,&00
 
 .graphic_record_33
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4686,9 +4686,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 0000 / 0000 / 0000 / 1010 / 1310 / 1310 / 3300
     ; graphic_strip_1_pixels 0000 / 0000 / 0000 / 0000 / 0101 / 0101 / 2101 / 2101
     ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0000 / 1000 / 1001 / 2200 / 2200
-    EQUB &00,&00,&00,&00,&05,&27,&27,&33    ; &2DC8
-    EQUB &00,&00,&00,&00,&0A,&0A,&1A,&1A    ; &2DD0
-    EQUB &00,&00,&00,&00,&01,&09,&30,&30    ; &2DD8
+    EQUB &00,&00,&00,&00,&05,&27,&27,&33
+    EQUB &00,&00,&00,&00,&0A,&0A,&1A,&1A
+    EQUB &00,&00,&00,&00,&01,&09,&30,&30
 
 .graphic_record_34
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4698,9 +4698,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0001 / 0011 / 0011
     ; graphic_strip_1_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0011 / 0011
     ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0000 / 0010 / 0010 / 0011 / 0011
-    EQUB &00,&00,&00,&00,&00,&08,&0C,&0C    ; &2DE0
-    EQUB &00,&00,&00,&00,&00,&00,&0C,&0C    ; &2DE8
-    EQUB &00,&00,&00,&00,&04,&04,&0C,&0C    ; &2DF0
+    EQUB &00,&00,&00,&00,&00,&08,&0C,&0C
+    EQUB &00,&00,&00,&00,&00,&00,&0C,&0C
+    EQUB &00,&00,&00,&00,&04,&04,&0C,&0C
 
 .graphic_record_35
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4710,9 +4710,9 @@ org runtime_start
     ; graphic_strip_0_pixels 3311 / 0301 / 0301 / 0301 / 3311 / 3311 / 3311 / 3311
     ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 3311
     ; graphic_strip_2_pixels 0301 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0301
-    EQUB &3F,&2A,&2A,&2A,&3F,&3F,&3F,&3F    ; &2DF8
-    EQUB &3F,&00,&00,&00,&00,&00,&00,&3F    ; &2E00
-    EQUB &2A,&00,&00,&00,&00,&00,&00,&2A    ; &2E08
+    EQUB &3F,&2A,&2A,&2A,&3F,&3F,&3F,&3F
+    EQUB &3F,&00,&00,&00,&00,&00,&00,&3F
+    EQUB &2A,&00,&00,&00,&00,&00,&00,&2A
 
 .graphic_record_36
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4722,9 +4722,9 @@ org runtime_start
     ; graphic_strip_0_pixels 3311 / 0301 / 0301 / 0301 / 3311 / 3311 / 3311 / 3311
     ; graphic_strip_1_pixels 3311 / 3010 / 3010 / 3010 / 3311 / 0000 / 0000 / 0000
     ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0301 / 0301 / 0301 / 0301 / 0301
-    EQUB &3F,&2A,&2A,&2A,&3F,&3F,&3F,&3F    ; &2E10
-    EQUB &3F,&15,&15,&15,&3F,&00,&00,&00    ; &2E18
-    EQUB &00,&00,&00,&2A,&2A,&2A,&2A,&2A    ; &2E20
+    EQUB &3F,&2A,&2A,&2A,&3F,&3F,&3F,&3F
+    EQUB &3F,&15,&15,&15,&3F,&00,&00,&00
+    EQUB &00,&00,&00,&2A,&2A,&2A,&2A,&2A
 
 .graphic_record_37
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4734,9 +4734,9 @@ org runtime_start
     ; graphic_strip_0_pixels 3311 / 0301 / 0301 / 3311 / 3311 / 3311 / 3311 / 3311
     ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 3311 / 0000 / 0000 / 3311 / 3311
     ; graphic_strip_2_pixels 0301 / 0000 / 0000 / 0301 / 0000 / 0000 / 0301 / 0301
-    EQUB &3F,&2A,&2A,&3F,&3F,&3F,&3F,&3F    ; &2E28
-    EQUB &3F,&00,&00,&3F,&00,&00,&3F,&3F    ; &2E30
-    EQUB &2A,&00,&00,&2A,&00,&00,&2A,&2A    ; &2E38
+    EQUB &3F,&2A,&2A,&3F,&3F,&3F,&3F,&3F
+    EQUB &3F,&00,&00,&3F,&00,&00,&3F,&3F
+    EQUB &2A,&00,&00,&2A,&00,&00,&2A,&2A
 
 .graphic_record_38
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4746,9 +4746,9 @@ org runtime_start
     ; graphic_strip_0_pixels 3010 / 3010 / 3010 / 3010 / 3311 / 3311 / 3311 / 3311
     ; graphic_strip_1_pixels 3311 / 3010 / 3010 / 0000 / 0000 / 0000 / 0000 / 0000
     ; graphic_strip_2_pixels 3311 / 3010 / 3010 / 3010 / 3311 / 3311 / 3311 / 3311
-    EQUB &15,&15,&15,&15,&3F,&3F,&3F,&3F    ; &2E40
-    EQUB &3F,&15,&15,&00,&00,&00,&00,&00    ; &2E48
-    EQUB &3F,&15,&15,&15,&3F,&3F,&3F,&3F    ; &2E50
+    EQUB &15,&15,&15,&15,&3F,&3F,&3F,&3F
+    EQUB &3F,&15,&15,&00,&00,&00,&00,&00
+    EQUB &3F,&15,&15,&15,&3F,&3F,&3F,&3F
 
 .graphic_record_39
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4758,9 +4758,9 @@ org runtime_start
     ; graphic_strip_0_pixels 3000 / 1010 / 2000 / 2000 / 0010 / 0010 / 0010 / 0010
     ; graphic_strip_1_pixels 0101 / 0101 / 0000 / 1200 / 0000 / 0000 / 0000 / 0001
     ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
-    EQUB &11,&05,&10,&10,&04,&04,&04,&04    ; &2E58
-    EQUB &0A,&0A,&00,&21,&00,&00,&00,&08    ; &2E60
-    EQUB &00,&00,&00,&00,&00,&00,&00,&00    ; &2E68
+    EQUB &11,&05,&10,&10,&04,&04,&04,&04
+    EQUB &0A,&0A,&00,&21,&00,&00,&00,&08
+    EQUB &00,&00,&00,&00,&00,&00,&00,&00
 
 .graphic_record_3a
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4770,9 +4770,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 1010 / 3010 / 1301 / 3010 / 1010 / 3010 / 0000
     ; graphic_strip_1_pixels 0000 / 1010 / 0100 / 1110 / 1101 / 1010 / 0000 / 0000
     ; graphic_strip_2_pixels 0000 / 0301 / 0000 / 0301 / 0000 / 0301 / 0000 / 0000
-    EQUB &00,&05,&15,&2B,&15,&05,&15,&00    ; &2E70
-    EQUB &00,&05,&02,&07,&0B,&05,&00,&00    ; &2E78
-    EQUB &00,&2A,&00,&2A,&00,&2A,&00,&00    ; &2E80
+    EQUB &00,&05,&15,&2B,&15,&05,&15,&00
+    EQUB &00,&05,&02,&07,&0B,&05,&00,&00
+    EQUB &00,&2A,&00,&2A,&00,&2A,&00,&00
 
 .graphic_record_3b
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4782,9 +4782,9 @@ org runtime_start
     ; graphic_strip_0_pixels 1311 / 1010 / 1100 / 1311 / 1010 / 1000 / 1010 / 0101
     ; graphic_strip_1_pixels 1010 / 0100 / 1100 / 1100 / 1100 / 1111 / 1010 / 0301
     ; graphic_strip_2_pixels 3111 / 0301 / 0000 / 3111 / 0101 / 0100 / 0000 / 3111
-    EQUB &2F,&05,&03,&2F,&05,&01,&05,&0A    ; &2E88
-    EQUB &05,&02,&03,&03,&03,&0F,&05,&2A    ; &2E90
-    EQUB &1F,&2A,&00,&1F,&0A,&02,&00,&1F    ; &2E98
+    EQUB &2F,&05,&03,&2F,&05,&01,&05,&0A
+    EQUB &05,&02,&03,&03,&03,&0F,&05,&2A
+    EQUB &1F,&2A,&00,&1F,&0A,&02,&00,&1F
 
 .graphic_record_3c
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4794,9 +4794,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 3010 / 3010 / 0301 / 0000 / 0301 / 3010 / 0000
     ; graphic_strip_1_pixels 3010 / 0000 / 0000 / 0000 / 0000 / 0000 / 3010 / 0301
     ; graphic_strip_2_pixels 0000 / 0301 / 3010 / 0000 / 0301 / 3010 / 0301 / 0000
-    EQUB &00,&15,&15,&2A,&00,&2A,&15,&00    ; &2EA0
-    EQUB &15,&00,&00,&00,&00,&00,&15,&2A    ; &2EA8
-    EQUB &00,&2A,&15,&00,&2A,&15,&2A,&00    ; &2EB0
+    EQUB &00,&15,&15,&2A,&00,&2A,&15,&00
+    EQUB &15,&00,&00,&00,&00,&00,&15,&2A
+    EQUB &00,&2A,&15,&00,&2A,&15,&2A,&00
 
 .graphic_record_3d
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4806,9 +4806,9 @@ org runtime_start
     ; graphic_strip_0_pixels 1133 / 0103 / 0103 / 0103 / 0103 / 0103 / 0103 / 1133
     ; graphic_strip_1_pixels 1133 / 0000 / 0000 / 1030 / 0000 / 0000 / 0000 / 1133
     ; graphic_strip_2_pixels 1133 / 1030 / 1030 / 1030 / 1030 / 1030 / 1030 / 1133
-    EQUB &CF,&8A,&8A,&8A,&8A,&8A,&8A,&CF    ; &2EB8
-    EQUB &CF,&00,&00,&45,&00,&00,&00,&CF    ; &2EC0
-    EQUB &CF,&45,&45,&45,&45,&45,&45,&CF    ; &2EC8
+    EQUB &CF,&8A,&8A,&8A,&8A,&8A,&8A,&CF
+    EQUB &CF,&00,&00,&45,&00,&00,&00,&CF
+    EQUB &CF,&45,&45,&45,&45,&45,&45,&CF
 
 .graphic_record_3e
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4818,9 +4818,9 @@ org runtime_start
     ; graphic_strip_0_pixels 0000 / 0000 / 1030 / 0103 / 0103 / 0103 / 1030 / 0000
     ; graphic_strip_1_pixels 1133 / 1133 / 0000 / 0000 / 0000 / 0000 / 1133 / 0000
     ; graphic_strip_2_pixels 0000 / 0000 / 0103 / 1030 / 1030 / 1030 / 0103 / 0000
-    EQUB &00,&00,&45,&8A,&8A,&8A,&45,&00    ; &2ED0
-    EQUB &CF,&CF,&00,&00,&00,&00,&CF,&00    ; &2ED8
-    EQUB &00,&00,&8A,&45,&45,&45,&8A,&00    ; &2EE0
+    EQUB &00,&00,&45,&8A,&8A,&8A,&45,&00
+    EQUB &CF,&CF,&00,&00,&00,&00,&CF,&00
+    EQUB &00,&00,&8A,&45,&45,&45,&8A,&00
 
 .graphic_record_3f
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4830,89 +4830,89 @@ org runtime_start
     ; graphic_strip_0_pixels 1030 / 1030 / 1030 / 0000 / 0000 / 0000 / 0000 / 0000
     ; graphic_strip_1_pixels 1133 / 1030 / 1133 / 0103 / 0103 / 1133 / 0103 / 1133
     ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
-    EQUB &45,&45,&45,&00,&00,&00,&00,&00    ; &2EE8
-    EQUB &CF,&45,&CF,&8A,&8A,&CF,&8A,&CF    ; &2EF0
-    EQUB &00,&00,&00,&00,&00,&00,&00,&00    ; &2EF8
+    EQUB &45,&45,&45,&00,&00,&00,&00,&00
+    EQUB &CF,&45,&CF,&8A,&8A,&CF,&8A,&CF
+    EQUB &00,&00,&00,&00,&00,&00,&00,&00
 
 .object_graphic_id_by_index
     ; render-object graphic ids for object indices $00-$0D; indices $0E+ are split below by slot role
     ; slot_map $00-$0D utility/status/text/transient renderer slots; these are outside the logical item window
-    EQUB &20,&53,&42,&43,&73,&78,&2B,&31    ; &2F00
-    EQUB &34,&3A,&42,&50,&4C,&6C    ; &2F08
+    EQUB &20,&53,&42,&43,&73,&78,&2B,&31
+    EQUB &34,&3A,&42,&50,&4C,&6C
 
 .spook_graphic_id_first_cell
     ; SPOOK pair graphic id seeded by $1E3A and moved by $23CF/$2410
-    EQUB &2E    ; &2F0E
+    EQUB &2E
 
 .spook_graphic_id_second_cell
     ; SPOOK pair graphic id seeded by $1E3A and moved by $23CF/$2410
-    EQUB &2F    ; &2F0F
+    EQUB &2F
 
 .player_graphic_id_first_cell
     ; current player pair graphic id, seeded by $1735 and updated by $16E1/$2493
-    EQUB &00    ; &2F10
+    EQUB &00
 
 .player_graphic_id_second_cell
     ; current player pair graphic id, seeded by $1735 and updated by $16E1/$2493
-    EQUB &03    ; &2F11
+    EQUB &03
 
 .reserved_transient_graphic_id_object_12
     ; reserved/transient render-object graphic id; no gameplay slot ownership currently proven
-    EQUB &82    ; &2F12
+    EQUB &82
 
 .reserved_transient_graphic_id_object_13
     ; reserved/transient render-object graphic id; no gameplay slot ownership currently proven
-    EQUB &23    ; &2F13
+    EQUB &23
 
 .item_graphic_id_alias_object_14
     ; logical slot $00-$0B graphic ids, rendered as object indices $14-$1F
     ; logical_slots $00-$0B -> render_objects $14-$1F; enemy scheduler window seeded by $1E3A/moved by $198C
-    EQUB &3C,&3C,&3C,&3C,&3C,&3C,&3C,&3C    ; &2F14
-    EQUB &41,&44,&43,&23    ; &2F1C
+    EQUB &3C,&3C,&3C,&3C,&3C,&3C,&3C,&3C
+    EQUB &41,&44,&43,&23
 
 .extra_item_or_enemy_graphic_id_alias_object_20
     ; logical slot $0C-$17 graphic ids, rendered as object indices $20-$2B
     ; logical_slots $0C-$17 -> render_objects $20-$2B; placed item/extra enemy hit-scan window
-    EQUB &31,&0D,&0F,&FA,&17,&2E,&6C,&70    ; &2F20
-    EQUB &73,&31,&20,&43    ; &2F28
+    EQUB &31,&0D,&0F,&FA,&17,&2E,&6C,&70
+    EQUB &73,&31,&20,&43
 
 .unclassified_graphic_id_data_2f2c
     ; unclassified bytes between logical-slot graphic ids and target-status graphic table
     ; raw_printable_view "MP#3:BPLlp"
-    EQUB &4D,&50,&23,&33,&3A,&42,&50,&4C    ; &2F2C
-    EQUB &6C,&70    ; &2F34
+    EQUB &4D,&50,&23,&33,&3A,&42,&50,&4C
+    EQUB &6C,&70
 
 .target_status_graphic_ids_2345
     ; target_status_graphics slot0=$3D:SAFE slot1=$3F:KEY slot2=$3E:RING slot3=$32:POT_OF_GOLD slot4=$3E:RING slot5=$32:POT_OF_GOLD slot6=$2D:bonus_target_status_and_room_fill_probe
-    EQUB &3D,&3F,&3E,&32,&3E,&32,&2D    ; &2F36
+    EQUB &3D,&3F,&3E,&32,&3E,&32,&2D
 
 .unclassified_data_2f3d
     ; raw_printable_view "LDA"
-    EQUB &4C,&44,&41    ; &2F3D
+    EQUB &4C,&44,&41
 
 .graphic_record_high_pointer_table_1404
     ; 64-entry graphic pointer table; graphic id Y maps to source address high[$2F40+Y]:low[$2F80+Y]
     ; selected_graphic_pointers $2A:SPINNER->&2CF0 $2B:CLONE->&2D08 $2C:CYBERDROID->&2D20 $2D:bonus_target_status_and_room_fill_probe->&2D38 $2E:SPOOK_first_cell->&2D50 $2F:SPOOK_second_cell->&2D68 $32:POT_OF_GOLD->&2DB0 $3D:SAFE->&2EB8 $3E:RING->&2ED0 $3F:KEY->&2EE8
-    EQUB &29,&29,&29,&29,&29,&29,&29,&29    ; &2F40
-    EQUB &29,&29,&29,&2A,&2A,&2A,&2A,&2A    ; &2F48
-    EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2B,&2B    ; &2F50
-    EQUB &2B,&2B,&2B,&2B,&2B,&2B,&2B,&2B    ; &2F58
-    EQUB &2C,&2C,&2C,&2C,&2C,&2C,&2C,&2C    ; &2F60
-    EQUB &2C,&2C,&2C,&2D,&2D,&2D,&2D,&2D    ; &2F68
-    EQUB &2D,&2D,&2D,&2D,&2D,&2D,&2E,&2E    ; &2F70
-    EQUB &2E,&2E,&2E,&2E,&2E,&2E,&2E,&2E    ; &2F78
+    EQUB &29,&29,&29,&29,&29,&29,&29,&29
+    EQUB &29,&29,&29,&2A,&2A,&2A,&2A,&2A
+    EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2B,&2B
+    EQUB &2B,&2B,&2B,&2B,&2B,&2B,&2B,&2B
+    EQUB &2C,&2C,&2C,&2C,&2C,&2C,&2C,&2C
+    EQUB &2C,&2C,&2C,&2D,&2D,&2D,&2D,&2D
+    EQUB &2D,&2D,&2D,&2D,&2D,&2D,&2E,&2E
+    EQUB &2E,&2E,&2E,&2E,&2E,&2E,&2E,&2E
 
 .graphic_record_low_pointer_table_1404
     ; 64-entry graphic pointer table; graphic id Y maps to source address high[$2F40+Y]:low[$2F80+Y]
-    EQUB &00,&18,&30,&48,&60,&78,&90,&A8    ; &2F80
-    EQUB &C0,&D8,&F0,&08,&20,&38,&50,&68    ; &2F88
-    EQUB &80,&98,&B0,&C8,&E0,&F8,&10,&28    ; &2F90
-    EQUB &40,&58,&70,&88,&A0,&B8,&D0,&E8    ; &2F98
-    EQUB &00,&18,&30,&48,&60,&78,&90,&A8    ; &2FA0
-    EQUB &C0,&D8,&F0,&08,&20,&38,&50,&68    ; &2FA8
-    EQUB &80,&98,&B0,&C8,&E0,&F8,&10,&28    ; &2FB0
-    EQUB &40,&58,&70,&88,&A0,&B8,&D0,&E8    ; &2FB8
-    EQUB &41,&23,&30,&3A,&53,&54,&41,&26    ; &2FC0
+    EQUB &00,&18,&30,&48,&60,&78,&90,&A8
+    EQUB &C0,&D8,&F0,&08,&20,&38,&50,&68
+    EQUB &80,&98,&B0,&C8,&E0,&F8,&10,&28
+    EQUB &40,&58,&70,&88,&A0,&B8,&D0,&E8
+    EQUB &00,&18,&30,&48,&60,&78,&90,&A8
+    EQUB &C0,&D8,&F0,&08,&20,&38,&50,&68
+    EQUB &80,&98,&B0,&C8,&E0,&F8,&10,&28
+    EQUB &40,&58,&70,&88,&A0,&B8,&D0,&E8
+    EQUB &41,&23,&30,&3A,&53,&54,&41,&26
 
 .tile_generator_source_low_table_0efe
     ; generated terrain/tile source table used by $0EFE
@@ -4935,37 +4935,37 @@ org runtime_start
     ; terrain_class_d role=solid_generated_terrain_without_player_exact_edge_byte cells=11 rooms=9 active_blocks=yes_when_renderer_accumulator_touches_nonzero_byte player_exact=none projectile_masks=$80=4 $82=20
     ; terrain_class_e role=solid_generated_terrain_without_player_exact_edge_byte cells=16 rooms=15 active_blocks=yes_when_renderer_accumulator_touches_nonzero_byte player_exact=none projectile_masks=$80=4 $82=20
     ; terrain_class_f role=solid_generated_terrain_without_player_exact_edge_byte cells=9 rooms=7 active_blocks=yes_when_renderer_accumulator_touches_nonzero_byte player_exact=none projectile_masks=$80=2 $82=22
-    EQUB &F5,&EA,&DF    ; &2FC8
+    EQUB &F5,&EA,&DF
 
 .tile_generator_middle_index_table_0efe
     ; generated terrain/tile source table used by $0EFE
-    EQUB &02,&05,&08,&0A    ; &2FCB
+    EQUB &02,&05,&08,&0A
 
 .tile_generator_side_index_table_0efe
     ; generated terrain/tile source table used by $0EFE
-    EQUB &01,&02,&04,&05,&07,&08,&0A,&0A    ; &2FCF
+    EQUB &01,&02,&04,&05,&07,&08,&0A,&0A
 
 .tile_generator_outer_index_table_0efe
     ; generated terrain/tile source table used by $0EFE
-    EQUB &00,&02,&03,&02,&06,&02,&09,&02    ; &2FD7
+    EQUB &00,&02,&03,&02,&06,&02,&09,&02
 
 .tile_generator_pattern_source_0_0efe
     ; generated terrain/tile source table used by $0EFE
     ; terrain pattern source run used by $0EFE to synthesize classes $1-$F; class $0 clears 24 bytes
-    EQUB &80,&C0,&C2,&80,&C0,&C2,&C0,&C3    ; &2FDF
-    EQUB &C3,&C0,&C3    ; &2FE7
+    EQUB &80,&C0,&C2,&80,&C0,&C2,&C0,&C3
+    EQUB &C3,&C0,&C3
 
 .tile_generator_pattern_source_1_0efe
     ; generated terrain/tile source table used by $0EFE
     ; terrain pattern source run used by $0EFE to synthesize classes $1-$F; class $0 clears 24 bytes
-    EQUB &C0,&C3,&C3,&C0,&C3,&C3,&C0,&C3    ; &2FEA
-    EQUB &C3,&C0,&C3    ; &2FF2
+    EQUB &C0,&C3,&C3,&C0,&C3,&C3,&C0,&C3
+    EQUB &C3,&C0,&C3
 
 .tile_generator_pattern_source_2_0efe
     ; generated terrain/tile source table used by $0EFE
     ; terrain pattern source run used by $0EFE to synthesize classes $1-$F; class $0 clears 24 bytes
-    EQUB &40,&C0,&C1,&C0,&C3,&C3,&40,&C0    ; &2FF5
-    EQUB &C1,&C0,&C3    ; &2FFD
+    EQUB &40,&C0,&C1,&C0,&C3,&C3,&40,&C0
+    EQUB &C1,&C0,&C3
 
 runtime_end = *
 SAVE "build/reconstruction/CYBRUN", runtime_start, runtime_end, runtime_entry
