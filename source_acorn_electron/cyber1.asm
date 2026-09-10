@@ -137,7 +137,7 @@ org runtime_start
     STA      wait_strip_screen_position
     STA      wait_strip_source_index
     LDA      #ATTRACT_TIMEOUT_OUTER_COUNT
-    STA      zp_indirect_74_high
+    STA      attract_timeout_outer_counter
     LDA      bootstrap_osbyte81_x_result_flag
     BEQ      attract_wait_poll_loop_0e2e
     SEI
@@ -180,7 +180,7 @@ org runtime_start
 .attract_wait_countdown_0e2e
     DEC      attract_timeout_inner_counter
     BNE      attract_wait_poll_loop_0e2e
-    DEC      zp_indirect_74_high
+    DEC      attract_timeout_outer_counter
     BNE      attract_wait_poll_loop_0e2e
     CLC
     RTS
@@ -206,7 +206,7 @@ org runtime_start
 .begin_level_intro_setup_path_0e85
     JSR      oswrch_wrapper_from_a
     LDA      #LEVEL_LOOP_STATE_CLEAR
-    STA      level_loop_seed_or_status
+    STA      area_entry_direction
     STA      current_level_intro_or_loop_flag
     JSR      show_level_intro_and_required_targets
     LDA      level_tens_digit
@@ -218,8 +218,8 @@ org runtime_start
     DEC      level_index_and_hazard_gate
 
 .level_active_loop
-    LDA      level_loop_seed_or_status
-    STA      saved_level_loop_seed_or_status
+    LDA      area_entry_direction
+    STA      saved_area_entry_direction
     LDA      #INITIAL_REMAINING_ACTIVE_OBJECT_COUNT
     STA      remaining_active_object_count
     JSR      start_or_reset_player_and_level_objects
@@ -287,14 +287,14 @@ org runtime_start
     ADC      #BITMAP_SCREEN_BASE_HIGH
     STA      zp_screen_ptr_70_high
     LDA      #TILE_GENERATOR_COUNTER_CLEAR
-    STA      zp_indirect_74_low
+    STA      tile_generated_row_index
     STA      tile_generated_byte_index
     LDY      #TILE_RECORD_LAST_BYTE_INDEX
-    LDA      room_tile_class_or_pattern
+    LDA      room_tile_pattern
     BEQ      clear_24byte_tile_loop
 
 .generate_next_compact_tile_row
-    LDA      room_tile_class_or_pattern
+    LDA      room_tile_pattern
     LSR      A
     PHP
     LSR      A
@@ -305,7 +305,7 @@ org runtime_start
     LDA      tile_generator_outer_index_table_0efe,X
     TAY
     JSR      write_compact_tile_pattern_byte
-    LDA      room_tile_class_or_pattern
+    LDA      room_tile_pattern
     LSR      A
     PHP
     LSR      A
@@ -317,7 +317,7 @@ org runtime_start
     JSR      write_compact_tile_pattern_byte
 
 .generate_compact_tile_middle_bytes
-    LDA      room_tile_class_or_pattern
+    LDA      room_tile_pattern
     LSR      A
     LSR      A
     TAX
@@ -328,20 +328,20 @@ org runtime_start
     AND      #TILE_MIDDLE_POSITION_MASK
     CMP      #TILE_MIDDLE_END_POSITION
     BMI      generate_compact_tile_middle_bytes
-    LDA      room_tile_class_or_pattern
+    LDA      room_tile_pattern
     LSR      A
     TAX
     LDA      tile_generator_side_index_table_0efe,X
     TAY
     JSR      write_compact_tile_pattern_byte
-    LDA      room_tile_class_or_pattern
+    LDA      room_tile_pattern
     LSR      A
     TAX
     LDA      tile_generator_outer_index_table_0efe,X
     TAY
     JSR      write_compact_tile_pattern_byte
-    INC      zp_indirect_74_low
-    LDA      zp_indirect_74_low
+    INC      tile_generated_row_index
+    LDA      tile_generated_row_index
     CMP      #TILE_GENERATED_ROW_COUNT
     BNE      generate_next_compact_tile_row
     RTS
@@ -371,10 +371,10 @@ org runtime_start
 .write_compact_tile_pattern_byte
     LDA      #TILE_PATTERN_SOURCE_PAGE_HIGH
     STA      tile_pattern_source_ptr_high
-    LDX      zp_indirect_74_low
+    LDX      tile_generated_row_index
     LDA      tile_generator_source_low_table_0efe,X
-    STA      zp_indirect_74_high
-    LDA      (zp_indirect_74_high),Y
+    STA      tile_pattern_source_ptr_low
+    LDA      (tile_pattern_source_ptr_low),Y
     LDY      tile_generated_byte_index
     STA      (zp_screen_ptr_70_low),Y
     INC      tile_generated_byte_index
@@ -1007,26 +1007,26 @@ org runtime_start
     LDA      saved_object_screen_high_by_index,X
     STA      zp_screen_ptr_70_high
     LDA      saved_object_y_by_index,X
-    STA      object_render_y_or_parity
+    STA      object_render_y_coordinate
     JMP      render_object_with_loaded_screen_ptr_1404
 
 .draw_object_by_index
     JSR      load_object_screen_ptr
     LDA      object_y_by_index,X
-    STA      object_render_y_or_parity
+    STA      object_render_y_coordinate
 
 .render_object_with_loaded_screen_ptr_1404
     LDY      object_render_mode
     LDA      renderer_store_vector_low_table,Y
-    STA      zp_indirect_74_low
+    STA      renderer_store_vector_low
     LDA      renderer_store_vector_high_table,Y
-    STA      zp_indirect_74_high
+    STA      renderer_store_vector_high
     LDY      object_graphic_id_by_index,X
     LDA      graphic_record_low_pointer_table_1404,Y
     STA      render_source_operand_low
     LDA      graphic_record_high_pointer_table_1404,Y
     STA      render_source_operand_high
-    LDA      object_render_y_or_parity
+    LDA      object_render_y_coordinate
     AND      #OBJECT_Y_PARITY_MASK
     BNE      render_odd_y_split_setup_143a
     LDX      #GRAPHIC_RECORD_FIRST_BYTE_INDEX
@@ -1042,7 +1042,7 @@ org runtime_start
 
 .render_load_source_byte_and_jump_store_stub
     LDA      render_source_address_placeholder,X
-    JMP      (zp_indirect_74_low)
+    JMP      (renderer_store_vector_low)
 
 .render_odd_y_split_setup_143a
     LDX      #GRAPHIC_RECORD_FIRST_BYTE_INDEX
@@ -1145,11 +1145,11 @@ org runtime_start
     LDA      room_tile_y_index
     ASL      A
     ADC      room_tile_y_index
-    STA      room_tile_class_or_pattern
+    STA      room_layout_byte_offset_work
     LDA      room_tile_x_index
     LSR      A
     CLC
-    ADC      room_tile_class_or_pattern
+    ADC      room_layout_byte_offset_work
     TAY
     LDA      #POINTER_HIGH_CLEAR
     STA      zp_screen_ptr_70_high
@@ -1180,23 +1180,23 @@ org runtime_start
 
 .room_tile_read_packed_byte_14b9
     LDA      (zp_screen_ptr_70_low),Y
-    STA      room_tile_class_or_pattern
+    STA      room_packed_tile_byte
     STA      zp_calc_ptr_72_low
     LDA      room_tile_x_index
     AND      #PACKED_ROOM_LOW_NIBBLE_SELECTOR
     BNE      room_tile_high_nibble_path_14b9
-    LDA      room_tile_class_or_pattern
+    LDA      room_packed_tile_byte
     AND      #PACKED_ROOM_NIBBLE_MASK
-    STA      room_tile_class_or_pattern
+    STA      room_tile_pattern
     RTS
 
 .room_tile_high_nibble_path_14b9
-    LDA      room_tile_class_or_pattern
+    LDA      room_packed_tile_byte
     LSR      A
     LSR      A
     LSR      A
     LSR      A
-    STA      room_tile_class_or_pattern
+    STA      room_tile_pattern
     RTS
 
 .draw_playfield_tiles
@@ -1224,15 +1224,15 @@ org runtime_start
     BEQ      fill_finished_major_column_gaps_1516
     LDA      #PLAYFIELD_GAP_CELL_COUNT
     STA      playfield_gap_cell_counter
-    LDA      room_tile_class_or_pattern
+    LDA      room_tile_pattern
     AND      #ROOM_TILE_VERTICAL_GAP_PATTERN_MASK
     PHP
     LDA      #ROOM_TILE_EMPTY_PATTERN
-    STA      room_tile_class_or_pattern
+    STA      room_tile_pattern
     PLP
     BEQ      draw_vertical_gap_cells_loop_1516
     LDA      #ROOM_TILE_VERTICAL_GAP_SOLID_PATTERN
-    STA      room_tile_class_or_pattern
+    STA      room_tile_pattern
 
 .draw_vertical_gap_cells_loop_1516
     INC      playfield_screen_tile_row_index
@@ -1267,12 +1267,12 @@ org runtime_start
 
 .draw_horizontal_gap_column_tile_loop_1516
     LDA      #PLAYFIELD_FIRST_INDEX
-    STA      room_tile_class_or_pattern
+    STA      room_tile_pattern
     LDY      room_tile_y_index
     LDA      player_collision_class_flag,Y
     BEQ      draw_horizontal_gap_tile_1516
     LDA      #ROOM_TILE_HORIZONTAL_GAP_SOLID_PATTERN
-    STA      room_tile_class_or_pattern
+    STA      room_tile_pattern
 
 .draw_horizontal_gap_tile_1516
     LDY      playfield_screen_tile_row_index
@@ -1284,7 +1284,7 @@ org runtime_start
     LDA      #PLAYFIELD_GAP_CELL_COUNT
     STA      playfield_gap_cell_counter
     LDA      #PLAYFIELD_FIRST_INDEX
-    STA      room_tile_class_or_pattern
+    STA      room_tile_pattern
 
 .draw_horizontal_gap_clear_vertical_run_loop_1516
     INC      playfield_screen_tile_row_index
@@ -1523,7 +1523,7 @@ org runtime_start
     JMP      move_object_and_update_screen_ptr
 
 .add_direction_score_or_state_delta
-    STX      saved_level_loop_seed_or_status
+    STX      saved_area_entry_direction
     LDA      player_direction_graphic_delta_table_16e1,X
     CLC
     ADC      room_area
@@ -1552,8 +1552,8 @@ org runtime_start
 
 .setup_player_start_state_1735
     JSR      draw_playfield_tiles
-    LDX      saved_level_loop_seed_or_status
-    STX      level_loop_seed_or_status
+    LDX      saved_area_entry_direction
+    STX      area_entry_direction
     LDA      player_start_x_by_exit_1735,X
     STA      player_x_first_cell
     STA      player_x_second_cell
@@ -1594,7 +1594,7 @@ org runtime_start
     JSR      setup_spinner_clone_cyberdroid_counts
     JSR      place_target_code_objects_for_room
     LDA      #COLLISION_CLASS_PRESENT
-    STA      bounds_or_outside_flag
+    STA      player_bounds_flag
     RTS
 
 .frame_update_continue_or_delay
@@ -1765,7 +1765,7 @@ org runtime_start
 .input_bounds_and_player_collision_path_18cb
     JSR      read_game_input_and_pause
     JSR      test_player_bounds_and_restart_area
-    LDA      bounds_or_outside_flag
+    LDA      player_bounds_flag
     BNE      bounds_flag_restart_frame_18cb
     STA      renderer_collision_accumulator
     LDA      frame_phase
@@ -1900,10 +1900,10 @@ org runtime_start
     BNE      test_active_cyberdroid_object
     TXA
     AND      #CLONE_FRAME_PHASE_MASK
-    STA      zp_indirect_74_low
+    STA      clone_phase_slot_work
     LDA      frame_phase
     AND      #CLONE_FRAME_PHASE_MASK
-    CMP      zp_indirect_74_low
+    CMP      clone_phase_slot_work
     BNE      test_active_cyberdroid_object
     JSR      begin_target_enemy_move_test
     JSR      move_clone_continue_or_random
@@ -2014,7 +2014,7 @@ org runtime_start
 
 .test_player_bounds_and_restart_area
     LDA      #BOUNDS_INSIDE
-    STA      bounds_or_outside_flag
+    STA      player_bounds_flag
     LDA      player_x_first_cell
     CMP      #PLAYER_LEFT_BOUNDARY
     BPL      test_player_right_boundary
@@ -2131,7 +2131,7 @@ org runtime_start
     DEY
     BPL      inspect_next_shot_collision_byte
     JSR      test_projectile_inside_playfield
-    LDA      bounds_or_outside_flag
+    LDA      projectile_bounds_flag
     BNE      deactivate_shot_or_hazard_slot
     RTS
 
@@ -2205,7 +2205,7 @@ org runtime_start
     RTS
 
 .compute_shot_screen_ptr
-    STX      zp_indirect_74_low
+    STX      screen_pointer_saved_object_index
     LDA      shot_y_by_slot,X
     AND      #SHOT_EVEN_Y_MASK
     ASL      A
@@ -2218,7 +2218,7 @@ org runtime_start
     JSR      add_a_to_pointer_70
     LDX      #SHOT_SCREEN_Y_SHIFT_COUNT
     JSR      shift_pointer_70_left_x_times
-    LDX      zp_indirect_74_low
+    LDX      screen_pointer_saved_object_index
     LDA      shot_y_by_slot,X
     AND      #SHOT_ROW_PARITY_MASK
     BEQ      add_shot_horizontal_screen_offset
@@ -2236,7 +2236,7 @@ org runtime_start
     CLC
     ADC      zp_screen_ptr_70_high
     STA      zp_screen_ptr_70_high
-    LDX      zp_indirect_74_low
+    LDX      screen_pointer_saved_object_index
     LDA      zp_screen_ptr_70_low
     CLC
     ADC      zp_calc_ptr_72_low
@@ -2283,7 +2283,7 @@ org runtime_start
 
 .test_projectile_inside_playfield
     LDA      #BOUNDS_INSIDE
-    STA      bounds_or_outside_flag
+    STA      projectile_bounds_flag
     LDA      shot_x_by_slot,X
     CMP      #PROJECTILE_LEFT_BOUNDARY
     BMI      mark_projectile_outside_playfield
@@ -2297,7 +2297,7 @@ org runtime_start
     RTS
 
 .mark_projectile_outside_playfield
-    INC      bounds_or_outside_flag
+    INC      projectile_bounds_flag
     RTS
 
 ; STATUS, RANDOM PLACEMENT AND ROOM TRANSITIONS
@@ -2414,7 +2414,7 @@ org runtime_start
     RTS
 
 .compute_item_screen_ptr
-    STX      zp_indirect_74_low
+    STX      screen_pointer_saved_object_index
     LDA      object_y_by_index,X
     AND      #ITEM_SCREEN_Y_MASK
     ASL      A
@@ -2427,7 +2427,7 @@ org runtime_start
     JSR      add_a_to_pointer_70
     LDX      #ITEM_SCREEN_Y_SHIFT_COUNT
     JSR      shift_pointer_70_left_x_times
-    LDX      zp_indirect_74_low
+    LDX      screen_pointer_saved_object_index
     LDA      object_x_by_index,X
     STA      zp_calc_ptr_72_low
     LDA      #POINTER_HIGH_CLEAR
@@ -2438,7 +2438,7 @@ org runtime_start
     CLC
     ADC      zp_screen_ptr_70_high
     STA      zp_screen_ptr_70_high
-    LDX      zp_indirect_74_low
+    LDX      screen_pointer_saved_object_index
     LDA      zp_screen_ptr_70_low
     CLC
     ADC      zp_calc_ptr_72_low
@@ -2729,7 +2729,7 @@ org runtime_start
 
 .test_object_inside_playfield
     LDA      #OBJECT_MOVEMENT_FAILED
-    STA      bounds_or_outside_flag
+    STA      object_bounds_flag
     LDA      object_x_by_index,X
     CMP      #OBJECT_LEFT_BOUNDARY
     BMI      mark_object_outside_playfield
@@ -2743,7 +2743,7 @@ org runtime_start
     RTS
 
 .mark_object_outside_playfield
-    INC      bounds_or_outside_flag
+    INC      object_bounds_flag
     RTS
 
 .begin_target_enemy_move_test
@@ -2836,7 +2836,7 @@ org runtime_start
     BNE      return_from_object_move_collision_test
     LDX      active_object_index
     JSR      test_object_inside_playfield
-    LDA      bounds_or_outside_flag
+    LDA      object_bounds_flag
     BNE      return_from_object_move_collision_test
     LDA      #OBJECT_MOVEMENT_SUCCEEDED
     STA      object_movement_success_flag
