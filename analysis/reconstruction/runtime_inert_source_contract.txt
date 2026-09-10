@@ -1,0 +1,48 @@
+runtime_inert_source_contract
+Purpose: complete negative contract for source-owned bytes and entries retained as unused.
+Authority: byte-exact CYBRUN layout, predecessor control flow, static operands, and bounded table consumers in cyber1.asm.
+Port rule: preserve these bytes for reconstruction fidelity but do not invent gameplay consumers or effects.
+
+unexecuted_pre_entry_$0DF0-$0E01
+$0DDD returns at $0DEF and cannot fall through; runtime entry is independently fixed at $0E02.
+No branch, jump, call, vector, or table points into the eighteen-byte gap.
+
+standalone_return_$0EFD
+The preceding game-over path unconditionally jumps to $0E05 at $0EFA.
+Tile generation begins independently at $0EFE; no reachable edge calls or falls into the retained RTS byte.
+
+duplicate_pointer_helper_$13CC
+This byte-exact copy of the add-to-$0072/$0073 helper has no call or jump operand.
+All proved pointer consumers call the corresponding active helper at $13C0.
+
+unused_screen_clear_$1637
+No call or jump operand selects the entry.
+Its internal branches are bounded within the routine and therefore do not establish an external caller.
+
+alternate_player_hit_bridge_$195E
+The preceding active shot/hazard loop ends with an unconditional jump to $17BF.
+No branch, jump, or call selects this retained JSR/JMP bridge; live player-hit routing enters $1964 or $1972.
+
+alternate_restore_entry_$1F94
+The preceding palette routine tail-jumps to $24C0 and cannot fall through.
+No control-flow operand selects $1F94; active enemy retry paths call the restore body at $1FA1.
+
+intertable_bytes_$26EE-$26EF_$2707-$270D_$273F-$274F
+Adjacent consumers are bounded by explicit eight-, sixteen-, six-, and eight-entry loops and cannot index these gaps.
+No absolute operand or pointer table selects any byte in the gaps.
+
+bitmap_shaped_record_$2758-$276F
+The only runtime graphic pointer tables map IDs 0-63 to $2900-$2EFF.
+No graphic selector, pointer, or absolute operand reaches this separate 24-byte record.
+
+object_table_padding_$2F2C-$2F35
+Object graphic IDs occupy exactly 44 entries $2F00-$2F2B; scheduler and collision scans stop at object index $2B.
+Target/status IDs begin independently at $2F36, so the ten intervening bytes have no object or target selector.
+
+pointer_alignment_$2F3D-$2F3F
+Target/status IDs stop after slot 6 at $2F3C.
+The 64-entry high-byte graphic pointer table begins independently at $2F40; no selector addresses the three alignment bytes.
+
+acceptance
+Every retained unused label above has a bounded no-consumer or unreachable-entry reason.
+Validation rejects uncertain source labels such as unknown, orphan, unreferenced, raw FUN addresses, and raw enter addresses.

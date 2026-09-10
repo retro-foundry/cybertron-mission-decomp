@@ -8,6 +8,13 @@
     "end_exclusive": 12288
   },
   "source_owned_payload_bytes": 8832,
+  "semantic_annotation_completion": {
+    "status": "complete",
+    "unresolved_active_code_or_data_ranges": 0,
+    "classification_rule": "every source-owned range is behavioral or port-contract; retained inert bytes have bounded no-consumer or unreachable-entry evidence",
+    "audit": "analysis/reconstruction/semantic_completion_audit.md",
+    "inert_contract": "analysis/reconstruction/runtime_inert_source_contract.txt"
+  },
   "data_ranges": [
     {
       "name": "runtime_code_and_inline_tables",

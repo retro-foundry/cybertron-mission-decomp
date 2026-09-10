@@ -1,5 +1,14 @@
 # Cybertron Mission semantic completion audit
 
+## Result
+
+Semantic annotation of the source-owned `CYBRUN` payload is complete under the
+same acceptance distinction used by Quest: every byte has an evidence-backed
+source role, active code has behavioral or reusable port contracts, and inert
+bytes have explicit bounded no-consumer or unreachable-entry contracts. This
+does not claim that every possible gameplay state has been observed or that a
+future port has passed full-frame parity.
+
 ## Authority and scope
 
 This audit covers the relocated Acorn Electron `CYBRUN` gameplay runtime at
@@ -21,6 +30,7 @@ accepted as evidence for gameplay identity.
 | Exact reconstruction | A clean BeebAsm build is checked for length and SHA-256 by `validate.ps1` | Proved |
 | Named executable operands | Validation rejects raw numeric instruction operands and raw symbol-relative offsets | Proved |
 | Named emitted data | Validation rejects any `EQUB`, `EQUW`, or `EQUS` without an active owner label | Proved |
+| Inert source bytes | `runtime_inert_source_contract.txt` gives every retained unused entry, gap, padding block, and bitmap-shaped record an exact unreachable-entry or bounded no-consumer contract | Behavioral, complete negative contract |
 | Contextual shared workspace | The source and memory map contain no generic `scratch` identifiers; shared addresses use bounded contextual aliases | Proved |
 | Graphic bank structure | 64 consecutive 24-byte Mode 2 records, IDs `$00-$3F`, selected through the `$2F40/$2F80` pointer tables | Proved |
 | Graphic bank meaning | Every record has a semantic source label and `graphic_usage` annotation; `$16E1` proves eight player direction families and three selected lower animation frames | Behavioral |
@@ -67,20 +77,15 @@ These counts describe the current source and are checked where practical by
 - Zero generic address-only, decoded-island, unclassified, numeric graphic,
   or scratch labels remain.
 - Thirteen `unused_*` labels remain intentionally. Each denotes retained
-  original bytes or an entry/loop with no proved reachable caller or consumer;
-  these are not omitted from the build.
+  original bytes or an entry/loop with a proved bounded no-consumer or
+  unreachable-entry contract; these are not omitted from the build.
 
-## Remaining work to reach Quest-level evidence
+## Additional port-validation work
 
-The source reconstruction itself is complete and byte-exact, but the dynamic
-validation depth is not yet equivalent to the Quest repository. Completion of
-that broader standard requires:
-
-1. Add an active-loop/full-frame comparison that records complete RAM and display
-   effects for fixed initial state and input sequences.
-2. Replace the active-frame spine's leaf probes with integrated subsystem
-   execution as replay coverage grows, then promote the full frame only when
-   complete state/display fixtures provide exact accept/reject evidence.
-
-Until those gates exist and pass, this audit must not describe the runtime as
-fully scenario-validated or port-contract complete.
+Quest-level semantic source completion does not require every possible dynamic
+state or a whole-frame emulator comparison. A stronger future port-acceptance
+ladder can still add an active-loop/full-frame comparison recording complete
+RAM and display effects for fixed initial state and input sequences, and can
+replace active-frame leaf probes with integrated subsystem execution. Until
+then, this audit does not describe the runtime as fully scenario-validated or
+claim that any port is frame-perfect.

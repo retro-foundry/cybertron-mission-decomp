@@ -28,6 +28,7 @@ $requiredFiles = @(
     'analysis/reconstruction/runtime_player_movement.txt'
     'analysis/reconstruction/runtime_enemy_movement_contract.txt'
     'analysis/reconstruction/runtime_player_collision_contract.txt'
+    'analysis/reconstruction/runtime_inert_source_contract.txt'
     'analysis/reconstruction/runtime_object_lifecycle_reference.txt'
     'analysis/reconstruction/runtime_object_slot_contract.txt'
     'analysis/reconstruction/runtime_projectile_lifecycle.txt'
@@ -66,6 +67,7 @@ $maintainedFiles = @(
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_player_movement.txt')
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_enemy_movement_contract.txt')
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_player_collision_contract.txt')
+    (Join-Path $repoRoot 'analysis\reconstruction\runtime_inert_source_contract.txt')
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_object_lifecycle_reference.txt')
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_object_slot_contract.txt')
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_projectile_lifecycle.txt')
@@ -112,6 +114,12 @@ if ($manifest.authority.load_address -ne 0x0D80 -or
     $manifest.source_owned_payload_bytes -ne $expectedLength -or
     $manifest.authority.sha256.ToUpperInvariant() -ne $expectedSha256) {
     throw 'reconstruction.json does not match the validated CYBRUN authority contract.'
+}
+if ($manifest.semantic_annotation_completion.status -ne 'complete' -or
+    $manifest.semantic_annotation_completion.unresolved_active_code_or_data_ranges -ne 0 -or
+    $manifest.semantic_annotation_completion.audit -ne 'analysis/reconstruction/semantic_completion_audit.md' -or
+    $manifest.semantic_annotation_completion.inert_contract -ne 'analysis/reconstruction/runtime_inert_source_contract.txt') {
+    throw 'reconstruction.json no longer declares the validated semantic completion contract.'
 }
 $nextManifestAddress = $manifest.authority.load_address
 foreach ($range in $manifest.data_ranges) {
@@ -161,6 +169,9 @@ if ($assemblyText -match '(?im)^\s*\.addr_[0-9A-F]+\s*$') {
 }
 if ($assemblyText -match '(?im)^\s*\.(?:byte_decoded|unclassified)_[A-Za-z0-9_]+\s*$') {
     throw 'Generic decoded/unclassified labels are not permitted in cyber1.asm; document the proven source role.'
+}
+if ($assemblyText -match '(?im)^\s*\.(?:unknown|orphan|unreferenced|FUN_[0-9A-F]+|enter_[0-9A-F]+)[A-Za-z0-9_]*\s*$') {
+    throw 'Uncertain or raw address-derived source labels are not permitted in cyber1.asm.'
 }
 if ($assemblyText -match '(?im)^\s*\.graphic_record_[0-9A-F]+\s*$') {
     throw 'Numeric graphic-record labels are not permitted; name the proved artwork or runtime role.'

@@ -86,6 +86,11 @@ The assembled phase-zero `$1812` erase/retire and `$1876` draw/advance passes
 are replayed for every lifecycle state, preserving their two-pass ordering.
 The actual assembled score routine is CPU-replayed across all 10,000 valid
 four-character score states, including every carry and extra-life boundary.
+Further original-code replays cover all 22 sound dispatch IDs, all runtime text
+streams, menu and level-intro ordering, target/bonus/level outcomes, life-loss
+reset, hazard allocation/rejection/recycling, enemy scheduling and movement
+policies, and player collision/room-exit priority. `validate.ps1` prints the
+exact replay count for every category and fails on the first divergence.
 
 ## Layout and provenance
 
@@ -117,6 +122,10 @@ The [control-flow reference](analysis/reconstruction/runtime_control_input_refer
 and [movement reference](analysis/reconstruction/runtime_player_movement.txt)
 document key codes, input selection, pause/menu behavior, direction mapping,
 room exits, and projectile movement tables.
+The [enemy movement contract](analysis/reconstruction/runtime_enemy_movement_contract.txt)
+and [player collision contract](analysis/reconstruction/runtime_player_collision_contract.txt)
+record the distinct scheduler, retry, collision-priority, damage, and room-exit
+rules now enforced by executable replays.
 The [object-slot contract](analysis/reconstruction/runtime_object_slot_contract.txt),
 [object lifecycle reference](analysis/reconstruction/runtime_object_lifecycle_reference.txt),
 and [projectile lifecycle reference](analysis/reconstruction/runtime_projectile_lifecycle.txt)
@@ -142,6 +151,9 @@ Additional CPU replays enforce the text-buffer clear, help-before-legend menu
 order, and every level-intro target-count/glyph/sound/wait sequence.
 They also guard the original distinction between the five-glyph intro cap and
 the inclusive highest-required-target slot used during gameplay.
+The [inert-source contract](analysis/reconstruction/runtime_inert_source_contract.txt)
+gives every retained unused entry and data block a bounded unreachable or
+no-consumer role, matching the semantic-completion standard used for Quest.
 
 The decoded 24-byte artwork can be reviewed in the
 [composed sprite and graphic sheet](analysis/reconstruction/composed_sprite_sheet.png).

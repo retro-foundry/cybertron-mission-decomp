@@ -23,7 +23,8 @@ the expected length and SHA-256 in `validate.ps1`.
 - Describe behavior only where control flow, dataflow, bounded consumers, or
   decoded artwork supports it.
 - Mark retained no-caller code and no-consumer data explicitly as unused.
-- Keep numeric graphic record names where artwork identity is not proven.
+- Give every graphic record a semantic source label and a bounded
+  `graphic_usage` annotation; qualify genuinely inert artwork explicitly.
 - Keep source and comments ASCII-only.
 
 Build and validate from the repository root with `./build.ps1` and
