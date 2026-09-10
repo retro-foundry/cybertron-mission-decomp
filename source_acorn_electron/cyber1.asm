@@ -2451,23 +2451,23 @@ org runtime_start
     STA      item_y_alias_object_14,X
     LDA      player_x_first_cell
     SBC      item_x_alias_object_14,X
-    BPL      addr_1E02
+    BPL      compare_item_horizontal_distance
     EOR      #&ff
 
-.addr_1E02
+.compare_item_horizontal_distance
     CMP      #&8
-    BPL      addr_1E15
+    BPL      test_item_candidate_position
     LDA      player_y_first_cell
     SEC
     SBC      item_y_alias_object_14,X
-    BPL      addr_1E11
+    BPL      compare_item_vertical_distance
     EOR      #&ff
 
-.addr_1E11
+.compare_item_vertical_distance
     CMP      #&5
     BMI      random_place_item
 
-.addr_1E15
+.test_item_candidate_position
     TXA
     CLC
     ADC      #&14
@@ -2505,12 +2505,12 @@ org runtime_start
     LDX      #&2b
     LDA      #&0
 
-.addr_1E62
+.clear_item_and_enemy_state_loop
     STA      item_state_alias_object_14,X
     STA      item_delta_x_by_slot,X
     STA      item_delta_y_by_slot,X
     DEX
-    BPL      addr_1E62
+    BPL      clear_item_and_enemy_state_loop
     LDA      pending_spinner_count
     CLC
     ADC      pending_clone_count
@@ -2521,35 +2521,35 @@ org runtime_start
     DEX
     LDA      #&1
 
-.addr_1E80
+.mark_initial_active_enemy_slots_loop
     STA      item_state_alias_object_14,X
     DEX
-    BPL      addr_1E80
+    BPL      mark_initial_active_enemy_slots_loop
     LDA      #&0
     STA      logical_item_slot_index
 
-.addr_1E8A
+.place_next_spinner
     DEC      pending_spinner_count
-    BMI      addr_1E97
+    BMI      place_next_clone
     LDA      #&2a
     JSR      set_item_graphic_and_random_place
-    JMP      addr_1E8A
+    JMP      place_next_spinner
 
-.addr_1E97
+.place_next_clone
     DEC      pending_clone_count
-    BMI      addr_1EA4
+    BMI      place_next_cyberdroid
     LDA      #&2b
     JSR      set_item_graphic_and_random_place
-    JMP      addr_1E97
+    JMP      place_next_clone
 
-.addr_1EA4
+.place_next_cyberdroid
     DEC      pending_cyberdroid_count
-    BMI      addr_1EB1
+    BMI      return_from_enemy_placement
     LDA      #&2c
     JSR      set_item_graphic_and_random_place
-    JMP      addr_1EA4
+    JMP      place_next_cyberdroid
 
-.addr_1EB1
+.return_from_enemy_placement
     RTS
 
 .read_object0_screen_byte_at_temp_position
@@ -2567,10 +2567,10 @@ org runtime_start
 .fill_room_masked_forward_screen_gaps
     LDX      room_area
     LDA      initial_screen_room_feature_mask_1ec8_1f19,X
-    BNE      addr_1ED0
+    BNE      setup_forward_room_gap_scan
     RTS
 
-.addr_1ED0
+.setup_forward_room_gap_scan
     LDA      room_tile_column_or_fill_index
     CLC
     ADC      room_tile_column_or_fill_index
@@ -2585,37 +2585,37 @@ org runtime_start
     STA      room_gap_transition_pending
     STA      room_gap_previous_screen_byte
 
-.addr_1EEE
+.scan_next_forward_room_gap_position
     JSR      read_object0_screen_byte_at_temp_position
-    BEQ      addr_1EFE
+    BEQ      fill_forward_gap_after_transition
     LDA      room_gap_transition_pending
     EOR      #&1
     STA      room_gap_transition_pending
-    JMP      addr_1F06
+    JMP      advance_forward_room_gap_scan
 
-.addr_1EFE
+.fill_forward_gap_after_transition
     LDA      room_gap_transition_pending
-    BEQ      addr_1F06
+    BEQ      advance_forward_room_gap_scan
     JSR      copy_level_modulo_24byte_fill_pattern
 
-.addr_1F06
+.advance_forward_room_gap_scan
     LDA      renderer_collision_accumulator
     STA      room_gap_previous_screen_byte
     INC      object_y_by_index
     INC      object_y_by_index
     LDA      object_y_by_index
     CMP      #&3a
-    BMI      addr_1EEE
+    BMI      scan_next_forward_room_gap_position
 
-.addr_1F18
+.return_from_room_gap_fill
     RTS
 
 .fill_room_masked_offset_screen_gaps
     LDX      room_area
     LDA      initial_screen_room_feature_mask_1ec8_1f19,X
-    BEQ      addr_1F18
+    BEQ      return_from_room_gap_fill
     LDA      room_tile_column_or_fill_index
-    BEQ      addr_1F18
+    BEQ      return_from_room_gap_fill
     LDA      room_tile_column_or_fill_index
     CLC
     ADC      room_tile_column_or_fill_index
@@ -2628,9 +2628,9 @@ org runtime_start
     LDA      #&6
     STA      object_y_by_index
 
-.addr_1F3B
+.scan_next_offset_room_gap_position
     JSR      read_object0_screen_byte_at_temp_position
-    BEQ      addr_1F58
+    BEQ      advance_offset_room_gap_scan
     LDA      #&18
     JSR      add_a_to_pointer_70
     LDA      zp_screen_ptr_70_low
@@ -2639,15 +2639,15 @@ org runtime_start
     STA      object_screen_high_by_index
     LDY      #&0
     LDA      (zp_screen_ptr_70_low),Y
-    BNE      addr_1F58
+    BNE      advance_offset_room_gap_scan
     JSR      copy_level_modulo_24byte_fill_pattern
 
-.addr_1F58
+.advance_offset_room_gap_scan
     INC      object_y_by_index
     INC      object_y_by_index
     LDA      object_y_by_index
     CMP      #&3a
-    BMI      addr_1F3B
+    BMI      scan_next_offset_room_gap_position
     RTS
 
 .clear_all_palette_entries
@@ -2705,17 +2705,17 @@ org runtime_start
     STA      bounds_or_outside_flag
     LDA      object_x_by_index,X
     CMP      #&4
-    BMI      addr_1FD8
+    BMI      mark_object_outside_playfield
     CMP      #&4a
-    BPL      addr_1FD8
+    BPL      mark_object_outside_playfield
     LDA      object_y_by_index,X
     CMP      #&8
-    BMI      addr_1FD8
+    BMI      mark_object_outside_playfield
     CMP      #&37
-    BPL      addr_1FD8
+    BPL      mark_object_outside_playfield
     RTS
 
-.addr_1FD8
+.mark_object_outside_playfield
     INC      bounds_or_outside_flag
     RTS
 
