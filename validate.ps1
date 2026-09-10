@@ -33,6 +33,7 @@ $requiredFiles = @(
     'analysis/reconstruction/runtime_active_frame_edge_contract.txt'
     'analysis/reconstruction/runtime_sound_dispatch_audit.txt'
     'analysis/reconstruction/runtime_sound_port_semantics.txt'
+    'analysis/reconstruction/runtime_screen_flow_contract.txt'
     'tools/reconstruction/replay_6502.py'
     'tools/reconstruction/render_graphic_sheet.py'
     'tools/reconstruction/validate_port_contracts.py'
@@ -68,6 +69,7 @@ $maintainedFiles = @(
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_active_frame_edge_contract.txt')
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_sound_dispatch_audit.txt')
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_sound_port_semantics.txt')
+    (Join-Path $repoRoot 'analysis\reconstruction\runtime_screen_flow_contract.txt')
     (Join-Path $repoRoot 'tools\reconstruction\replay_6502.py')
     (Join-Path $repoRoot 'tools\reconstruction\render_graphic_sheet.py')
     (Join-Path $repoRoot 'tools\reconstruction\validate_port_contracts.py')

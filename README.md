@@ -134,6 +134,10 @@ and [sound port semantics](analysis/reconstruction/runtime_sound_port_semantics.
 preserve all 22 loader-owned sound rows and their BBC channel/envelope meaning.
 The assembled `$21EA` dispatcher is replayed for every ID with sound both on
 and off, checking gating and the exact OSWORD 7 block pointer.
+The [screen-flow contract](analysis/reconstruction/runtime_screen_flow_contract.txt)
+records the original help, legend, and level-intro order without the archived
+report's incorrect Mode-5 previews. Actual `$110E` and `$111B` CPU replays
+verify all three VDU streams and all fourteen compact text streams.
 
 The decoded 24-byte artwork can be reviewed in the
 [composed sprite and graphic sheet](analysis/reconstruction/composed_sprite_sheet.png).

@@ -22,6 +22,7 @@ PROJECTILE_LIFECYCLE_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime
 SCORE_STATUS_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_score_status_contract.txt"
 ACTIVE_FRAME_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_active_frame_edge_contract.txt"
 SOUND_DISPATCH_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_sound_dispatch_audit.txt"
+SCREEN_FLOW_CONTRACT = ROOT / "analysis" / "reconstruction" / "runtime_screen_flow_contract.txt"
 LOAD_ADDRESS = 0x0D80
 
 
@@ -1256,6 +1257,73 @@ def main() -> None:
                 )
             sound_cpu_replays += 1
 
+    # Execute both original text transport formats. Expected compact strings
+    # and VDU-stream digests are independent, human-reviewable contract data.
+    if "Do not decode the graphic bytes as Mode 5" not in SCREEN_FLOW_CONTRACT.read_text(
+        encoding="ascii"
+    ):
+        fail("screen-flow contract is missing the Mode 2 artwork guard")
+    zero_streams = (
+        (0x00, 120, "95cead3a77f3c4204262a90bb1e3b899a669b57334a08871978b39808acb823f"),
+        (0xB8, 13, "d9e1dc9052ebdd310976ab3e3ed9d200beaf1ecef6f4cf6955176ff578411ccb"),
+        (0xC6, 23, "e23ea60c8f5d6fcb23a9cf319b56cd1b23764dfc0a2bced7d38d95087e8799fe"),
+    )
+    zero_text_cpu_replays = 0
+    for start_x, expected_length, expected_digest in zero_streams:
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        output = bytearray()
+
+        def oswrch_handler(cpu: Replay6502, target: int) -> bool:
+            if target == 0xFFEE:
+                output.append(cpu.a)
+                return True
+            return False
+
+        cpu = Replay6502(memory, oswrch_handler)
+        cpu.x = start_x
+        cpu.run_subroutine(0x110E)
+        if (len(output), hashlib.sha256(output).hexdigest()) != (
+            expected_length,
+            expected_digest,
+        ):
+            fail(f"zero-text stream ${start_x:02X}: output contract differs")
+        zero_text_cpu_replays += 1
+
+    compact_streams = (
+        (0x7C, 0x05, "CYBERTRON"),
+        (0x87, 0x00, "PRESS SPACE TO START"),
+        (0x9D, 0x06, "SPOOK"),
+        (0xA4, 0x06, "SPINNER"),
+        (0xAD, 0x06, "CLONE"),
+        (0xB4, 0x06, "CYBERDROID"),
+        (0xC0, 0x06, "SAFE"),
+        (0xC6, 0x06, "POT OF GOLD"),
+        (0xD3, 0x06, "KEY"),
+        (0xD8, 0x06, "RING"),
+        (0xDE, 0x06, "LEVEL"),
+        (0xE5, 0x04, "END OF GAME"),
+        (0xF2, 0x08, "KEYS"),
+        (0xF8, 0x07, "STATUS"),
+    )
+    compact_text_cpu_replays = 0
+    for stream_offset, destination, text_value in compact_streams:
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        cpu = Replay6502(memory)
+        cpu.x = stream_offset
+        cpu.run_subroutine(0x111B)
+        encoded = bytes(ord(character) - 0x20 for character in text_value)
+        actual = bytes(memory[0x0CCA + destination : 0x0CCA + destination + len(encoded)])
+        if actual != encoded:
+            fail(
+                f"compact text ${stream_offset:02X}: decoded {actual.hex()}, "
+                f"expected {encoded.hex()}"
+            )
+        compact_text_cpu_replays += 1
+    if block(0x2700, 6) != bytes((0x3F, 0x3E, 0x32, 0x3E, 0x32, 0x32)):
+        fail("level-intro required-target order differs")
+
     # Replay the assembled $17BF-$195B frame spine with leaf systems captured
     # as ordered probes. This isolates the rare delay branches without
     # pretending that transition delay is a global gameplay pause.
@@ -1365,6 +1433,8 @@ def main() -> None:
         f"{projectile_expiry_cpu_replays} projectile expiry CPU replays, "
         f"{score_replays} score CPU replays"
         f", {sound_cpu_replays} sound-dispatch CPU replays"
+        f", {zero_text_cpu_replays} zero-text CPU replays"
+        f", {compact_text_cpu_replays} compact-text CPU replays"
         f", {active_frame_cpu_replays} active-frame spine CPU replays"
     )
 

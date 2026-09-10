@@ -1,0 +1,43 @@
+runtime_screen_flow_contract
+Purpose: port-facing contract for the original help, legend, and level-intro screens.
+Authority: $0E05 menu order, $110E zero-terminated VDU output, $111B compact text decode, $1145 help, $1175 legend, and $11FE level intro.
+Artwork previews are intentionally omitted here; graphics are Mode 2 and are covered by composed_sprite_sheet.png and the renderer contracts.
+
+screen_order
+1 $1145 controls/help screen
+2 $1175 object legend screen
+3 $11FE level intro after starting a game
+
+compact_text_streams
+offset destination text
+$7C $05 CYBERTRON
+$87 $00 PRESS SPACE TO START
+$9D $06 SPOOK
+$A4 $06 SPINNER
+$AD $06 CLONE
+$B4 $06 CYBERDROID
+$C0 $06 SAFE
+$C6 $06 POT OF GOLD
+$D3 $06 KEY
+$D8 $06 RING
+$DE $06 LEVEL
+$E5 $04 END OF GAME
+$F2 $08 KEYS
+$F8 $07 STATUS
+
+legend_graphics
+SPINNER=$2A CLONE=$2B CYBERDROID=$2C SAFE=$3D KEY=$3F POT_OF_GOLD=$32 RING=$3E SPOOK=$2E+$2F
+
+required_target_order
+$3F KEY
+$3E RING
+$32 POT_OF_GOLD
+$3E RING
+$32 POT_OF_GOLD
+$32 POT_OF_GOLD
+
+port_rules
+Preserve the three screens and their original order.
+Preserve compact text decoding and destination offsets rather than inventing a new layout.
+Preserve the required-target sound/wait between glyphs.
+Do not decode the graphic bytes as Mode 5; this runtime uses BBC/Electron Mode 2.

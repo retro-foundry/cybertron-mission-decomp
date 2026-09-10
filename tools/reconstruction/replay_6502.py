@@ -107,6 +107,8 @@ class Replay6502:
                 self.a = self._flags(self._fetch())
             elif opcode == 0x9D:  # STA abs,X
                 self.memory[(self._word() + self.x) & 0xFFFF] = self.a
+            elif opcode == 0x99:  # STA abs,Y
+                self.memory[(self._word() + self.y) & 0xFFFF] = self.a
             elif opcode == 0xE8:  # INX
                 self.x = self._flags(self.x + 1)
             elif opcode == 0xE6:  # INC zp
@@ -134,6 +136,8 @@ class Replay6502:
                 self.a = self._flags(self.memory[(address + self.y) & 0xFFFF])
             elif opcode == 0x88:  # DEY
                 self.y = self._flags(self.y - 1)
+            elif opcode == 0xC8:  # INY
+                self.y = self._flags(self.y + 1)
             elif opcode == 0x10:  # BPL rel
                 self._branch(not self.negative)
             elif opcode == 0x20:  # JSR abs
