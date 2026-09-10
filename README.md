@@ -60,6 +60,8 @@ standalone port preflight contracts for graphic pointers, player animation
 selection, player starts, projectile address updates, all 256 clean room
 render variants, all 640 room/level status-panel composites, both sprite
 destination walks, and all four isolated player-start layers.
+Seven seeded setup scenarios additionally validate target-code generation,
+enemy/target placement, collision rejection, and the composed entry frame.
 
 ## Layout and provenance
 
@@ -84,6 +86,9 @@ slot placement references.
 The [sprite renderer oracle](analysis/reconstruction/runtime_sprite_renderer_reference.txt)
 records the distinct even/odd-Y write sequences and exact player-start layer
 digests.
+The [setup-frame oracle](analysis/reconstruction/runtime_setup_frame_reference.txt)
+records the seeded RNG state, placed objects, setup-screen digest, and immediate
+player-entry digest for each scenario.
 
 The decoded 24-byte artwork can be reviewed in the
 [composed sprite and graphic sheet](analysis/reconstruction/composed_sprite_sheet.png).

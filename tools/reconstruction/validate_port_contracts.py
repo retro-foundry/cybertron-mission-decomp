@@ -12,6 +12,7 @@ DEFAULT_RUNTIME = ROOT / "build" / "reconstruction" / "CYBRUN"
 ROOM_FIXTURE = ROOT / "analysis" / "reconstruction" / "room_render_fixture.json"
 STATUS_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_status_panel_reference.txt"
 SPRITE_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_sprite_renderer_reference.txt"
+SETUP_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_setup_frame_reference.txt"
 LOAD_ADDRESS = 0x0D80
 
 
@@ -494,6 +495,160 @@ def main() -> None:
             )
         player_layer_rows += 1
 
+    # G4: compose deterministic $1735 setup scenarios from the already
+    # validated room, status, and sprite primitives. These vectors cover RNG
+    # target codes, enemy/target rejection placement, and the immediate
+    # visible-player draw at $1849-$1863.
+    setup_reference = SETUP_REFERENCE.read_text(encoding="ascii")
+    setup_pattern = re.compile(
+        r"^## (?P<name>[^\n]+)\n"
+        r"inputs: room=\$(?P<room>[0-9a-f]{2}) level=(?P<tens>[0-9])(?P<ones>[0-9]) "
+        r"level_index=(?P<level_index>[0-5]) start_index=(?P<start>[0-3]) lives=(?P<lives>[0-9]+) "
+        r"rng_seed=(?P<seed>[0-9a-f]{6}) (?P<carry>[Cc])\n"
+        r"target_required_max_slot=(?P<required>[0-5]) target_codes=(?P<codes>[^\n]+)\n"
+        r"player_anchor_for_proximity: x=\$(?P<player_x>[0-9a-f]{2}) y=\$(?P<player_y>[0-9a-f]{2})\n"
+        r"rng_final=(?P<rng_final>[0-9a-f]{6}) (?P<rng_carry>[Cc]) rng_calls=(?P<rng_calls>[0-9]+)\n"
+        r"screen_sha256=(?P<screen_digest>[0-9a-f]{64}) nonzero_bytes=(?P<screen_nonzero>[0-9]+)\n"
+        r"entry_player_draw_1849_1863: .*? sha256=(?P<player_digest>[0-9a-f]{64}) "
+        r"nonzero_bytes=(?P<player_nonzero>[0-9]+)$",
+        re.MULTILINE,
+    )
+    setup_scenarios = [match.groupdict() for match in setup_pattern.finditer(setup_reference)]
+    if len(setup_scenarios) != 7:
+        fail(f"setup reference has {len(setup_scenarios)} scenarios; expected 7")
+
+    spinner_counts = block(0x2782, 6)
+    clone_counts = block(0x277C, 6)
+    cyberdroid_counts = block(0x2776, 6)
+    enemy_families = (
+        (spinner_counts, 0x2A),
+        (clone_counts, 0x2B),
+        (cyberdroid_counts, 0x2C),
+    )
+
+    def adc8(a: int, value: int, carry: bool) -> tuple[int, bool]:
+        total = a + value + int(carry)
+        return total & 0xFF, total > 0xFF
+
+    def rng_next(state: list) -> int:
+        a, b, c, carry, calls = state
+        value, carry = adc8(a, b, carry)
+        if not value & 0x80:
+            pass
+        else:
+            value, carry = adc8(value, 0x69, carry)
+        value, carry = adc8(value, c, carry)
+        a = value
+        b, carry = adc8(b, 0x3C, carry)
+        c, carry = adc8(c, 0x5A, carry)
+        state[:] = (a, b, c, carry, calls + 1)
+        return a
+
+    def too_close(player_x: int, player_y: int, candidate_x: int, candidate_y: int) -> bool:
+        x_delta = (player_x - candidate_x - 1) & 0xFF
+        if x_delta & 0x80:
+            x_delta ^= 0xFF
+        if x_delta >= 8:
+            return False
+        y_delta = (player_y - candidate_y) & 0xFF
+        if y_delta & 0x80:
+            y_delta ^= 0xFF
+        return y_delta < 5
+
+    def place_graphic(
+        screen: bytearray, rng: list, player_x: int, player_y: int, graphic_id: int
+    ) -> tuple[int, int, int]:
+        for _ in range(10000):
+            x = ((rng_next(rng) & 0x1F) + (rng_next(rng) & 0x0F) + 0x0F) & 0xFF
+            y = ((rng_next(rng) & 0x1F) + 0x0F) & 0xFF
+            if too_close(player_x, player_y, x, y):
+                continue
+            pointer = object_pointer(x, y)
+            collision = 0
+            for _, destination_offset in renderer_steps(y):
+                collision |= screen[pointer + destination_offset - 0x3000]
+            if collision:
+                continue
+            draw_xor(screen, pointer, y, graphic_id)
+            return x, y, pointer
+        fail(f"setup placement did not converge for graphic ${graphic_id:02X}")
+
+    setup_rows = 0
+    for expected in setup_scenarios:
+        room_id = int(expected["room"], 16)
+        level_tens = int(expected["tens"])
+        level_ones = int(expected["ones"])
+        level_index = int(expected["level_index"])
+        start = int(expected["start"])
+        required = 5 if level_tens or level_ones >= 6 else level_ones
+        if required != int(expected["required"]):
+            fail(f"{expected['name']}: required target slot differs")
+        seed = bytes.fromhex(expected["seed"])
+        rng = [seed[0], seed[1], seed[2], expected["carry"] == "C", 0]
+        target_codes = [-1] * 7
+        for slot in (*range(required + 1), 6):
+            while True:
+                code = rng_next(rng) & 0x0F
+                target_codes[slot] = code
+                if code not in target_codes[:slot]:
+                    break
+        expected_codes = tuple(
+            -1 if value == "--" else int(value[1:], 16)
+            for value in re.findall(r"[0-6]:(--|\$[0-9a-f])", expected["codes"])
+        )
+        if tuple(target_codes) != expected_codes:
+            fail(f"{expected['name']}: target codes {target_codes}, expected {expected_codes}")
+
+        screen = bytearray(render_status(room_id, level_ones))
+        player_x = start_x[start]
+        player_y = start_y[start]
+        if (player_x, player_y) != (
+            int(expected["player_x"], 16),
+            int(expected["player_y"], 16),
+        ):
+            fail(f"{expected['name']}: player proximity anchor differs")
+
+        for counts, graphic_id in enemy_families:
+            for _ in range(counts[level_index]):
+                place_graphic(screen, rng, player_x, player_y, graphic_id)
+        for slot in (*range(required, -1, -1), 6):
+            if room_id & 0x0F == target_codes[slot]:
+                place_graphic(screen, rng, player_x, player_y, block(0x2F36 + slot, 1)[0])
+
+        actual_setup = (sum(value != 0 for value in screen), hashlib.sha256(screen).hexdigest())
+        expected_setup = (int(expected["screen_nonzero"]), expected["screen_digest"])
+        if actual_setup != expected_setup:
+            fail(f"{expected['name']}: setup screen {actual_setup}, expected {expected_setup}")
+
+        entry_screen = bytearray(screen)
+        draw_xor(
+            entry_screen,
+            first_low[start] | first_high[start] << 8,
+            player_y,
+            first_graphic[start],
+        )
+        draw_xor(
+            entry_screen,
+            second_low[start] | second_high[start] << 8,
+            player_y + 2,
+            second_graphic[start],
+        )
+        actual_entry = (
+            sum(value != 0 for value in entry_screen),
+            hashlib.sha256(entry_screen).hexdigest(),
+        )
+        expected_entry = (int(expected["player_nonzero"]), expected["player_digest"])
+        if actual_entry != expected_entry:
+            fail(f"{expected['name']}: entry screen {actual_entry}, expected {expected_entry}")
+        actual_rng = f"{rng[0]:02x}{rng[1]:02x}{rng[2]:02x}"
+        if (actual_rng, rng[3], rng[4]) != (
+            expected["rng_final"],
+            expected["rng_carry"] == "C",
+            int(expected["rng_calls"]),
+        ):
+            fail(f"{expected['name']}: final RNG state differs")
+        setup_rows += 1
+
     print(
         "Validated port preflight: "
         "64 graphic pointers, "
@@ -503,7 +658,8 @@ def main() -> None:
         f"{movement_rows} movement projections, "
         f"{room_rows} room-render digests, "
         f"{status_rows} status-render digests, "
-        f"{player_layer_rows} player sprite layers"
+        f"{player_layer_rows} player sprite layers, "
+        f"{setup_rows} deterministic setup frames"
     )
 
 

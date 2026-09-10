@@ -1,0 +1,327 @@
+# Cybertron setup-frame reference
+
+Scope: controlled deterministic vectors for target-code generation followed by the $1735 setup path.
+The resulting screen includes room render, status panel, enemies, and room-target objects.
+It also exports a second digest after the immediate $1849-$1863 visible-player draw/save subpath.
+Each scenario includes a port-state snapshot for seeded player fields, phase/input flags, target arrays, and placed render objects.
+It excludes later $1849 collision/input checks, shots, hazards, spook release, sound, and palette effects.
+
+RNG inputs are explicit three-byte seeds plus an explicit carry flag. This keeps the vectors
+portable even though the original caller context owns carry into $1D61.
+
+## level01_room00_seed_5aa53c
+inputs: room=$00 level=01 level_index=0 start_index=0 lives=4 rng_seed=5aa53c c
+target_required_max_slot=1 target_codes=0:$5,1:$6,2:--,3:--,4:--,5:--,6:$f
+player_anchor_for_proximity: x=$07 y=$1e
+rng_final=dbd1fb c rng_calls=39
+screen_sha256=fa5e5c734cba96dd3e2f68f5da7b0c047f31348fdf52652c39c53031b5668be2 nonzero_bytes=11252
+entry_player_draw_1849_1863: first_graphic=$08 first_y=$1e first_ptr=$55b8 second_graphic=$0a second_y=$20 second_ptr=$5838 sha256=d997b58af3cf61b82b81d333e4717b1bf458f671f2c2f494966dd9dcf95fd57f nonzero_bytes=11288
+port_state_snapshot_after_0eca_0ed9:
+  flags phase_0036=$03 delay_0082=$00 fire_003e=$00 input_dx_003f=$00 input_dy_0040=$00 projectile_spook_pause_0043=$00
+  rng_final=dbd1fb c rng_calls=39
+  target_codes_0c14: 0=$5 1=$6 2=-- 3=-- 4=-- 5=-- 6=$f
+  target_collected_0c0d: 0=0 1=0 2=0 3=0 4=0 5=0 6=0
+  shot_hazard_seed_from_179b_17ae active_player_shot_count_0042=$00 active_spawned_hazard_count_0bb8=$00 slots_0c4e=ff,ff,ff,ff,ff,ff,ff,ff slots_0c56=00,00,00,00,00,00,00,00
+  first_frame_projectile_projection: $189C/$1937/$194E scan slots 7..0 but all are inactive until $1C4D sees fire edge or $2235 spawns a hazard.
+  render_slot=$10 role=player_first graphic=$08 x=$07 y=$1e ptr=$55b8
+  render_slot=$11 role=player_second graphic=$0a x=$07 y=$20 ptr=$5838
+  render_slot=$14 role=enemy_spinner logical=$00 graphic=$2a x=$18 y=$17 ptr=$4c40
+  render_slot=$15 role=enemy_spinner logical=$01 graphic=$2a x=$23 y=$29 ptr=$6318
+  render_slot=$16 role=enemy_spinner logical=$02 graphic=$2a x=$2a y=$28 ptr=$6350
+  render_slot=$17 role=enemy_spinner logical=$03 graphic=$2a x=$31 y=$2b ptr=$6608
+  render_slot=$18 role=enemy_spinner logical=$04 graphic=$2a x=$34 y=$28 ptr=$63a0
+  render_slot=$19 role=enemy_spinner logical=$05 graphic=$2a x=$16 y=$2a ptr=$6530
+  initial_enemy_scheduler_projection_after_first_17bf_increment phase=$04:
+    render_slot=$14 graphic=$2a scheduler=spinner phase_gate=$04 moves_on_first_normal_phase_04=yes
+    render_slot=$15 graphic=$2a scheduler=spinner phase_gate=$05 moves_on_first_normal_phase_04=no
+    render_slot=$16 graphic=$2a scheduler=spinner phase_gate=$06 moves_on_first_normal_phase_04=no
+    render_slot=$17 graphic=$2a scheduler=spinner phase_gate=$07 moves_on_first_normal_phase_04=no
+    render_slot=$18 graphic=$2a scheduler=spinner phase_gate=$08 moves_on_first_normal_phase_04=no
+    render_slot=$19 graphic=$2a scheduler=spinner phase_gate=$09 moves_on_first_normal_phase_04=no
+  note=spook pair graphics $2E/$2F are seeded by $1E3A but their release/location lifecycle is covered by runtime_enemy_movement.txt and runtime_special_status_edges.txt.
+target_scans:
+  slot=1 code=$6 action=skipped_room_mismatch
+  slot=0 code=$5 action=skipped_room_mismatch
+  slot=6 code=$f action=skipped_room_mismatch
+placements:
+  enemy_spinner logical=$00 render=$14 graphic=$2a x=$18 y=$17 ptr=$4c40 attempts=2 proximity_rejects=0 collision_rejects=1
+  enemy_spinner logical=$01 render=$15 graphic=$2a x=$23 y=$29 ptr=$6318 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_spinner logical=$02 render=$16 graphic=$2a x=$2a y=$28 ptr=$6350 attempts=4 proximity_rejects=0 collision_rejects=3
+  enemy_spinner logical=$03 render=$17 graphic=$2a x=$31 y=$2b ptr=$6608 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_spinner logical=$04 render=$18 graphic=$2a x=$34 y=$28 ptr=$63a0 attempts=3 proximity_rejects=0 collision_rejects=2
+  enemy_spinner logical=$05 render=$19 graphic=$2a x=$16 y=$2a ptr=$6530 attempts=1 proximity_rejects=0 collision_rejects=0
+
+## level01_room05_seed_5aa53c_target_slot0
+inputs: room=$05 level=01 level_index=0 start_index=0 lives=4 rng_seed=5aa53c c
+target_required_max_slot=1 target_codes=0:$5,1:$6,2:--,3:--,4:--,5:--,6:$f
+player_anchor_for_proximity: x=$07 y=$1e
+rng_final=f91ced c rng_calls=36
+screen_sha256=26003f51ada24050f30a1bcf7e91d0a5a903f5aac729f55f1b86ddeee37806d2 nonzero_bytes=4465
+entry_player_draw_1849_1863: first_graphic=$08 first_y=$1e first_ptr=$55b8 second_graphic=$0a second_y=$20 second_ptr=$5838 sha256=9cfe0282ac381d09640257ad12b878c0e311a7d2fce9857baffab98b993cd38d nonzero_bytes=4501
+port_state_snapshot_after_0eca_0ed9:
+  flags phase_0036=$03 delay_0082=$00 fire_003e=$00 input_dx_003f=$00 input_dy_0040=$00 projectile_spook_pause_0043=$00
+  rng_final=f91ced c rng_calls=36
+  target_codes_0c14: 0=$5 1=$6 2=-- 3=-- 4=-- 5=-- 6=$f
+  target_collected_0c0d: 0=0 1=0 2=0 3=0 4=0 5=0 6=0
+  shot_hazard_seed_from_179b_17ae active_player_shot_count_0042=$00 active_spawned_hazard_count_0bb8=$00 slots_0c4e=ff,ff,ff,ff,ff,ff,ff,ff slots_0c56=00,00,00,00,00,00,00,00
+  first_frame_projectile_projection: $189C/$1937/$194E scan slots 7..0 but all are inactive until $1C4D sees fire edge or $2235 spawns a hazard.
+  render_slot=$10 role=player_first graphic=$08 x=$07 y=$1e ptr=$55b8
+  render_slot=$11 role=player_second graphic=$0a x=$07 y=$20 ptr=$5838
+  render_slot=$14 role=enemy_spinner logical=$00 graphic=$2a x=$18 y=$17 ptr=$4c40
+  render_slot=$15 role=enemy_spinner logical=$01 graphic=$2a x=$23 y=$29 ptr=$6318
+  render_slot=$16 role=enemy_spinner logical=$02 graphic=$2a x=$2a y=$28 ptr=$6350
+  render_slot=$17 role=enemy_spinner logical=$03 graphic=$2a x=$31 y=$2b ptr=$6608
+  render_slot=$18 role=enemy_spinner logical=$04 graphic=$2a x=$20 y=$1f ptr=$5680
+  render_slot=$19 role=enemy_spinner logical=$05 graphic=$2a x=$29 y=$1f ptr=$56c8
+  render_slot=$36 role=target_slot_0 logical=$22 graphic=$3d x=$34 y=$28 ptr=$63a0
+  initial_enemy_scheduler_projection_after_first_17bf_increment phase=$04:
+    render_slot=$14 graphic=$2a scheduler=spinner phase_gate=$04 moves_on_first_normal_phase_04=yes
+    render_slot=$15 graphic=$2a scheduler=spinner phase_gate=$05 moves_on_first_normal_phase_04=no
+    render_slot=$16 graphic=$2a scheduler=spinner phase_gate=$06 moves_on_first_normal_phase_04=no
+    render_slot=$17 graphic=$2a scheduler=spinner phase_gate=$07 moves_on_first_normal_phase_04=no
+    render_slot=$18 graphic=$2a scheduler=spinner phase_gate=$08 moves_on_first_normal_phase_04=no
+    render_slot=$19 graphic=$2a scheduler=spinner phase_gate=$09 moves_on_first_normal_phase_04=no
+  note=spook pair graphics $2E/$2F are seeded by $1E3A but their release/location lifecycle is covered by runtime_enemy_movement.txt and runtime_special_status_edges.txt.
+target_scans:
+  slot=1 code=$6 action=skipped_room_mismatch
+  slot=0 code=$5 action=placed logical=$22 graphic=$3d
+  slot=6 code=$f action=skipped_room_mismatch
+placements:
+  enemy_spinner logical=$00 render=$14 graphic=$2a x=$18 y=$17 ptr=$4c40 attempts=2 proximity_rejects=0 collision_rejects=1
+  enemy_spinner logical=$01 render=$15 graphic=$2a x=$23 y=$29 ptr=$6318 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_spinner logical=$02 render=$16 graphic=$2a x=$2a y=$28 ptr=$6350 attempts=4 proximity_rejects=0 collision_rejects=3
+  enemy_spinner logical=$03 render=$17 graphic=$2a x=$31 y=$2b ptr=$6608 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_spinner logical=$04 render=$18 graphic=$2a x=$20 y=$1f ptr=$5680 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_spinner logical=$05 render=$19 graphic=$2a x=$29 y=$1f ptr=$56c8 attempts=1 proximity_rejects=0 collision_rejects=0
+  target_slot_0 logical=$22 render=$36 graphic=$3d x=$34 y=$28 ptr=$63a0 attempts=1 proximity_rejects=0 collision_rejects=0
+
+## level01_room06_seed_5aa53c_target_slot1
+inputs: room=$06 level=01 level_index=0 start_index=0 lives=4 rng_seed=5aa53c c
+target_required_max_slot=1 target_codes=0:$5,1:$6,2:--,3:--,4:--,5:--,6:$f
+player_anchor_for_proximity: x=$07 y=$1e
+rng_final=70b3cf c rng_calls=30
+screen_sha256=46452cd3c8c28d8eb60c298eebc5ee8b312275a579d2eba60fbc4d031b235f26 nonzero_bytes=4117
+entry_player_draw_1849_1863: first_graphic=$08 first_y=$1e first_ptr=$55b8 second_graphic=$0a second_y=$20 second_ptr=$5838 sha256=db842165c2d3e005ea59e63df18493816d079534529f163ae678005f5b167b0d nonzero_bytes=4153
+port_state_snapshot_after_0eca_0ed9:
+  flags phase_0036=$03 delay_0082=$00 fire_003e=$00 input_dx_003f=$00 input_dy_0040=$00 projectile_spook_pause_0043=$00
+  rng_final=70b3cf c rng_calls=30
+  target_codes_0c14: 0=$5 1=$6 2=-- 3=-- 4=-- 5=-- 6=$f
+  target_collected_0c0d: 0=0 1=0 2=0 3=0 4=0 5=0 6=0
+  shot_hazard_seed_from_179b_17ae active_player_shot_count_0042=$00 active_spawned_hazard_count_0bb8=$00 slots_0c4e=ff,ff,ff,ff,ff,ff,ff,ff slots_0c56=00,00,00,00,00,00,00,00
+  first_frame_projectile_projection: $189C/$1937/$194E scan slots 7..0 but all are inactive until $1C4D sees fire edge or $2235 spawns a hazard.
+  render_slot=$10 role=player_first graphic=$08 x=$07 y=$1e ptr=$55b8
+  render_slot=$11 role=player_second graphic=$0a x=$07 y=$20 ptr=$5838
+  render_slot=$14 role=enemy_spinner logical=$00 graphic=$2a x=$17 y=$2d ptr=$67b8
+  render_slot=$15 role=enemy_spinner logical=$01 graphic=$2a x=$18 y=$17 ptr=$4c40
+  render_slot=$16 role=enemy_spinner logical=$02 graphic=$2a x=$23 y=$29 ptr=$6318
+  render_slot=$17 role=enemy_spinner logical=$03 graphic=$2a x=$2a y=$0f ptr=$42d0
+  render_slot=$18 role=enemy_spinner logical=$04 graphic=$2a x=$2a y=$28 ptr=$6350
+  render_slot=$19 role=enemy_spinner logical=$05 graphic=$2a x=$31 y=$2b ptr=$6608
+  render_slot=$37 role=target_slot_1 logical=$23 graphic=$3f x=$20 y=$1f ptr=$5680
+  initial_enemy_scheduler_projection_after_first_17bf_increment phase=$04:
+    render_slot=$14 graphic=$2a scheduler=spinner phase_gate=$04 moves_on_first_normal_phase_04=yes
+    render_slot=$15 graphic=$2a scheduler=spinner phase_gate=$05 moves_on_first_normal_phase_04=no
+    render_slot=$16 graphic=$2a scheduler=spinner phase_gate=$06 moves_on_first_normal_phase_04=no
+    render_slot=$17 graphic=$2a scheduler=spinner phase_gate=$07 moves_on_first_normal_phase_04=no
+    render_slot=$18 graphic=$2a scheduler=spinner phase_gate=$08 moves_on_first_normal_phase_04=no
+    render_slot=$19 graphic=$2a scheduler=spinner phase_gate=$09 moves_on_first_normal_phase_04=no
+  note=spook pair graphics $2E/$2F are seeded by $1E3A but their release/location lifecycle is covered by runtime_enemy_movement.txt and runtime_special_status_edges.txt.
+target_scans:
+  slot=1 code=$6 action=placed logical=$23 graphic=$3f
+  slot=0 code=$5 action=skipped_room_mismatch
+  slot=6 code=$f action=skipped_room_mismatch
+placements:
+  enemy_spinner logical=$00 render=$14 graphic=$2a x=$17 y=$2d ptr=$67b8 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_spinner logical=$01 render=$15 graphic=$2a x=$18 y=$17 ptr=$4c40 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_spinner logical=$02 render=$16 graphic=$2a x=$23 y=$29 ptr=$6318 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_spinner logical=$03 render=$17 graphic=$2a x=$2a y=$0f ptr=$42d0 attempts=3 proximity_rejects=0 collision_rejects=2
+  enemy_spinner logical=$04 render=$18 graphic=$2a x=$2a y=$28 ptr=$6350 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_spinner logical=$05 render=$19 graphic=$2a x=$31 y=$2b ptr=$6608 attempts=1 proximity_rejects=0 collision_rejects=0
+  target_slot_1 logical=$23 render=$37 graphic=$3f x=$20 y=$1f ptr=$5680 attempts=1 proximity_rejects=0 collision_rejects=0
+
+## level01_room0f_seed_5aa53c_target_slot6
+inputs: room=$0f level=01 level_index=0 start_index=0 lives=4 rng_seed=5aa53c c
+target_required_max_slot=1 target_codes=0:$5,1:$6,2:--,3:--,4:--,5:--,6:$f
+player_anchor_for_proximity: x=$07 y=$1e
+rng_final=7169d8 c rng_calls=84
+screen_sha256=3e822ede5ea338279408a4a50eeaffc39df60fb1290d33cb39cbaacf9a5ec148 nonzero_bytes=14268
+entry_player_draw_1849_1863: first_graphic=$08 first_y=$1e first_ptr=$55b8 second_graphic=$0a second_y=$20 second_ptr=$5838 sha256=77950e35e96bf512a6ab920ab13b9108d19e7378088035f740a9133dfc98f471 nonzero_bytes=14304
+port_state_snapshot_after_0eca_0ed9:
+  flags phase_0036=$03 delay_0082=$00 fire_003e=$00 input_dx_003f=$00 input_dy_0040=$00 projectile_spook_pause_0043=$00
+  rng_final=7169d8 c rng_calls=84
+  target_codes_0c14: 0=$5 1=$6 2=-- 3=-- 4=-- 5=-- 6=$f
+  target_collected_0c0d: 0=0 1=0 2=0 3=0 4=0 5=0 6=0
+  shot_hazard_seed_from_179b_17ae active_player_shot_count_0042=$00 active_spawned_hazard_count_0bb8=$00 slots_0c4e=ff,ff,ff,ff,ff,ff,ff,ff slots_0c56=00,00,00,00,00,00,00,00
+  first_frame_projectile_projection: $189C/$1937/$194E scan slots 7..0 but all are inactive until $1C4D sees fire edge or $2235 spawns a hazard.
+  render_slot=$10 role=player_first graphic=$08 x=$07 y=$1e ptr=$55b8
+  render_slot=$11 role=player_second graphic=$0a x=$07 y=$20 ptr=$5838
+  render_slot=$14 role=enemy_spinner logical=$00 graphic=$2a x=$2a y=$0f ptr=$42d0
+  render_slot=$15 role=enemy_spinner logical=$01 graphic=$2a x=$20 y=$1f ptr=$5680
+  render_slot=$16 role=enemy_spinner logical=$02 graphic=$2a x=$29 y=$1f ptr=$56c8
+  render_slot=$17 role=enemy_spinner logical=$03 graphic=$2a x=$27 y=$1d ptr=$5438
+  render_slot=$18 role=enemy_spinner logical=$04 graphic=$2a x=$20 y=$1d ptr=$5400
+  render_slot=$19 role=enemy_spinner logical=$05 graphic=$2a x=$29 y=$18 ptr=$4f48
+  render_slot=$3c role=target_slot_6 logical=$28 graphic=$2d x=$26 y=$20 ptr=$5930
+  initial_enemy_scheduler_projection_after_first_17bf_increment phase=$04:
+    render_slot=$14 graphic=$2a scheduler=spinner phase_gate=$04 moves_on_first_normal_phase_04=yes
+    render_slot=$15 graphic=$2a scheduler=spinner phase_gate=$05 moves_on_first_normal_phase_04=no
+    render_slot=$16 graphic=$2a scheduler=spinner phase_gate=$06 moves_on_first_normal_phase_04=no
+    render_slot=$17 graphic=$2a scheduler=spinner phase_gate=$07 moves_on_first_normal_phase_04=no
+    render_slot=$18 graphic=$2a scheduler=spinner phase_gate=$08 moves_on_first_normal_phase_04=no
+    render_slot=$19 graphic=$2a scheduler=spinner phase_gate=$09 moves_on_first_normal_phase_04=no
+  note=spook pair graphics $2E/$2F are seeded by $1E3A but their release/location lifecycle is covered by runtime_enemy_movement.txt and runtime_special_status_edges.txt.
+target_scans:
+  slot=1 code=$6 action=skipped_room_mismatch
+  slot=0 code=$5 action=skipped_room_mismatch
+  slot=6 code=$f action=placed logical=$28 graphic=$2d
+placements:
+  enemy_spinner logical=$00 render=$14 graphic=$2a x=$2a y=$0f ptr=$42d0 attempts=6 proximity_rejects=0 collision_rejects=5
+  enemy_spinner logical=$01 render=$15 graphic=$2a x=$20 y=$1f ptr=$5680 attempts=3 proximity_rejects=0 collision_rejects=2
+  enemy_spinner logical=$02 render=$16 graphic=$2a x=$29 y=$1f ptr=$56c8 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_spinner logical=$03 render=$17 graphic=$2a x=$27 y=$1d ptr=$5438 attempts=7 proximity_rejects=0 collision_rejects=6
+  enemy_spinner logical=$04 render=$18 graphic=$2a x=$20 y=$1d ptr=$5400 attempts=5 proximity_rejects=0 collision_rejects=4
+  enemy_spinner logical=$05 render=$19 graphic=$2a x=$29 y=$18 ptr=$4f48 attempts=2 proximity_rejects=0 collision_rejects=1
+  target_slot_6 logical=$28 render=$3c graphic=$2d x=$26 y=$20 ptr=$5930 attempts=3 proximity_rejects=0 collision_rejects=2
+
+## level01_room00_seed_010000
+inputs: room=$00 level=01 level_index=0 start_index=0 lives=4 rng_seed=010000 c
+target_required_max_slot=1 target_codes=0:$1,1:$7,2:--,3:--,4:--,5:--,6:$4
+player_anchor_for_proximity: x=$07 y=$1e
+rng_final=c877b0 c rng_calls=36
+screen_sha256=800cc6e761d9570281143c8df98c37bf3331943f5152d3a0f4fcf68cda5fd851 nonzero_bytes=11252
+entry_player_draw_1849_1863: first_graphic=$08 first_y=$1e first_ptr=$55b8 second_graphic=$0a second_y=$20 second_ptr=$5838 sha256=d1dd27ecbf95b6f7088590e63bcd32ec957150a57baaf4731fb899e967bb846c nonzero_bytes=11288
+port_state_snapshot_after_0eca_0ed9:
+  flags phase_0036=$03 delay_0082=$00 fire_003e=$00 input_dx_003f=$00 input_dy_0040=$00 projectile_spook_pause_0043=$00
+  rng_final=c877b0 c rng_calls=36
+  target_codes_0c14: 0=$1 1=$7 2=-- 3=-- 4=-- 5=-- 6=$4
+  target_collected_0c0d: 0=0 1=0 2=0 3=0 4=0 5=0 6=0
+  shot_hazard_seed_from_179b_17ae active_player_shot_count_0042=$00 active_spawned_hazard_count_0bb8=$00 slots_0c4e=ff,ff,ff,ff,ff,ff,ff,ff slots_0c56=00,00,00,00,00,00,00,00
+  first_frame_projectile_projection: $189C/$1937/$194E scan slots 7..0 but all are inactive until $1C4D sees fire edge or $2235 spawns a hazard.
+  render_slot=$10 role=player_first graphic=$08 x=$07 y=$1e ptr=$55b8
+  render_slot=$11 role=player_second graphic=$0a x=$07 y=$20 ptr=$5838
+  render_slot=$14 role=enemy_spinner logical=$00 graphic=$2a x=$18 y=$20 ptr=$58c0
+  render_slot=$15 role=enemy_spinner logical=$01 graphic=$2a x=$34 y=$28 ptr=$63a0
+  render_slot=$16 role=enemy_spinner logical=$02 graphic=$2a x=$26 y=$13 ptr=$47b0
+  render_slot=$17 role=enemy_spinner logical=$03 graphic=$2a x=$34 y=$1c ptr=$54a0
+  render_slot=$18 role=enemy_spinner logical=$04 graphic=$2a x=$1e y=$28 ptr=$62f0
+  render_slot=$19 role=enemy_spinner logical=$05 graphic=$2a x=$27 y=$17 ptr=$4cb8
+  initial_enemy_scheduler_projection_after_first_17bf_increment phase=$04:
+    render_slot=$14 graphic=$2a scheduler=spinner phase_gate=$04 moves_on_first_normal_phase_04=yes
+    render_slot=$15 graphic=$2a scheduler=spinner phase_gate=$05 moves_on_first_normal_phase_04=no
+    render_slot=$16 graphic=$2a scheduler=spinner phase_gate=$06 moves_on_first_normal_phase_04=no
+    render_slot=$17 graphic=$2a scheduler=spinner phase_gate=$07 moves_on_first_normal_phase_04=no
+    render_slot=$18 graphic=$2a scheduler=spinner phase_gate=$08 moves_on_first_normal_phase_04=no
+    render_slot=$19 graphic=$2a scheduler=spinner phase_gate=$09 moves_on_first_normal_phase_04=no
+  note=spook pair graphics $2E/$2F are seeded by $1E3A but their release/location lifecycle is covered by runtime_enemy_movement.txt and runtime_special_status_edges.txt.
+target_scans:
+  slot=1 code=$7 action=skipped_room_mismatch
+  slot=0 code=$1 action=skipped_room_mismatch
+  slot=6 code=$4 action=skipped_room_mismatch
+placements:
+  enemy_spinner logical=$00 render=$14 graphic=$2a x=$18 y=$20 ptr=$58c0 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_spinner logical=$01 render=$15 graphic=$2a x=$34 y=$28 ptr=$63a0 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_spinner logical=$02 render=$16 graphic=$2a x=$26 y=$13 ptr=$47b0 attempts=2 proximity_rejects=0 collision_rejects=1
+  enemy_spinner logical=$03 render=$17 graphic=$2a x=$34 y=$1c ptr=$54a0 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_spinner logical=$04 render=$18 graphic=$2a x=$1e y=$28 ptr=$62f0 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_spinner logical=$05 render=$19 graphic=$2a x=$27 y=$17 ptr=$4cb8 attempts=5 proximity_rejects=0 collision_rejects=4
+
+## level01_room00_seed_ffffff
+inputs: room=$00 level=01 level_index=0 start_index=0 lives=4 rng_seed=ffffff c
+target_required_max_slot=1 target_codes=0:$8,1:$9,2:--,3:--,4:--,5:--,6:$f
+player_anchor_for_proximity: x=$07 y=$1e
+rng_final=1df066 c rng_calls=21
+screen_sha256=c1bd264060113923c2de5f3dc5d81ee446416276f5c04152e0a83427a2b848b1 nonzero_bytes=11252
+entry_player_draw_1849_1863: first_graphic=$08 first_y=$1e first_ptr=$55b8 second_graphic=$0a second_y=$20 second_ptr=$5838 sha256=0f94134cfb4ac6b5b1fe1cec9f506da96e0b47bc0f2f138d8912c4d4065703d3 nonzero_bytes=11288
+port_state_snapshot_after_0eca_0ed9:
+  flags phase_0036=$03 delay_0082=$00 fire_003e=$00 input_dx_003f=$00 input_dy_0040=$00 projectile_spook_pause_0043=$00
+  rng_final=1df066 c rng_calls=21
+  target_codes_0c14: 0=$8 1=$9 2=-- 3=-- 4=-- 5=-- 6=$f
+  target_collected_0c0d: 0=0 1=0 2=0 3=0 4=0 5=0 6=0
+  shot_hazard_seed_from_179b_17ae active_player_shot_count_0042=$00 active_spawned_hazard_count_0bb8=$00 slots_0c4e=ff,ff,ff,ff,ff,ff,ff,ff slots_0c56=00,00,00,00,00,00,00,00
+  first_frame_projectile_projection: $189C/$1937/$194E scan slots 7..0 but all are inactive until $1C4D sees fire edge or $2235 spawns a hazard.
+  render_slot=$10 role=player_first graphic=$08 x=$07 y=$1e ptr=$55b8
+  render_slot=$11 role=player_second graphic=$0a x=$07 y=$20 ptr=$5838
+  render_slot=$14 role=enemy_spinner logical=$00 graphic=$2a x=$22 y=$2e ptr=$6a90
+  render_slot=$15 role=enemy_spinner logical=$01 graphic=$2a x=$17 y=$23 ptr=$5b38
+  render_slot=$16 role=enemy_spinner logical=$02 graphic=$2a x=$34 y=$2c ptr=$68a0
+  render_slot=$17 role=enemy_spinner logical=$03 graphic=$2a x=$28 y=$17 ptr=$4cc0
+  render_slot=$18 role=enemy_spinner logical=$04 graphic=$2a x=$1c y=$20 ptr=$58e0
+  render_slot=$19 role=enemy_spinner logical=$05 graphic=$2a x=$16 y=$2c ptr=$67b0
+  initial_enemy_scheduler_projection_after_first_17bf_increment phase=$04:
+    render_slot=$14 graphic=$2a scheduler=spinner phase_gate=$04 moves_on_first_normal_phase_04=yes
+    render_slot=$15 graphic=$2a scheduler=spinner phase_gate=$05 moves_on_first_normal_phase_04=no
+    render_slot=$16 graphic=$2a scheduler=spinner phase_gate=$06 moves_on_first_normal_phase_04=no
+    render_slot=$17 graphic=$2a scheduler=spinner phase_gate=$07 moves_on_first_normal_phase_04=no
+    render_slot=$18 graphic=$2a scheduler=spinner phase_gate=$08 moves_on_first_normal_phase_04=no
+    render_slot=$19 graphic=$2a scheduler=spinner phase_gate=$09 moves_on_first_normal_phase_04=no
+  note=spook pair graphics $2E/$2F are seeded by $1E3A but their release/location lifecycle is covered by runtime_enemy_movement.txt and runtime_special_status_edges.txt.
+target_scans:
+  slot=1 code=$9 action=skipped_room_mismatch
+  slot=0 code=$8 action=skipped_room_mismatch
+  slot=6 code=$f action=skipped_room_mismatch
+placements:
+  enemy_spinner logical=$00 render=$14 graphic=$2a x=$22 y=$2e ptr=$6a90 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_spinner logical=$01 render=$15 graphic=$2a x=$17 y=$23 ptr=$5b38 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_spinner logical=$02 render=$16 graphic=$2a x=$34 y=$2c ptr=$68a0 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_spinner logical=$03 render=$17 graphic=$2a x=$28 y=$17 ptr=$4cc0 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_spinner logical=$04 render=$18 graphic=$2a x=$1c y=$20 ptr=$58e0 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_spinner logical=$05 render=$19 graphic=$2a x=$16 y=$2c ptr=$67b0 attempts=1 proximity_rejects=0 collision_rejects=0
+
+## level05_room00_seed_5aa53c
+inputs: room=$00 level=05 level_index=4 start_index=0 lives=4 rng_seed=5aa53c c
+target_required_max_slot=5 target_codes=0:$5,1:$6,2:$f,3:$2,4:$e,5:$8,6:$1
+player_anchor_for_proximity: x=$07 y=$1e
+rng_final=e868dc c rng_calls=50
+screen_sha256=ec6f1a660ef7d0490ca21b36234bb56bbe2d260be5e59af0a062457918bbcf0c nonzero_bytes=11334
+entry_player_draw_1849_1863: first_graphic=$08 first_y=$1e first_ptr=$55b8 second_graphic=$0a second_y=$20 second_ptr=$5838 sha256=d08121aeb64fa0600f322fe2f8cc773e8d15874e215f4f3926b90fa258052aee nonzero_bytes=11370
+port_state_snapshot_after_0eca_0ed9:
+  flags phase_0036=$03 delay_0082=$00 fire_003e=$00 input_dx_003f=$00 input_dy_0040=$00 projectile_spook_pause_0043=$00
+  rng_final=e868dc c rng_calls=50
+  target_codes_0c14: 0=$5 1=$6 2=$f 3=$2 4=$e 5=$8 6=$1
+  target_collected_0c0d: 0=0 1=0 2=0 3=0 4=0 5=0 6=0
+  shot_hazard_seed_from_179b_17ae active_player_shot_count_0042=$00 active_spawned_hazard_count_0bb8=$00 slots_0c4e=ff,ff,ff,ff,ff,ff,ff,ff slots_0c56=00,00,00,00,00,00,00,00
+  first_frame_projectile_projection: $189C/$1937/$194E scan slots 7..0 but all are inactive until $1C4D sees fire edge or $2235 spawns a hazard.
+  render_slot=$10 role=player_first graphic=$08 x=$07 y=$1e ptr=$55b8
+  render_slot=$11 role=player_second graphic=$0a x=$07 y=$20 ptr=$5838
+  render_slot=$14 role=enemy_spinner logical=$00 graphic=$2a x=$2b y=$26 ptr=$60d8
+  render_slot=$15 role=enemy_spinner logical=$01 graphic=$2a x=$37 y=$2b ptr=$6638
+  render_slot=$16 role=enemy_clone logical=$02 graphic=$2b x=$18 y=$21 ptr=$58c0
+  render_slot=$17 role=enemy_clone logical=$03 graphic=$2b x=$37 y=$22 ptr=$5c38
+  render_slot=$18 role=enemy_clone logical=$04 graphic=$2b x=$30 y=$2b ptr=$6600
+  render_slot=$19 role=enemy_clone logical=$05 graphic=$2b x=$22 y=$26 ptr=$6090
+  render_slot=$1a role=enemy_cyberdroid logical=$06 graphic=$2c x=$2e y=$15 ptr=$4a70
+  render_slot=$1b role=enemy_cyberdroid logical=$07 graphic=$2c x=$2b y=$13 ptr=$47d8
+  render_slot=$1c role=enemy_cyberdroid logical=$08 graphic=$2c x=$32 y=$1c ptr=$5490
+  render_slot=$1d role=enemy_cyberdroid logical=$09 graphic=$2c x=$30 y=$17 ptr=$4d00
+  initial_enemy_scheduler_projection_after_first_17bf_increment phase=$04:
+    render_slot=$14 graphic=$2a scheduler=spinner phase_gate=$04 moves_on_first_normal_phase_04=yes
+    render_slot=$15 graphic=$2a scheduler=spinner phase_gate=$05 moves_on_first_normal_phase_04=no
+    render_slot=$16 graphic=$2b scheduler=clone phase_gates=$06,$0e moves_on_first_normal_phase_04=no
+    render_slot=$17 graphic=$2b scheduler=clone phase_gates=$07,$0f moves_on_first_normal_phase_04=no
+    render_slot=$18 graphic=$2b scheduler=clone phase_gates=$00,$08 moves_on_first_normal_phase_04=no
+    render_slot=$19 graphic=$2b scheduler=clone phase_gates=$01,$09 moves_on_first_normal_phase_04=no
+    render_slot=$1a graphic=$2c scheduler=cyberdroid phase_gate=$0a moves_on_first_normal_phase_04=no
+    render_slot=$1b graphic=$2c scheduler=cyberdroid phase_gate=$0b moves_on_first_normal_phase_04=no
+    render_slot=$1c graphic=$2c scheduler=cyberdroid phase_gate=$0c moves_on_first_normal_phase_04=no
+    render_slot=$1d graphic=$2c scheduler=cyberdroid phase_gate=$0d moves_on_first_normal_phase_04=no
+  note=spook pair graphics $2E/$2F are seeded by $1E3A but their release/location lifecycle is covered by runtime_enemy_movement.txt and runtime_special_status_edges.txt.
+target_scans:
+  slot=5 code=$8 action=skipped_room_mismatch
+  slot=4 code=$e action=skipped_room_mismatch
+  slot=3 code=$2 action=skipped_room_mismatch
+  slot=2 code=$f action=skipped_room_mismatch
+  slot=1 code=$6 action=skipped_room_mismatch
+  slot=0 code=$5 action=skipped_room_mismatch
+  slot=6 code=$1 action=skipped_room_mismatch
+placements:
+  enemy_spinner logical=$00 render=$14 graphic=$2a x=$2b y=$26 ptr=$60d8 attempts=2 proximity_rejects=0 collision_rejects=1
+  enemy_spinner logical=$01 render=$15 graphic=$2a x=$37 y=$2b ptr=$6638 attempts=2 proximity_rejects=0 collision_rejects=1
+  enemy_clone logical=$02 render=$16 graphic=$2b x=$18 y=$21 ptr=$58c0 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_clone logical=$03 render=$17 graphic=$2b x=$37 y=$22 ptr=$5c38 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_clone logical=$04 render=$18 graphic=$2b x=$30 y=$2b ptr=$6600 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_clone logical=$05 render=$19 graphic=$2b x=$22 y=$26 ptr=$6090 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_cyberdroid logical=$06 render=$1a graphic=$2c x=$2e y=$15 ptr=$4a70 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_cyberdroid logical=$07 render=$1b graphic=$2c x=$2b y=$13 ptr=$47d8 attempts=1 proximity_rejects=0 collision_rejects=0
+  enemy_cyberdroid logical=$08 render=$1c graphic=$2c x=$32 y=$1c ptr=$5490 attempts=3 proximity_rejects=0 collision_rejects=2
+  enemy_cyberdroid logical=$09 render=$1d graphic=$2c x=$30 y=$17 ptr=$4d00 attempts=1 proximity_rejects=0 collision_rejects=0
+
