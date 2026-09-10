@@ -131,7 +131,7 @@ org runtime_start
 .wait_for_start_escape_fire_or_timeout
     LDA      #ATTRACT_TEXT_COLOUR
     STA      text_render_colour_value
-    LDA      #&0
+    LDA      #ATTRACT_COUNTER_CLEAR
     STA      zp_scratch_76
     STA      zp_scratch_79
     STA      zp_scratch_78
@@ -188,9 +188,9 @@ org runtime_start
 .start_level_or_round
     LDA      #INITIAL_LIVES_STATUS_COUNT
     STA      lives_status_count
-    LDA      #&0
+    LDA      #INITIAL_ROOM_AREA
     STA      room_area
-    LDA      #&0
+    LDA      #INITIAL_LEVEL_INDEX
     STA      level_index_and_hazard_gate
     STA      level_tens_digit
     LDA      #INITIAL_LEVEL_UNITS_DIGIT
@@ -205,7 +205,7 @@ org runtime_start
 
 .begin_level_intro_setup_path_0e85
     JSR      oswrch_wrapper_from_a
-    LDA      #&0
+    LDA      #LEVEL_LOOP_STATE_CLEAR
     STA      level_loop_seed_or_status
     STA      current_level_intro_or_loop_flag
     JSR      show_level_intro_and_required_targets
@@ -223,7 +223,7 @@ org runtime_start
     LDA      #INITIAL_REMAINING_ACTIVE_OBJECT_COUNT
     STA      remaining_active_object_count
     JSR      start_or_reset_player_and_level_objects
-    LDA      #&0
+    LDA      #FRAME_INPUT_STATE_CLEAR
     STA      transition_delay
     STA      fire_edge_request
     STA      input_delta_x
@@ -286,7 +286,7 @@ org runtime_start
     LDA      zp_screen_ptr_70_high
     ADC      #BITMAP_SCREEN_BASE_HIGH
     STA      zp_screen_ptr_70_high
-    LDA      #&0
+    LDA      #TILE_GENERATOR_COUNTER_CLEAR
     STA      zp_indirect_74_low
     STA      zp_scratch_77
     LDY      #TILE_RECORD_LAST_BYTE_INDEX
@@ -357,7 +357,7 @@ org runtime_start
     ADC      zp_calc_ptr_72_low
     STA      zp_calc_ptr_72_low
     LDA      zp_calc_ptr_72_high
-    ADC      #&0
+    ADC      #POINTER_PAGE_CARRY
     STA      zp_calc_ptr_72_high
     RTS
 
@@ -386,7 +386,7 @@ org runtime_start
     JMP      draw_object_by_index
 
 .handle_collected_target_or_level_done
-    LDA      #&0
+    LDA      #COLLISION_ACCUMULATOR_CLEAR
     STA      renderer_collision_accumulator
     LDX      #TARGET_SLOT_SEARCH_BEFORE_FIRST
 
@@ -396,7 +396,7 @@ org runtime_start
     AND      #ROOM_AREA_LOW_NIBBLE_MASK
     CMP      target_room_code,X
     BNE      find_collected_target_slot
-    CPX      #&0
+    CPX      #BONUS_TARGET_STATUS_SLOT
     BEQ      begin_required_target_completion_scan
     LDA      #TARGET_STATUS_COLLECTED
     STA      target_collected_status,X
@@ -437,11 +437,11 @@ org runtime_start
     CPX      collected_target_count
     BEQ      advance_level_after_all_targets
     LDA      input_delta_x
-    EOR      #&ff
+    EOR      #SIGNED_ONES_COMPLEMENT_MASK
     STA      input_delta_x
     INC      input_delta_x
     LDA      input_delta_y
-    EOR      #&ff
+    EOR      #SIGNED_ONES_COMPLEMENT_MASK
     STA      input_delta_y
     INC      input_delta_y
     JSR      apply_input_delta_to_player_pair
@@ -453,7 +453,7 @@ org runtime_start
     LDA      level_units_digit
     CMP      #LEVEL_DECIMAL_RADIX
     BNE      enter_next_level_area
-    LDA      #&0
+    LDA      #LEVEL_UNITS_ZERO
     STA      level_units_digit
     INC      level_tens_digit
 
@@ -481,7 +481,7 @@ org runtime_start
     LDX      object_x_by_index
     LDA      text_buffer_20chars,X
     STA      zp_calc_ptr_72_low
-    LDA      #&0
+    LDA      #POINTER_HIGH_CLEAR
     STA      zp_calc_ptr_72_high
     LDX      #FONT_GLYPH_SHIFT_COUNT
     JSR      shift_pointer_72_left_x_times
@@ -501,16 +501,16 @@ org runtime_start
     TYA
     AND      #FONT_QUARTET_INDEX_MASK
     BNE      load_character_font_quartet
-    LDA      #&0
+    LDA      #FONT_QUARTER_COUNTER_CLEAR
     STA      movement_delta_x
 
 .draw_next_character_quarter
-    LDA      #&0
+    LDA      #FONT_PIXEL_PAIR_COUNTER_CLEAR
     STA      input_delta_y
-    LDY      #&0
+    LDY      #FONT_EXPANDED_BYTE_FIRST_INDEX
 
 .draw_next_character_pixel_pair
-    LDA      #&0
+    LDA      #FONT_PIXEL_PAIR_CLEAR
     STA      render_mode_or_text_scratch
     LDX      input_delta_y
     LDA      font_expand_work_bytes,X
@@ -557,7 +557,7 @@ org runtime_start
 .draw_20char_buffer_two_rows
     LDA      #TEXT_BUFFER_CHARACTER_COUNT
     STA      text_render_char_limit
-    LDA      #&0
+    LDA      #TEXT_FIRST_ROW_FONT_OFFSET
     STA      object_y_by_index
     JSR      draw_20char_buffer_as_bitmap_text
     LDA      #TEXT_SECOND_ROW_FONT_OFFSET
@@ -589,7 +589,7 @@ org runtime_start
 
 .clear_20char_text_buffer
     LDY      #TEXT_BUFFER_LAST_CHARACTER_INDEX
-    LDA      #&0
+    LDA      #TEXT_BUFFER_CLEAR_CHARACTER
 
 .clear_next_text_buffer_byte
     STA      text_buffer_20chars,Y
@@ -649,7 +649,7 @@ org runtime_start
     STA      object_screen_high_by_index
     LDA      #LEGEND_FIRST_GRAPHIC_SCREEN_LOW
     STA      object_screen_low_by_index
-    LDA      #&1
+    LDA      #LEGEND_GRAPHIC_Y_OFFSET
     STA      object_y_by_index
     LDX      #LEGEND_FIRST_OBJECT_INDEX
     STX      render_mode_or_text_scratch
@@ -671,7 +671,7 @@ org runtime_start
     INX
     CPX      #LEGEND_GRAPHIC_COUNT
     BNE      draw_next_legend_graphic
-    LDA      #&0
+    LDA      #LEGEND_SPOOK_Y_OFFSET
     STA      object_y_by_index
     LDA      #LEGEND_SPOOK_FIRST_SCREEN_HIGH
     STA      object_screen_high_by_index
@@ -695,7 +695,7 @@ org runtime_start
     STA      text_render_colour_value
     JSR      seed_required_target_codes
     JSR      apply_level_palette
-    LDA      #&0
+    LDA      #COLLECTED_TARGET_COUNT_CLEAR
     STA      collected_target_count
     STA      render_mode_or_text_scratch
     LDX      #LEVEL_INTRO_ENTERING_TEXT_OFFSET
@@ -714,7 +714,7 @@ org runtime_start
     CLC
     ADC      #SCORE_GLYPH_CODE_OFFSET
     STA      level_intro_units_digit_character
-    LDA      #&0
+    LDA      #LEVEL_INTRO_SCREEN_LOW
     STA      zp_screen_ptr_70_low
     LDA      #LEVEL_INTRO_SCREEN_HIGH
     STA      zp_screen_ptr_70_high
@@ -833,7 +833,7 @@ org runtime_start
     AND      #TARGET_CODE_MASK
     LDX      object_x_by_index
     STA      target_room_code,X
-    LDA      #&0
+    LDA      #TARGET_STATUS_UNCOLLECTED
     STA      target_collected_status,X
     LDY      #TARGET_SLOT_BEFORE_FIRST
 
@@ -861,15 +861,15 @@ org runtime_start
 .test_player_spook_pair_overlap
     LDA      spook_release_timer
     BNE      return_from_player_spook_overlap_test_1311
-    LDA      #&0
+    LDA      #COLLISION_ACCUMULATOR_CLEAR
     STA      renderer_collision_accumulator
     LDA      player_x_first_cell
     SEC
     SBC      spook_first_cell_x
     BPL      player_spook_overlap_compare_x_range_1311
-    EOR      #&ff
+    EOR      #SIGNED_ONES_COMPLEMENT_MASK
     CLC
-    ADC      #&1
+    ADC      #SIGNED_TWOS_COMPLEMENT_ADD
 
 .player_spook_overlap_compare_x_range_1311
     CMP      #PLAYER_SPOOK_HORIZONTAL_EXTENT
@@ -878,9 +878,9 @@ org runtime_start
     SEC
     SBC      spook_first_cell_y
     BPL      player_spook_overlap_compare_y_range_1311
-    EOR      #&ff
+    EOR      #SIGNED_ONES_COMPLEMENT_MASK
     CLC
-    ADC      #&1
+    ADC      #SIGNED_TWOS_COMPLEMENT_ADD
 
 .player_spook_overlap_compare_y_range_1311
     CMP      #PLAYER_SPOOK_VERTICAL_EXTENT
@@ -897,7 +897,7 @@ org runtime_start
     LDX      #WAIT_STRIP_LAST_EDGE_BYTE
 
 .clear_rotating_wait_text_edge_loop_1341
-    LDA      #&0
+    LDA      #WAIT_STRIP_EDGE_CLEAR_BYTE
     STA      rotating_wait_text_top_edge,X
     STA      rotating_wait_text_bottom_edge,X
     DEX
@@ -925,7 +925,7 @@ org runtime_start
     CPY      #WAIT_STRIP_CHARACTER_COUNT
     BNE      copy_rotating_wait_text_chars_loop_1341
     JSR      wait_one_frame_tick
-    LDA      #&0
+    LDA      #WAIT_STRIP_FIRST_ROW_FONT_OFFSET
     STA      object_y_by_index
     LDA      #WAIT_STRIP_RENDER_CHARACTER_LIMIT
     STA      text_render_char_limit
@@ -933,7 +933,7 @@ org runtime_start
     INC      zp_screen_ptr_70_high
     LDA      #WAIT_STRIP_SECOND_ROW_PTR_STEP
     JSR      add_a_to_pointer_70
-    LDA      #&4
+    LDA      #TEXT_SECOND_ROW_FONT_OFFSET
     STA      object_y_by_index
     JSR      draw_20char_buffer_as_bitmap_text
     LDA      zp_scratch_78
@@ -973,7 +973,7 @@ org runtime_start
     ADC      zp_screen_ptr_70_low
     STA      zp_screen_ptr_70_low
     LDA      zp_screen_ptr_70_high
-    ADC      #&0
+    ADC      #POINTER_PAGE_CARRY
     STA      zp_screen_ptr_70_high
     RTS
 
@@ -983,7 +983,7 @@ org runtime_start
     ADC      zp_calc_ptr_72_low
     STA      zp_calc_ptr_72_low
     LDA      zp_calc_ptr_72_high
-    ADC      #&0
+    ADC      #POINTER_PAGE_CARRY
     STA      zp_calc_ptr_72_high
     RTS
 
@@ -1227,7 +1227,7 @@ org runtime_start
     LDA      room_tile_class_or_pattern
     AND      #ROOM_TILE_VERTICAL_GAP_PATTERN_MASK
     PHP
-    LDA      #&0
+    LDA      #ROOM_TILE_EMPTY_PATTERN
     STA      room_tile_class_or_pattern
     PLP
     BEQ      draw_vertical_gap_cells_loop_1516
@@ -1266,7 +1266,7 @@ org runtime_start
     STA      zp_scratch_3c
 
 .draw_horizontal_gap_column_tile_loop_1516
-    LDA      #&0
+    LDA      #PLAYFIELD_FIRST_INDEX
     STA      room_tile_class_or_pattern
     LDY      room_tile_y_index
     LDA      player_collision_class_flag,Y
@@ -1283,7 +1283,7 @@ org runtime_start
     BEQ      fill_finished_horizontal_gap_column_1516
     LDA      #PLAYFIELD_GAP_CELL_COUNT
     STA      zp_scratch_3d
-    LDA      #&0
+    LDA      #PLAYFIELD_FIRST_INDEX
     STA      room_tile_class_or_pattern
 
 .draw_horizontal_gap_clear_vertical_run_loop_1516
@@ -1379,7 +1379,7 @@ org runtime_start
 .unused_clear_32_screen_rows_from_index
     ; Unreferenced screen clear: zp_scratch_3d selects an eight-byte column,
     ; then 32 character rows are cleared at the BBC bitmap row stride.
-    LDA      #&0
+    LDA      #POINTER_HIGH_CLEAR
     STA      zp_screen_ptr_70_high
     LDA      zp_scratch_3d
     STA      zp_screen_ptr_70_low
@@ -1389,14 +1389,14 @@ org runtime_start
     CLC
     ADC      #BITMAP_SCREEN_BASE_HIGH
     STA      zp_screen_ptr_70_high
-    LDA      #&0
+    LDA      #UNUSED_CLEAR_ROW_INDEX_CLEAR
     STA      zp_scratch_3c
 
 .unused_clear_32_screen_rows_loop
     LDY      #UNUSED_CLEAR_FIRST_ROW_BYTE
 
 .unused_clear_screen_row_bytes_loop
-    LDA      #&0
+    LDA      #UNUSED_CLEAR_SCREEN_BYTE
     STA      (zp_screen_ptr_70_low),Y
     DEY
     BPL      unused_clear_screen_row_bytes_loop
@@ -1429,7 +1429,7 @@ org runtime_start
     SBC      #OBJECT_SCREEN_HORIZONTAL_BYTE_STEP
     STA      zp_screen_ptr_70_low
     LDA      zp_screen_ptr_70_high
-    SBC      #&0
+    SBC      #POINTER_PAGE_CARRY
     STA      zp_screen_ptr_70_high
 
 .compute_screen_ptr_y_delta_166a
@@ -1537,17 +1537,17 @@ org runtime_start
     JSR      apply_level_palette
     INC      current_level_intro_or_loop_flag
     LDA      current_level_intro_or_loop_flag
-    CMP      #&18
+    CMP      #LEVEL_AREA_ADVANCE_PERIOD
     BNE      setup_remaining_object_score_gate_1735
     LDA      level_index_and_hazard_gate
-    CMP      #&5
+    CMP      #MAX_LEVEL_INDEX
     BEQ      setup_remaining_object_score_gate_1735
     INC      level_index_and_hazard_gate
 
 .setup_remaining_object_score_gate_1735
     LDA      remaining_active_object_count
     BNE      setup_player_start_state_1735
-    LDA      #&19
+    LDA      #ROOM_COMPLETION_SCORE_ADD
     JSR      increment_four_char_score_or_counter
 
 .setup_player_start_state_1735
@@ -1581,13 +1581,13 @@ org runtime_start
     LDX      #SHOT_HAZARD_LAST_SLOT
 
 .clear_shot_hazard_seed_loop_1735
-    LDA      #&0
+    LDA      #SHOT_NOT_YET_VISIBLE
     STA      shot_visible_flag_by_slot,X
     LDA      #SHOT_HAZARD_INACTIVE_DIRECTION
     STA      shot_direction_or_inactive_by_slot,X
     DEX
     BPL      clear_shot_hazard_seed_loop_1735
-    LDA      #&0
+    LDA      #ACTIVE_SHOT_COUNTS_CLEAR
     STA      active_player_shot_count
     STA      active_spawned_hazard_count
     JSR      draw_static_status_panel
@@ -1640,7 +1640,7 @@ org runtime_start
     LDA      palette_cycle_row_index
     CMP      #PALETTE_CYCLE_VALUE_COUNT
     BNE      phase_mod4_hit_animation_gate_17bf
-    LDA      #&0
+    LDA      #PALETTE_CYCLE_FIRST_ROW
     STA      palette_cycle_row_index
 
 .phase_mod4_hit_animation_gate_17bf
@@ -1650,7 +1650,7 @@ org runtime_start
 
 .erase_previous_hit_object_frame
     LDX      #FIRST_ITEM_OBJECT_INDEX
-    LDA      #&0
+    LDA      #RENDER_MODE_ERASE_OBJECT
     STA      render_mode_or_text_scratch
 
 .erase_hit_object_loop_1812
@@ -1661,7 +1661,7 @@ org runtime_start
     LDA      object_lifecycle_base_for_indexed_refs,X
     CMP      #OBJECT_LIFECYCLE_HIT_END_EXCLUSIVE
     BNE      erase_hit_object_draw_current_1812
-    LDA      #&0
+    LDA      #OBJECT_LIFECYCLE_INACTIVE
     STA      object_lifecycle_base_for_indexed_refs,X
 
 .erase_hit_object_draw_current_1812
@@ -1711,7 +1711,7 @@ org runtime_start
 
 .advance_hit_object_animation_frame
     LDX      #FIRST_ITEM_OBJECT_INDEX
-    LDA      #&0
+    LDA      #RENDER_MODE_ERASE_OBJECT
     STA      render_mode_or_text_scratch
 
 .advance_hit_object_animation_loop_1876
@@ -1752,7 +1752,7 @@ org runtime_start
     LDX      #SPOOK_PAUSE_PALETTE_LOGICAL_COLOUR
     LDA      #SPOOK_PAUSE_PALETTE_VALUE
     JSR      vdu19_set_palette_or_colour
-    LDA      #&0
+    LDA      #PROJECTILE_SPOOK_COLLISION_CLEAR
     STA      projectile_spook_pause_collision_flag
     LDA      #SOUND_ID_SPOOK_COLLISION
     JSR      play_sound_id_if_enabled
@@ -1786,7 +1786,7 @@ org runtime_start
     LDA      renderer_collision_accumulator
     BNE      clear_player_before_life_loss_path_18df
     JSR      apply_player_input_to_player_pair
-    LDA      #&0
+    LDA      #PLAYER_COLLISION_FLAGS_CLEAR
     STA      player_collision_class_flag
     STA      target_collect_collision_flag
     LDX      #PLAYER_FIRST_OBJECT_INDEX
@@ -1858,7 +1858,7 @@ org runtime_start
     JMP      jump_to_life_loss_after_player_redraw_1964
 
 .clear_player_cells_before_life_loss
-    LDA      #&0
+    LDA      #RENDER_MODE_ERASE_OBJECT
     STA      render_mode_or_text_scratch
     LDX      #PLAYER_FIRST_OBJECT_INDEX
     JSR      draw_object_by_index
@@ -1869,7 +1869,7 @@ org runtime_start
     JMP      lose_life_and_reset_player
 
 .cancel_player_movement_delta
-    LDA      #&0
+    LDA      #PLAYER_INPUT_DELTA_CLEAR
     STA      input_delta_x
     STA      input_delta_y
     JMP      apply_input_delta_to_player_pair
@@ -1981,14 +1981,14 @@ org runtime_start
     JSR      draw_lives_or_target_status
     LDA      #SOUND_ID_LIFE_LOST
     JSR      play_sound_id_if_enabled
-    LDA      #&0
+    LDA      #RENDER_MODE_ERASE_OBJECT
     STA      render_mode_or_text_scratch
     LDA      saved_player_second_screen_low
     SEC
     SBC      #PLAYER_RESET_FIRST_SCREEN_LOW_DELTA
     STA      player_screen_low_first_cell
     LDA      saved_player_second_screen_high
-    SBC      #&0
+    SBC      #POINTER_PAGE_CARRY
     STA      player_screen_high_first_cell
     LDA      saved_player_second_cell_y
     STA      player_y_first_cell
@@ -1998,7 +1998,7 @@ org runtime_start
     ADC      #PLAYER_RESET_SECOND_SCREEN_LOW_DELTA
     STA      player_screen_low_second_cell
     LDA      saved_player_second_screen_high
-    ADC      #&0
+    ADC      #POINTER_PAGE_CARRY
     STA      player_screen_high_second_cell
     LDA      #PLAYER_RESET_FIRST_GRAPHIC
     STA      player_graphic_id_first_cell
@@ -2013,7 +2013,7 @@ org runtime_start
     RTS
 
 .test_player_bounds_and_restart_area
-    LDA      #&0
+    LDA      #BOUNDS_INSIDE
     STA      bounds_or_outside_flag
     LDA      player_x_first_cell
     CMP      #PLAYER_LEFT_BOUNDARY
@@ -2070,14 +2070,14 @@ org runtime_start
     BPL      erase_next_shot_or_hazard_byte
     LDA      shot_direction_or_inactive_by_slot,X
     BPL      return_from_shot_or_hazard_deactivation
-    LDA      #&0
+    LDA      #SHOT_NOT_YET_VISIBLE
     STA      shot_visible_flag_by_slot,X
 
 .return_from_shot_or_hazard_deactivation
     RTS
 
 .draw_active_shot_or_hazard_and_test
-    LDA      #&0
+    LDA      #COLLISION_ACCUMULATOR_CLEAR
     STA      renderer_collision_accumulator
     LDA      shot_direction_or_inactive_by_slot,X
     BMI      return_from_bounds_or_invisible_shot
@@ -2109,7 +2109,7 @@ org runtime_start
 .expire_projectile_or_hazard_on_collision
     LDA      shot_direction_or_inactive_by_slot,X
     BMI      return_from_bounds_or_invisible_shot
-    LDA      #&0
+    LDA      #PROJECTILE_SPOOK_COLLISION_CLEAR
     STA      projectile_spook_pause_collision_flag
     LDA      shot_screen_low_current,X
     STA      zp_screen_ptr_70_low
@@ -2211,7 +2211,7 @@ org runtime_start
     ASL      A
     ASL      A
     STA      zp_screen_ptr_70_low
-    LDA      #&0
+    LDA      #POINTER_HIGH_CLEAR
     STA      zp_screen_ptr_70_high
     LDA      shot_y_by_slot,X
     AND      #SHOT_EVEN_Y_MASK
@@ -2228,7 +2228,7 @@ org runtime_start
 .add_shot_horizontal_screen_offset
     LDA      shot_x_by_slot,X
     STA      zp_calc_ptr_72_low
-    LDA      #&0
+    LDA      #POINTER_HIGH_CLEAR
     STA      zp_calc_ptr_72_high
     LDX      #SHOT_SCREEN_X_SHIFT_COUNT
     JSR      shift_pointer_72_left_x_times
@@ -2249,7 +2249,7 @@ org runtime_start
 .spawn_player_shot_if_fire_pressed
     LDA      fire_edge_request
     BEQ      return_from_player_shot_request
-    LDA      #&0
+    LDA      #FIRE_EDGE_CLEAR
     STA      fire_edge_request
     LDA      active_player_shot_count
     CMP      #PLAYER_SHOT_LIMIT
@@ -2275,14 +2275,14 @@ org runtime_start
     ADC      player_shot_y_offsets_1c4d,Y
     STA      shot_y_by_slot,X
     JSR      compute_shot_screen_ptr
-    LDA      #&0
+    LDA      #SOUND_ID_PLAYER_SHOT
     JSR      play_sound_id_if_enabled
 
 .return_from_player_shot_request
     RTS
 
 .test_projectile_inside_playfield
-    LDA      #&0
+    LDA      #BOUNDS_INSIDE
     STA      bounds_or_outside_flag
     LDA      shot_x_by_slot,X
     CMP      #PROJECTILE_LEFT_BOUNDARY
@@ -2308,7 +2308,7 @@ org runtime_start
     STA      object_screen_high_by_index
     LDA      #STATUS_PANEL_FIRST_SCREEN_LOW
     STA      object_screen_low_by_index
-    LDA      #&0
+    LDA      #STATUS_PANEL_Y_OFFSET
     STA      object_y_by_index
     LDA      #STATUS_LABEL_GRAPHIC_0
     JSR      draw_status_glyph_at_current_ptr
@@ -2384,13 +2384,13 @@ org runtime_start
     ADC      #STATUS_GLYPH_SCREEN_STEP
     STA      object_screen_low_by_index
     LDA      object_screen_high_by_index
-    ADC      #&0
+    ADC      #POINTER_PAGE_CARRY
     STA      object_screen_high_by_index
     RTS
 
 .rng_next_byte
     LDY      #RNG_OUTPUT_BIT_COUNT
-    LDA      #&0
+    LDA      #RNG_OUTPUT_CLEAR
     STA      rng_output_byte
 
 .generate_next_rng_output_bit
@@ -2420,7 +2420,7 @@ org runtime_start
     ASL      A
     ASL      A
     STA      zp_screen_ptr_70_low
-    LDA      #&0
+    LDA      #POINTER_HIGH_CLEAR
     STA      zp_screen_ptr_70_high
     LDA      object_y_by_index,X
     AND      #ITEM_SCREEN_Y_MASK
@@ -2430,7 +2430,7 @@ org runtime_start
     LDX      zp_indirect_74_low
     LDA      object_x_by_index,X
     STA      zp_calc_ptr_72_low
-    LDA      #&0
+    LDA      #POINTER_HIGH_CLEAR
     STA      zp_calc_ptr_72_high
     LDX      #ITEM_SCREEN_X_SHIFT_COUNT
     JSR      shift_pointer_72_left_x_times
@@ -2474,7 +2474,7 @@ org runtime_start
     LDA      player_x_first_cell
     SBC      item_x_alias_object_14,X
     BPL      compare_item_horizontal_distance
-    EOR      #&ff
+    EOR      #SIGNED_ONES_COMPLEMENT_MASK
 
 .compare_item_horizontal_distance
     CMP      #RANDOM_ITEM_MINIMUM_X_DISTANCE
@@ -2483,7 +2483,7 @@ org runtime_start
     SEC
     SBC      item_y_alias_object_14,X
     BPL      compare_item_vertical_distance
-    EOR      #&ff
+    EOR      #SIGNED_ONES_COMPLEMENT_MASK
 
 .compare_item_vertical_distance
     CMP      #RANDOM_ITEM_MINIMUM_Y_DISTANCE
@@ -2496,14 +2496,14 @@ org runtime_start
     TAX
     STX      zp_scratch_77
     JSR      compute_item_screen_ptr
-    LDA      #&0
+    LDA      #COLLISION_ACCUMULATOR_CLEAR
     STA      renderer_collision_accumulator
     LDA      #RENDER_MODE_PLACEMENT_COLLISION_TEST
     STA      render_mode_or_text_scratch
     JSR      draw_object_by_index
     LDA      renderer_collision_accumulator
     BNE      random_place_item
-    LDA      #&0
+    LDA      #RENDER_MODE_ERASE_OBJECT
     STA      render_mode_or_text_scratch
     LDX      zp_scratch_77
     JSR      draw_object_by_index
@@ -2525,7 +2525,7 @@ org runtime_start
     LDA      cyberdroid_count_by_level_index_1e3a,X
     STA      pending_cyberdroid_count
     LDX      #ITEM_ENEMY_STATE_LAST_INDEX
-    LDA      #&0
+    LDA      #ITEM_ENEMY_STATE_CLEAR
 
 .clear_item_and_enemy_state_loop
     STA      item_state_alias_object_14,X
@@ -2547,7 +2547,7 @@ org runtime_start
     STA      item_state_alias_object_14,X
     DEX
     BPL      mark_initial_active_enemy_slots_loop
-    LDA      #&0
+    LDA      #FIRST_LOGICAL_ITEM_SLOT
     STA      logical_item_slot_index
 
 .place_next_spinner
@@ -2603,7 +2603,7 @@ org runtime_start
     STA      object_graphic_id_by_index
     LDA      #ROOM_GAP_FIRST_SCREEN_Y
     STA      object_y_by_index
-    LDA      #&0
+    LDA      #ROOM_GAP_STATE_CLEAR
     STA      room_gap_transition_pending
     STA      room_gap_previous_screen_byte
 
@@ -3144,7 +3144,7 @@ org runtime_start
     LDA      shot_visible_flag_by_slot,Y
     BNE      return_without_hazard_spawn
     STY      hazard_spawn_slot_index
-    LDA      #&0
+    LDA      #SHOT_NOT_YET_VISIBLE
     STA      shot_visible_flag_by_slot,Y
     LDA      hazard_spawn_direction
     STA      shot_direction_or_inactive_by_slot,Y
@@ -3287,7 +3287,7 @@ org runtime_start
 .clear_empty_life_status_cell_2345
     JSR      load_object_screen_ptr
     LDY      #STATUS_CELL_LAST_BYTE
-    LDA      #&0
+    LDA      #STATUS_CELL_CLEAR_BYTE
 
 .clear_status_cell_byte_loop_2345
     STA      (zp_screen_ptr_70_low),Y
@@ -3313,7 +3313,7 @@ org runtime_start
     SBC      #TARGET_STATUS_SCREEN_REWIND
     STA      object_screen_low_by_index
     LDA      object_screen_high_by_index
-    SBC      #&0
+    SBC      #POINTER_PAGE_CARRY
     STA      object_screen_high_by_index
 
 .target_status_scan_next_2345
@@ -3356,7 +3356,7 @@ org runtime_start
 .release_spook_pair_when_timer_expires
     DEC      spook_release_timer
     BNE      return_from_spook_release_or_draw_23cf
-    LDA      #&0
+    LDA      #SPOOK_STATE_CLEAR
     STA      spook_pause_counter
     STA      spook_first_cell_x
     STA      spook_first_cell_y
@@ -3378,7 +3378,7 @@ org runtime_start
 .draw_spook_pair_if_released
     LDA      spook_release_timer
     BNE      return_from_spook_release_or_draw_23cf
-    LDA      #&0
+    LDA      #RENDER_MODE_ERASE_OBJECT
     STA      render_mode_or_text_scratch
     LDX      #SPOOK_FIRST_OBJECT_INDEX
     JSR      draw_object_by_index
@@ -3475,7 +3475,7 @@ org runtime_start
     STA      player_graphic_id_second_cell
     LDA      saved_visible_player_graphic_id_first
     STA      player_graphic_id_first_cell
-    LDA      #&0
+    LDA      #RENDER_MODE_ERASE_OBJECT
     STA      render_mode_or_text_scratch
     LDX      #PLAYER_FIRST_OBJECT_INDEX
     JSR      draw_object_using_saved_screen_ptr

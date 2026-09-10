@@ -87,6 +87,16 @@ $rawAbsoluteOperands = [regex]::Matches($assemblyText, $rawAbsoluteOperandPatter
 if ($rawAbsoluteOperands.Count -ne 0) {
     throw "Raw absolute operand in cyber1.asm; use a memory-map symbol: $($rawAbsoluteOperands[0].Value.Trim())"
 }
+$numericInstructionPattern = '(?im)^\s*(?:ADC|AND|ASL|BIT|CMP|CPX|CPY|DEC|EOR|INC|JMP|JSR|LDA|LDX|LDY|LSR|ORA|ROL|ROR|SBC|STA|STX|STY)\s+#?(?:&[0-9A-F]+|\$[0-9A-F]+|%[01]+|[0-9]+)(?:\s*,\s*[XY])?\s*(?:;.*)?$'
+$numericInstructions = [regex]::Matches($assemblyText, $numericInstructionPattern)
+if ($numericInstructions.Count -ne 0) {
+    throw "Raw numeric operand in cyber1.asm; use a named constant or label: $($numericInstructions[0].Value.Trim())"
+}
+$relativeNumericOperandPattern = '(?im)^\s*(?:ADC|AND|ASL|BIT|CMP|CPX|CPY|DEC|EOR|INC|JMP|JSR|LDA|LDX|LDY|LSR|ORA|ROL|ROR|SBC|STA|STX|STY)\s+.*[A-Z_][A-Z0-9_]*[+-][0-9]+(?:\s*,\s*[XY])?\s*(?:;.*)?$'
+$relativeNumericOperands = [regex]::Matches($assemblyText, $relativeNumericOperandPattern)
+if ($relativeNumericOperands.Count -ne 0) {
+    throw "Raw symbol-relative operand in cyber1.asm; use a named offset or alias: $($relativeNumericOperands[0].Value.Trim())"
+}
 
 if ($assemblyText -match '(?im)^\s*\.addr_[0-9A-F]+\s*$') {
     throw 'Generic address-only labels are not permitted in cyber1.asm; name the control-flow purpose.'
