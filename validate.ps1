@@ -30,6 +30,7 @@ $requiredFiles = @(
     'analysis/reconstruction/runtime_object_slot_contract.txt'
     'analysis/reconstruction/runtime_projectile_lifecycle.txt'
     'analysis/reconstruction/runtime_score_status_contract.txt'
+    'analysis/reconstruction/runtime_active_frame_edge_contract.txt'
     'tools/reconstruction/replay_6502.py'
     'tools/reconstruction/render_graphic_sheet.py'
     'tools/reconstruction/validate_port_contracts.py'
@@ -62,6 +63,7 @@ $maintainedFiles = @(
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_object_slot_contract.txt')
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_projectile_lifecycle.txt')
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_score_status_contract.txt')
+    (Join-Path $repoRoot 'analysis\reconstruction\runtime_active_frame_edge_contract.txt')
     (Join-Path $repoRoot 'tools\reconstruction\replay_6502.py')
     (Join-Path $repoRoot 'tools\reconstruction\render_graphic_sheet.py')
     (Join-Path $repoRoot 'tools\reconstruction\validate_port_contracts.py')

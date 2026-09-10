@@ -1,0 +1,342 @@
+runtime_active_frame_edge_contract
+Purpose: port-facing rare active-frame edge contract for delay frames, projectile/object collision, spook-pause consumption, hit-state ordering, and spawn suppression.
+Port rule: preserve the exact branch edges; do not treat transition delay, projectile processing, spook pause, and player damage as one global pause/damage state.
+
+active_frame_edge_matrix
+Authority: $17BF-$195B active-frame loop plus $2163 shot/hazard collision dispatch.
+edge original_order port_obligation
+$0082==1 returns at $17C5 before phase increment no projectile/object/spook/input work runs
+$0082>1 decrements at $17CA, advances phase, and runs pre-input projectile draw/test, $0043 consume, projectile movement, and expiry
+$0082>1 skips $18CB-$1929 input/bounds/player-collision and skips $1C4D/$2235 spawning at $1944-$194E
+$0043 consume $18AB-$18C1 runs after pre-input projectile draw/test and before the $0082 branch at $18C4
+$0043 effect sets $0BBC=$32, palette logical 12 to 4, clears $0043, plays sound id 20
+pre-input $2163 during delay skips direct player overlap when $0082!=0 but still scans active object slots $14-$2B
+object hit during delay can still set $0C53=2, score/decrement $0080 for player shots, recycle hit graphic for hazards, deactivate slot, and play sound id 2
+hit animation $1812/$1876 runs on phase mod4 zero before the enemy scheduler and before projectile loops
+enemy scheduler $198C runs before visible player draw/collision and before projectile pre-input draw/test
+player collision window $18DF-$1929 exists only on phase mod4 three and only when $0082==0
+
+delay_collision_case_table
+case phase_work direct_player_hit object_hit projectile_move projectile_spawn projectile_expire
+normal_$0082_00 yes yes yes yes yes yes
+terminal_delay_$0082_01 no no no no no no
+active_delay_$0082_02_ff yes no yes yes no yes
+
+port_rule
+Do not suppress all projectile collision behavior during death/transition delay.
+$0082>1 still lets existing shots/hazards hit active objects through $2163, but prevents direct player hits and new shot/hazard spawns.
+
+active_frame_ordering_ladder
+order routine condition
+01 $17BF-$17CA transition delay gate and phase advance
+02 $17D4-$17DB phase-0 spook release timer
+03 $17DE-$1809 phase-mod4 palette cycle
+04 $180C-$1835 phase-mod4 erase/retire hit-object states
+05 $1837/$198C active enemy scheduler
+06 $1849-$1863 visible player draw/save only phase-mod4-three and $0082==0
+07 $186D/$2410 spook pair odd-phase release/pause/move gate
+08 $1870-$189A phase-mod4 hit-frame draw/advance
+09 $189C-$18A9 pre-input shot/hazard erase/draw/test slots 7..0
+10 $18AB-$18C1 consume $0043 spook-pause collision flag
+11 $18C4-$18C8 branch around input/player collision when $0082!=0
+12 $18CB-$1929 input, room bounds, player collision, target/life outcomes when allowed
+13 $1937-$1942 shot/hazard movement slots 7..0
+14 $1944-$194E shot/hazard spawning only when $0082==0
+15 $194E-$1959 shot/hazard expiry slots 7..0
+
+port_summary
+$0082==1 is a hard early return; $0082>1 is a non-input frame that still advances several active systems.
+Projectile/object collisions remain live during $0082>1 delay frames, but direct player overlap and new spawning are suppressed.
+$0043 is produced by expiry and consumed on the following frame after pre-input projectile draw/test, before the delay branch skips input.
+
+active_frame_loop_17bf_195b 17bf-195b
+17bf  LDA      0x0082
+17c1  CMP      #0x1
+17c3  BNE      0x17c6
+17c5  RTS      
+17c6  LDA      0x0082
+17c8  BEQ      0x17cc
+17ca  DEC      0x0082
+17cc  INC      0x0036
+17ce  LDA      0x0036
+17d0  AND      #0xf
+17d2  STA      0x0036
+17d4  BNE      0x17de
+17d6  LDA      0x0c66
+17d9  BEQ      0x17de
+17db  JSR      0x23cf
+17de  LDA      0x0036
+17e0  AND      #0x3
+17e2  BNE      0x180c
+17e4  LDY      0x0c96
+17e7  LDA      0x2714,Y
+17ea  LDX      #0xd
+17ec  JSR      0x24c0
+17ef  LDA      0x2711,Y
+17f2  INX      
+17f3  JSR      0x24c0
+17f6  LDA      0x270e,Y
+17f9  INX      
+17fa  JSR      0x24c0
+17fd  INC      0x0c96
+1800  LDA      0x0c96
+1803  CMP      #0x3
+1805  BNE      0x180c
+1807  LDA      #0x0
+1809  STA      0x0c96
+180c  LDA      0x0036
+180e  AND      #0x3
+1810  BNE      0x1837
+1812  LDX      #0x14
+1814  LDA      #0x0
+1816  STA      0x0031
+1818  STX      0x0039
+181a  LDA      0xc53,X
+181d  CMP      #0x2
+181f  BMI      0x1830
+1821  LDA      0xc53,X
+1824  CMP      #0x5
+1826  BNE      0x182d
+1828  LDA      #0x0
+182a  STA      0xc53,X
+182d  JSR      0x13fb
+1830  LDX      0x0039
+1832  INX      
+1833  CPX      #0x20
+1835  BNE      0x1818
+1837  JSR      0x198c
+183a  LDA      0x0036
+183c  AND      #0x3
+183e  CMP      #0x3
+1840  BNE      0x1849
+1842  LDA      0x0082
+1844  BNE      0x1849
+1846  JSR      0x2493
+1849  LDA      0x0036
+184b  AND      #0x3
+184d  CMP      #0x3
+184f  BNE      0x186d
+1851  LDA      0x0082
+1853  BNE      0x186d
+1855  LDA      #0x1
+1857  STA      0x0031
+1859  LDX      #0x10
+185b  JSR      0x13fb
+185e  LDX      #0x11
+1860  JSR      0x13fb
+1863  LDA      0x2f10
+1866  STA      0x008e
+1868  LDA      0x2f11
+186b  STA      0x008d
+186d  JSR      0x2410
+1870  LDA      0x0036
+1872  AND      #0x3
+1874  BNE      0x189c
+1876  LDX      #0x14
+1878  LDA      #0x0
+187a  STA      0x0031
+187c  STX      0x0039
+187e  LDA      0xc53,X
+1881  CMP      #0x2
+1883  BMI      0x1895
+1885  CMP      #0x5
+1887  BPL      0x1895
+1889  CLC      
+188a  ADC      #0x38
+188c  STA      0x2f00,X
+188f  INC      0xc53,X
+1892  JSR      0x13fb
+1895  LDX      0x0039
+1897  INX      
+1898  CPX      #0x20
+189a  BNE      0x187c
+189c  LDX      #0x7
+189e  STX      0x0039
+18a0  JSR      0x1ae9
+18a3  JSR      0x1b0e
+18a6  LDX      0x0039
+18a8  DEX      
+18a9  BPL      0x189e
+18ab  LDA      0x0043
+18ad  BEQ      0x18c4
+18af  LDA      #0x32
+18b1  STA      0x0bbc
+18b4  LDX      #0xc
+18b6  LDA      #0x4
+18b8  JSR      0x24c0
+18bb  LDA      #0x0
+18bd  STA      0x0043
+18bf  LDA      #0x14
+18c1  JSR      0x21ea
+18c4  LDA      0x0082
+18c6  BEQ      0x18cb
+18c8  JMP      0x1937
+18cb  JSR      0x15c3
+18ce  JSR      0x1aac
+18d1  LDA      0x0041
+18d3  BNE      0x1922
+18d5  STA      0x0030
+18d7  LDA      0x0036
+18d9  AND      #0x3
+18db  CMP      #0x3
+18dd  BNE      0x1937
+18df  LDA      #0x4
+18e1  STA      0x0031
+18e3  LDX      #0x10
+18e5  JSR      0x13fb
+18e8  LDX      #0x11
+18ea  JSR      0x13fb
+18ed  LDA      0x0030
+18ef  BNE      0x1934
+18f1  JSR      0x1311
+18f4  LDA      0x0030
+18f6  BNE      0x1934
+18f8  JSR      0x16e1
+18fb  LDA      #0x0
+18fd  STA      0x0c07
+1900  STA      0x004a
+1902  LDX      #0x10
+1904  LDA      #0x3
+1906  STA      0x0031
+1908  JSR      0x13fb
+190b  LDX      #0x11
+190d  JSR      0x13fb
+1910  LDA      0x004a
+1912  BEQ      0x191a
+1914  JSR      0x0fd6
+1917  JSR      0x2345
+191a  LDA      0x0c07
+191d  BEQ      0x1925
+191f  JMP      0x19f3
+1922  JMP      0x1849
+1925  LDA      0x0030
+1927  AND      #0xc0
+1929  BEQ      0x1937
+192b  JSR      0x2493
+192e  JSR      0x1a59
+1931  JMP      0x1937
+1934  JSR      0x1972
+1937  LDA      #0x7
+1939  STA      0x0039
+193b  LDX      0x0039
+193d  JSR      0x1b87
+1940  DEC      0x0039
+1942  BPL      0x193b
+1944  LDA      0x0082
+1946  BNE      0x194e
+1948  JSR      0x1c4d
+194b  JSR      0x2235
+194e  LDA      #0x7
+1950  STA      0x0039
+1952  LDX      0x0039
+1954  JSR      0x1b41
+1957  DEC      0x0039
+1959  BPL      0x1952
+195b  JMP      0x17bf
+
+projectile_object_collision_dispatch_2163 2163-21d7
+2163  LDA      0x0082
+2165  BNE      0x2187
+2167  LDA      0xc3e,X
+216a  SEC      
+216b  SBC      0x0a10
+216e  BMI      0x2187
+2170  CMP      #0x3
+2172  BPL      0x2187
+2174  LDA      0xc46,X
+2177  SEC      
+2178  SBC      0x0a50
+217b  BMI      0x2187
+217d  CMP      #0x4
+217f  BPL      0x2187
+2181  JSR      0x21d8
+2184  JMP      0x1964
+2187  LDY      #0x14
+2189  LDA      0xc53,Y
+218c  CMP      #0x1
+218e  BNE      0x21d2
+2190  LDA      0xc3e,X
+2193  SEC      
+2194  SBC      0xa00,Y
+2197  BMI      0x21d2
+2199  CMP      #0x3
+219b  BPL      0x21d2
+219d  LDA      0xc46,X
+21a0  SEC      
+21a1  SBC      0xa40,Y
+21a4  BMI      0x21d2
+21a6  CMP      #0x2
+21a8  BPL      0x21d2
+21aa  LDA      #0x2
+21ac  STA      0xc53,Y
+21af  CPX      #0x4
+21b1  BPL      0x21c2
+21b3  LDA      0x2f00,Y
+21b6  SEC      
+21b7  SBC      #0x29
+21b9  ASL      A
+21ba  JSR      0x22e6
+21bd  DEC      0x0080
+21bf  JMP      0x21c8
+21c2  LDA      0x2f00,Y
+21c5  JSR      0x22d0
+21c8  LDX      0x0039
+21ca  JSR      0x21d8
+21cd  LDA      #0x2
+21cf  JMP      0x21ea
+21d2  INY      
+21d3  CPY      #0x2c
+21d5  BNE      0x2189
+21d7  RTS      
+
+projectile_expiry_flag_1b41 1b41-1b86
+1b41  LDA      0xc4e,X
+1b44  BMI      0x1ada
+1b46  LDA      #0x0
+1b48  STA      0x0043
+1b4a  LDA      0xc1e,X
+1b4d  STA      0x0070
+1b4f  LDA      0xc26,X
+1b52  STA      0x0071
+1b54  LDY      #0x1
+1b56  LDA      (0x70),Y
+1b58  AND      #0xaa
+1b5a  CMP      #0xa0
+1b5c  BEQ      0x1b75
+1b5e  CMP      #0x80
+1b60  BEQ      0x1b77
+1b62  CMP      #0x82
+1b64  BEQ      0x1b77
+1b66  CMP      #0x8a
+1b68  BEQ      0x1b77
+1b6a  DEY      
+1b6b  BPL      0x1b56
+1b6d  JSR      0x1c8d
+1b70  LDA      0x0041
+1b72  BNE      0x1b77
+1b74  RTS      
+1b75  INC      0x0043
+1b77  LDA      #0xff
+1b79  STA      0xc4e,X
+1b7c  CPX      #0x4
+1b7e  BPL      0x1b83
+1b80  DEC      0x0042
+1b82  RTS      
+1b83  DEC      0x0bb8
+1b86  RTS      
+
+spook_pause_consumer_18ab 18ab-18c8
+18ab  LDA      0x0043
+18ad  BEQ      0x18c4
+18af  LDA      #0x32
+18b1  STA      0x0bbc
+18b4  LDX      #0xc
+18b6  LDA      #0x4
+18b8  JSR      0x24c0
+18bb  LDA      #0x0
+18bd  STA      0x0043
+18bf  LDA      #0x14
+18c1  JSR      0x21ea
+18c4  LDA      0x0082
+18c6  BEQ      0x18cb
+18c8  JMP      0x1937

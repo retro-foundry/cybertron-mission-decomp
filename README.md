@@ -126,6 +126,9 @@ The [score/status contract](analysis/reconstruction/runtime_score_status_contrac
 documents the original character-counter, target outcomes, lives, and level
 completion behavior. A strict bounded 6502 replay core executes the source-built
 routine rather than replacing it with the port model under test.
+The [active-frame edge contract](analysis/reconstruction/runtime_active_frame_edge_contract.txt)
+is enforced by bounded CPU replays of normal, terminal-delay, active-delay,
+and spook-pause-consumption frame spines, including exact leaf-call order.
 
 The decoded 24-byte artwork can be reviewed in the
 [composed sprite and graphic sheet](analysis/reconstruction/composed_sprite_sheet.png).

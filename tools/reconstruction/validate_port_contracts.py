@@ -20,6 +20,7 @@ OBJECT_LIFECYCLE_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_obj
 OBJECT_SLOT_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_object_slot_contract.txt"
 PROJECTILE_LIFECYCLE_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_projectile_lifecycle.txt"
 SCORE_STATUS_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_score_status_contract.txt"
+ACTIVE_FRAME_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_active_frame_edge_contract.txt"
 LOAD_ADDRESS = 0x0D80
 
 
@@ -324,7 +325,7 @@ def main() -> None:
             cpu.negative = False
             return True
 
-        cpu = Replay6502(memory, inkey_handler)
+        cpu = Replay6502(memory, inkey_handler, inkey_handler)
         cpu.run_subroutine(0x1609)
         actual_x = memory[0x003F]
         actual_y = memory[0x0040]
@@ -1201,7 +1202,7 @@ def main() -> None:
                 return True
             return False
 
-        cpu = Replay6502(memory, score_jsr_handler)
+        cpu = Replay6502(memory, score_jsr_handler, score_jsr_handler)
         cpu.a = 1
         cpu.run_subroutine(0x22E6)
         actual_chars = list(memory[0x0CEC:0x0CF0])
@@ -1214,6 +1215,88 @@ def main() -> None:
                 f"{expected_chars}/{expected_life}/{expected_calls}"
             )
         score_replays += 1
+
+    # Replay the assembled $17BF-$195B frame spine with leaf systems captured
+    # as ordered probes. This isolates the rare delay branches without
+    # pretending that transition delay is a global gameplay pause.
+    active_frame_reference = ACTIVE_FRAME_REFERENCE.read_text(encoding="ascii")
+    for required_edge in (
+        "$0082==1 returns at $17C5 before phase increment",
+        "$0082>1 decrements at $17CA, advances phase",
+        "$0043 consume $18AB-$18C1 runs after pre-input projectile draw/test",
+    ):
+        if required_edge not in active_frame_reference:
+            fail(f"active-frame reference is missing edge: {required_edge}")
+
+    preinput_calls = [0x198C, 0x2410]
+    for _ in range(8):
+        preinput_calls.extend((0x1AE9, 0x1B0E))
+    movement_calls = [0x1B87] * 8
+    expiry_calls = [0x1B41] * 8
+    frame_cases = (
+        ("terminal_delay", 1, 0, []),
+        ("active_delay", 2, 0, preinput_calls + movement_calls + expiry_calls),
+        (
+            "active_delay_spook_pause",
+            2,
+            1,
+            preinput_calls + [0x24C0, 0x21EA] + movement_calls + expiry_calls,
+        ),
+        (
+            "normal",
+            0,
+            0,
+            preinput_calls
+            + [0x15C3, 0x1AAC]
+            + movement_calls
+            + [0x1C4D, 0x2235]
+            + expiry_calls,
+        ),
+    )
+    active_frame_cpu_replays = 0
+    for name, delay, spook_collision, expected_targets in frame_cases:
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        memory[0x0082] = delay
+        memory[0x0036] = 1
+        memory[0x0043] = spook_collision
+        calls = []
+
+        def frame_probe_handler(cpu: Replay6502, target: int) -> bool:
+            calls.append((target, cpu.x, cpu.a))
+            return True
+
+        cpu = Replay6502(memory, frame_probe_handler)
+        cpu.run_subroutine(0x17BF, stop_addresses=(0x195B,))
+        actual_targets = [target for target, _, _ in calls]
+        if actual_targets != expected_targets:
+            fail(f"active-frame {name}: calls {actual_targets}, expected {expected_targets}")
+        expected_delay = 1 if delay == 2 else delay
+        expected_phase = 1 if delay == 1 else 2
+        expected_pause = 0x32 if spook_collision else 0
+        expected_collision_flag = 0
+        actual_state = (
+            memory[0x0082],
+            memory[0x0036],
+            memory[0x0BBC],
+            memory[0x0043],
+        )
+        expected_state = (
+            expected_delay,
+            expected_phase,
+            expected_pause,
+            expected_collision_flag,
+        )
+        if actual_state != expected_state:
+            fail(f"active-frame {name}: state {actual_state}, expected {expected_state}")
+        if spook_collision:
+            palette_call = calls[len(preinput_calls)]
+            sound_call = calls[len(preinput_calls) + 1]
+            if palette_call != (0x24C0, 0x0C, 0x04) or sound_call[0::2] != (0x21EA, 0x14):
+                fail(
+                    f"active-frame {name}: spook pause calls {palette_call}/{sound_call} differ"
+                )
+        active_frame_cpu_replays += 1
 
     print(
         "Validated port preflight: "
@@ -1241,6 +1324,7 @@ def main() -> None:
         f"{expiry_rows} projectile expiry bytes, "
         f"{projectile_expiry_cpu_replays} projectile expiry CPU replays, "
         f"{score_replays} score CPU replays"
+        f", {active_frame_cpu_replays} active-frame spine CPU replays"
     )
 
 

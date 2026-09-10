@@ -7,11 +7,12 @@ the newly executed instruction semantics.
 
 
 class Replay6502:
-    def __init__(self, memory: bytearray, jsr_handler=None):
+    def __init__(self, memory: bytearray, jsr_handler=None, jmp_handler=None):
         if len(memory) != 0x10000:
             raise ValueError("Replay6502 requires a 64K memory image")
         self.memory = memory
         self.jsr_handler = jsr_handler
+        self.jmp_handler = jmp_handler
         self.a = 0
         self.x = 0
         self.y = 0
@@ -181,7 +182,7 @@ class Replay6502:
                 self.memory[target] = self._flags((value << 1) | carry_in)
             elif opcode == 0x4C:  # JMP abs (tail-call handler may end replay)
                 target = self._word()
-                if self.jsr_handler is not None and self.jsr_handler(self, target):
+                if self.jmp_handler is not None and self.jmp_handler(self, target):
                     return steps
                 self.pc = target
             elif opcode == 0xEE:  # INC abs

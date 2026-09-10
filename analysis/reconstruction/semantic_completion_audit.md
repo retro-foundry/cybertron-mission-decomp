@@ -39,6 +39,7 @@ accepted as evidence for gameplay identity.
 | Hit lifecycle replay | The actual source-built `$1812` erase/retire and `$1876` draw/advance passes are CPU-replayed for all six lifecycle states with renderer calls captured | Port-contract, exhaustive |
 | Projectile expiry replay | The actual source-built `$1B41` routine is CPU-replayed for all 256 screen-byte values in both player-shot and hazard slots, including counter ownership and the `$A0` spook-pause class | Port-contract, exhaustive |
 | Score CPU replay | The actual source-built `$22E6` routine is executed for all 10,000 valid four-character score states and compared with an independent carry/extra-life model | Port-contract, exhaustive |
+| Active-frame edge replay | The actual `$17BF-$195B` frame spine is CPU-replayed for normal, terminal-delay, active-delay, and spook-pause-consumption cases with leaf-call order and state effects checked | Port-contract |
 | Full active-frame parity | No deterministic full-frame replay oracle is bundled in this standalone repository | Not proved |
 
 ## Source quality metrics
