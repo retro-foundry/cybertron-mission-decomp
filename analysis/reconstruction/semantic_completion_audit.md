@@ -30,7 +30,7 @@ accepted as evidence for gameplay identity.
 | Projectile movement replay | The actual source-built `$1B87` routine is CPU-replayed for all eight directions from four representative even/odd-Y positions; current/previous pointers and X/Y fields are checked | Port-contract |
 | Projectile pointer replay | The actual source-built `$1BFC` routine and nested pointer helpers are CPU-replayed for all 32 player-start/direction shot positions | Port-contract |
 | Player-shot spawn replay | The actual source-built `$1C4D` allocator is CPU-replayed through 128 admitted start/direction/free-slot combinations and both refusal edges | Port-contract |
-| Hazard spawn replay | The actual source-built `$2235` allocator is CPU-replayed for all eight movement directions in every eligible first-free slot 4-7, plus the Electron escape-condition pulse path; source selection, offsets, pointer calculation, slot writes, counter ownership, and sound dispatch are checked | Port-contract |
+| Hazard spawn replay | The actual source-built `$2235` allocator is CPU-replayed for all eight movement directions in every eligible first-free slot 4-7, the Electron escape-condition pulse path, and all five rejection gates; source selection, offsets, pointer calculation, slot writes, counter ownership, and sound dispatch are checked | Port-contract |
 | Input replay and projection | The actual source-built `$1609` scanner is CPU-replayed for all 16 keyboard masks, `$1287` for 72 joystick X/Y/fire edge combinations, and `$2207` for all eight non-idle direction vectors; four fire-latch transitions are also checked | Port-contract |
 | Room-render parity | `validate_port_contracts.py` independently reconstructs `$14B9/$1516/$0EFE/$1EC8/$1F19` and matches all 256 original-output `$3000-$7FFF` digests, draw/fill counts, and nonzero-byte totals | Port-contract |
 | Status-render parity | `validate_port_contracts.py` independently reconstructs `$1CAB/$1D3C/$2319/$2345` and matches all 640 original-output room/level composite digests; the bundled oracle also records life and target-slot placement | Port-contract |
@@ -38,6 +38,7 @@ accepted as evidence for gameplay identity.
 | Setup-frame parity | Seven deterministic scenarios reproduce target-code generation, enemy/target placement with rejection, RNG end state, setup-screen digest, and the immediate `$1849-$1863` player-entry digest | Port-contract |
 | Object/projectile lifecycle projection | All six enemy-count rows, 41 overlapping render-slot roles, six hit-animation states, and 256 masked projectile-expiry bytes are checked against bundled contracts | Port-contract |
 | Hit lifecycle replay | The actual source-built `$1812` erase/retire and `$1876` draw/advance passes are CPU-replayed for all six lifecycle states with renderer calls captured | Port-contract, exhaustive |
+| Hazard recycle replay | The actual source-built `$22D0` path is CPU-replayed for every first-free logical item slot 0-11 and the slot-12 refusal boundary; graphic transfer, active state, saved slot, placement tail, and bounded ownership are checked | Port-contract, exhaustive |
 | Projectile expiry replay | The actual source-built `$1B41` routine is CPU-replayed for all 256 screen-byte values in both player-shot and hazard slots, including counter ownership and the `$A0` spook-pause class | Port-contract, exhaustive |
 | Target outcome replay | The actual source-built `$0FD6-$1069` handler is CPU-replayed for required slots 1-5, the bonus target, the incomplete completion gate, and level advance with and without decimal carry; matching, status consumption, movement reversal/cancellation, score/sound dispatch, lives, level digits, and room-bank rotation are checked | Port-contract |
 | Life-loss replay | The complete source-built `$1A59-$1AAA` reset is CPU-replayed across four saved-pointer cases spanning low-byte borrow/carry boundaries; life count, status/sound calls, both restored pointers and Y fields, death graphics, draw order, render mode, and transition delay are checked | Port-contract |
@@ -69,10 +70,9 @@ The source reconstruction itself is complete and byte-exact, but the dynamic
 validation depth is not yet equivalent to the Quest repository. Completion of
 that broader standard requires:
 
-1. Add actual-code replay coverage for player collision outcomes, enemy AI
-   movement decisions, hazard-spawn rejection gates, and hit-object recycling.
-   Current contracts for these areas are static or cover only their setup and
-   lifecycle edges.
+1. Add actual-code replay coverage for player collision outcomes and enemy AI
+   movement decisions. Current contracts for these areas are static or cover
+   only their setup and lifecycle edges.
 2. Add an active-loop/full-frame comparison that records complete RAM and display
    effects for fixed initial state and input sequences.
 3. Replace the active-frame spine's leaf probes with integrated subsystem

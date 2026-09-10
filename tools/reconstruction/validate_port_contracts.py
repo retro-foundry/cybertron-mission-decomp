@@ -319,6 +319,86 @@ def main() -> None:
         fail(f"hazard escape pulse calls {calls}")
     hazard_spawn_cpu_replays += 1
 
+    # Rejection paths must not allocate a shared slot or change the hazard
+    # count. Scripted RNG results isolate each gate in source order.
+    hazard_rejection_cases = (
+        ("capacity", 4, 7, (), 1, 1, 0, 0),
+        ("level_rng", 0, 7, (7,), 1, 1, 0, 0),
+        ("inactive_source", 0, 7, (0, 0), 0, 1, 0, 0),
+        ("stationary_source", 0, 7, (0, 0), 1, 0, 0, 0),
+        ("stale_visible_slot", 0, 7, (0, 0), 1, 1, 0, 1),
+    )
+    for name, count, level_gate, scripted_rng, source_state, delta_x, delta_y, slot4_visible in hazard_rejection_cases:
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        memory[0x00B8] = level_gate
+        memory[0x0BB8] = count
+        memory[0x0C03] = 1
+        memory[0x0C53 + 0x19] = source_state
+        memory[0x0C86 + 0x19] = delta_x & 0xFF
+        memory[0x0C9E + 0x19] = delta_y & 0xFF
+        memory[0x0C4E + 4:0x0C4E + 8] = bytes((0xFF,) * 4)
+        memory[0x0C56 + 4] = slot4_visible
+        rng_values = list(scripted_rng)
+        rng_calls = []
+        before_slots = bytes(memory[0x0C1E:0x0C5E])
+
+        def rejected_hazard_handler(cpu: Replay6502, target: int) -> bool:
+            if target == 0x1D61:
+                value = rng_values.pop(0)
+                cpu.a = value
+                rng_calls.append(value)
+                return True
+            return False
+
+        cpu = Replay6502(memory, rejected_hazard_handler)
+        cpu.run_subroutine(0x2235)
+        actual = (memory[0x0BB8], bytes(memory[0x0C1E:0x0C5E]), rng_calls)
+        expected = (count, before_slots, list(scripted_rng))
+        if actual != expected:
+            fail(f"hazard rejection {name}: {actual}, expected {expected}")
+        hazard_spawn_cpu_replays += 1
+
+    # $22D0 recycles an object hit by a spawned hazard into the first free
+    # logical item slot, but only within slots 0-11. Execute every admissible
+    # first-free result and the slot-12 refusal boundary.
+    hazard_recycle_cpu_replays = 0
+    for free_slot in range(13):
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        memory[0x0C67:0x0C74] = bytes(1 if slot < free_slot else 0 for slot in range(13))
+        memory[0x2F14:0x2F21] = bytes((0x55,) * 13)
+        placement_calls = []
+
+        def recycle_tail(cpu: Replay6502, target: int) -> bool:
+            if target == 0x1DD1:
+                placement_calls.append((target, cpu.a, cpu.x, cpu.y))
+                return True
+            return False
+
+        cpu = Replay6502(memory, jmp_handler=recycle_tail)
+        cpu.a = 0x2B
+        cpu.run_subroutine(0x22D0)
+        if free_slot < 12:
+            actual = (
+                memory[0x003A],
+                memory[0x0C67 + free_slot],
+                memory[0x2F14 + free_slot],
+                placement_calls,
+            )
+            expected = (free_slot, 1, 0x2B, [(0x1DD1, 1, free_slot, 0x2B)])
+        else:
+            actual = (
+                memory[0x003A],
+                memory[0x0C67 + free_slot],
+                memory[0x2F14 + free_slot],
+                placement_calls,
+            )
+            expected = (free_slot, 0, 0x55, [])
+        if actual != expected:
+            fail(f"hazard recycle first-free slot {free_slot}: {actual}, expected {expected}")
+        hazard_recycle_cpu_replays += 1
+
     # $1B87 movement deltas must reproduce $1BFC for both even and odd Y.
     delta_y = tuple(value if value < 0x80 else value - 0x100 for value in block(0x2798, 8))
     delta_x = tuple(value if value < 0x80 else value - 0x100 for value in block(0x27A0, 8))
@@ -1844,6 +1924,7 @@ def main() -> None:
         f"{projectile_pointer_cpu_replays} shot-pointer CPU replays, "
         f"{shot_spawn_cpu_replays} shot-spawn CPU replays, "
         f"{hazard_spawn_cpu_replays} hazard-spawn CPU replays, "
+        f"{hazard_recycle_cpu_replays} hazard-recycle CPU replays, "
         f"{movement_rows} movement projections, "
         f"{movement_cpu_replays} movement CPU replays, "
         f"{keyboard_rows} keyboard masks, "
