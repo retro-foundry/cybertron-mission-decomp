@@ -285,9 +285,9 @@ org runtime_start
     STA      zp_scratch_77    ; &0F46
     LDY      #&17    ; &0F48
     LDA      room_tile_class_or_pattern    ; &0F4A
-    BEQ      addr_0FA1    ; &0F4C
+    BEQ      clear_24byte_tile_loop    ; &0F4C
 
-.addr_0F4E
+.generate_next_compact_tile_row
     LDA      room_tile_class_or_pattern    ; &0F4E
     LSR      A    ; &0F50
     PHP    ; &0F51
@@ -310,7 +310,7 @@ org runtime_start
     TAY    ; &0F6A
     JSR      write_compact_tile_pattern_byte    ; &0F6B
 
-.addr_0F6E
+.generate_compact_tile_middle_bytes
     LDA      room_tile_class_or_pattern    ; &0F6E
     LSR      A    ; &0F70
     LSR      A    ; &0F71
@@ -321,7 +321,7 @@ org runtime_start
     LDA      zp_scratch_77    ; &0F7A
     AND      #&7    ; &0F7C
     CMP      #&6    ; &0F7E
-    BMI      addr_0F6E    ; &0F80
+    BMI      generate_compact_tile_middle_bytes    ; &0F80
     LDA      room_tile_class_or_pattern    ; &0F82
     LSR      A    ; &0F84
     TAX    ; &0F85
@@ -337,13 +337,13 @@ org runtime_start
     INC      zp_indirect_74_low    ; &0F98
     LDA      zp_indirect_74_low    ; &0F9A
     CMP      #&3    ; &0F9C
-    BNE      addr_0F4E    ; &0F9E
+    BNE      generate_next_compact_tile_row    ; &0F9E
     RTS    ; &0FA0
 
-.addr_0FA1
+.clear_24byte_tile_loop
     STA      (zp_screen_ptr_70_low),Y    ; &0FA1
     DEY    ; &0FA3
-    BPL      addr_0FA1    ; &0FA4
+    BPL      clear_24byte_tile_loop    ; &0FA4
     RTS    ; &0FA6
 
 .add_a_to_pointer_72
@@ -384,14 +384,14 @@ org runtime_start
     STA      renderer_collision_accumulator    ; &0FD8
     LDX      #&ff    ; &0FDA
 
-.addr_0FDC
+.find_collected_target_slot
     INX    ; &0FDC
     LDA      room_area    ; &0FDD
     AND      #&f    ; &0FDF
     CMP      target_room_code,X    ; &0FE1
-    BNE      addr_0FDC    ; &0FE4
+    BNE      find_collected_target_slot    ; &0FE4
     CPX      #&0    ; &0FE6
-    BEQ      addr_1013    ; &0FE8
+    BEQ      begin_required_target_completion_scan    ; &0FE8
     LDA      #&1    ; &0FEA
     STA      target_collected_status,X    ; &0FEC
     STX      zp_scratch_77    ; &0FEF
@@ -404,32 +404,32 @@ org runtime_start
     JSR      play_sound_id_if_enabled    ; &0FFB
     LDX      zp_scratch_77    ; &0FFE
     CPX      #&6    ; &1000
-    BEQ      addr_100A    ; &1002
+    BEQ      award_bonus_target_life    ; &1002
     LDA      target_collection_score_add_table_0fd6,X    ; &1004
     JMP      increment_four_char_score_or_counter    ; &1007
 
-.addr_100A
+.award_bonus_target_life
     JSR      reroll_bonus_target_code    ; &100A
     INC      lives_status_count    ; &100D
     JMP      draw_lives_or_target_status    ; &1010
 
-.addr_1013
+.begin_required_target_completion_scan
     LDX      #&0    ; &1013
 
-.addr_1015
+.scan_next_required_target_status
     INX    ; &1015
     LDA      target_collected_status,X    ; &1016
     CMP      #&1    ; &1019
-    BNE      addr_1024    ; &101B
+    BNE      test_required_target_scan_complete    ; &101B
     LDA      #&ff    ; &101D
     STA      target_collected_status,X    ; &101F
     INC      collected_target_count    ; &1022
 
-.addr_1024
+.test_required_target_scan_complete
     CPX      highest_required_target_slot    ; &1024
-    BNE      addr_1015    ; &1026
+    BNE      scan_next_required_target_status    ; &1026
     CPX      collected_target_count    ; &1028
-    BEQ      addr_1042    ; &102A
+    BEQ      advance_level_after_all_targets    ; &102A
     LDA      input_delta_x    ; &102C
     EOR      #&ff    ; &102E
     STA      input_delta_x    ; &1030
@@ -441,17 +441,17 @@ org runtime_start
     JSR      apply_input_delta_to_player_pair    ; &103C
     JMP      cancel_player_movement_delta    ; &103F
 
-.addr_1042
+.advance_level_after_all_targets
     INC      lives_status_count    ; &1042
     INC      level_units_digit    ; &1045
     LDA      level_units_digit    ; &1048
     CMP      #&a    ; &104B
-    BNE      addr_1057    ; &104D
+    BNE      enter_next_level_area    ; &104D
     LDA      #&0    ; &104F
     STA      level_units_digit    ; &1051
     INC      level_tens_digit    ; &1054
 
-.addr_1057
+.enter_next_level_area
     LDA      room_area    ; &1057
     CLC    ; &1059
     ADC      #&10    ; &105A
@@ -471,7 +471,7 @@ org runtime_start
     LDA      #&0    ; &1071
     STA      object_x_by_index    ; &1073
 
-.addr_1076
+.draw_next_text_character
     LDX      object_x_by_index    ; &1076
     LDA      text_buffer_20chars,X    ; &1079
     STA      zp_calc_ptr_72_low    ; &107C
@@ -485,7 +485,7 @@ org runtime_start
     STA      zp_calc_ptr_72_high    ; &108C
     LDY      object_y_by_index    ; &108E
 
-.addr_1091
+.load_character_font_quartet
     TYA    ; &1091
     AND      #&3    ; &1092
     TAX    ; &1094
@@ -494,35 +494,35 @@ org runtime_start
     INY    ; &109A
     TYA    ; &109B
     AND      #&3    ; &109C
-    BNE      addr_1091    ; &109E
+    BNE      load_character_font_quartet    ; &109E
     LDA      #&0    ; &10A0
     STA      movement_delta_x    ; &10A2
 
-.addr_10A4
+.draw_next_character_quarter
     LDA      #&0    ; &10A4
     STA      input_delta_y    ; &10A6
     LDY      #&0    ; &10A8
 
-.addr_10AA
+.draw_next_character_pixel_pair
     LDA      #&0    ; &10AA
     STA      render_mode_or_text_scratch    ; &10AC
     LDX      input_delta_y    ; &10AE
     LDA      font_expand_work_bytes,X    ; &10B0
     AND      #&80    ; &10B3
-    BEQ      addr_10BD    ; &10B5
+    BEQ      test_second_pixel_colour    ; &10B5
     LDA      text_render_colour_value    ; &10B7
     ASL      A    ; &10BA
     STA      render_mode_or_text_scratch    ; &10BB
 
-.addr_10BD
+.test_second_pixel_colour
     LDA      font_expand_work_bytes,X    ; &10BD
     AND      #&40    ; &10C0
-    BEQ      addr_10CB    ; &10C2
+    BEQ      store_expanded_pixel_pair    ; &10C2
     LDA      text_render_colour_value    ; &10C4
     ORA      render_mode_or_text_scratch    ; &10C7
     STA      render_mode_or_text_scratch    ; &10C9
 
-.addr_10CB
+.store_expanded_pixel_pair
     ASL      font_expand_work_bytes,X    ; &10CB
     ASL      font_expand_work_bytes,X    ; &10CE
     LDA      render_mode_or_text_scratch    ; &10D1
@@ -532,21 +532,21 @@ org runtime_start
     INC      input_delta_y    ; &10D8
     INY    ; &10DA
     CPY      #&8    ; &10DB
-    BNE      addr_10AA    ; &10DD
+    BNE      draw_next_character_pixel_pair    ; &10DD
     LDA      #&8    ; &10DF
     JSR      add_a_to_pointer_70    ; &10E1
     INC      movement_delta_x    ; &10E4
     LDA      movement_delta_x    ; &10E6
     CMP      #&4    ; &10E8
-    BNE      addr_10A4    ; &10EA
+    BNE      draw_next_character_quarter    ; &10EA
     INC      object_x_by_index    ; &10EC
     LDA      object_x_by_index    ; &10EF
     CMP      text_render_char_limit    ; &10F2
-    BNE      addr_10F7    ; &10F4
+    BNE      continue_text_character_loop    ; &10F4
     RTS    ; &10F6
 
-.addr_10F7
-    JMP      addr_1076    ; &10F7
+.continue_text_character_loop
+    JMP      draw_next_text_character    ; &10F7
 
 .draw_20char_buffer_two_rows
     LDA      #&14    ; &10FA
@@ -560,12 +560,12 @@ org runtime_start
 
 .oswrch_zero_terminated_text_2600_x
     LDA      control_help_text,X    ; &110E
-    BEQ      addr_111A    ; &1111
+    BEQ      return_from_text_stream    ; &1111
     JSR      MOS_OSWRCH    ; &1113
     INX    ; &1116
     JMP      oswrch_zero_terminated_text_2600_x    ; &1117
 
-.addr_111A
+.return_from_text_stream
     RTS    ; &111A
 
 .copy_encoded_text_stream_to_buffer
@@ -573,22 +573,22 @@ org runtime_start
     TAY    ; &111E
     INX    ; &111F
 
-.addr_1120
+.copy_next_encoded_text_byte
     LDA      screen_copy_control_streams,X    ; &1120
-    BMI      addr_111A    ; &1123
+    BMI      return_from_text_stream    ; &1123
     STA      text_buffer_20chars,Y    ; &1125
     INY    ; &1128
     INX    ; &1129
-    JMP      addr_1120    ; &112A
+    JMP      copy_next_encoded_text_byte    ; &112A
 
 .clear_20char_text_buffer
     LDY      #&13    ; &112D
     LDA      #&0    ; &112F
 
-.addr_1131
+.clear_next_text_buffer_byte
     STA      text_buffer_20chars,Y    ; &1131
     DEY    ; &1134
-    BPL      addr_1131    ; &1135
+    BPL      clear_next_text_buffer_byte    ; &1135
     RTS    ; &1137
 
 .draw_encoded_text_stream_to_screen
@@ -625,7 +625,7 @@ org runtime_start
     STA      text_render_colour_value    ; &1177
     LDX      #&0    ; &117A
 
-.addr_117C
+.draw_next_legend_text
     STX      zp_scratch_79    ; &117C
     LDY      object_legend_screen_high_bytes_1175,X    ; &117E
     LDA      object_legend_text_stream_offsets_1175,X    ; &1181
@@ -638,7 +638,7 @@ org runtime_start
     LDA      #&10    ; &1191
     STA      text_render_colour_value    ; &1193
     CPX      #&9    ; &1196
-    BNE      addr_117C    ; &1198
+    BNE      draw_next_legend_text    ; &1198
     LDA      #&44    ; &119A
     STA      object_screen_high_by_index    ; &119C
     LDA      #&90    ; &119F
@@ -648,7 +648,7 @@ org runtime_start
     LDX      #&0    ; &11A9
     STX      render_mode_or_text_scratch    ; &11AB
 
-.addr_11AD
+.draw_next_legend_graphic
     STX      zp_scratch_79    ; &11AD
     LDA      object_legend_graphic_ids_1175,X    ; &11AF
     STA      object_graphic_id_by_index    ; &11B2
@@ -664,7 +664,7 @@ org runtime_start
     LDX      zp_scratch_79    ; &11CB
     INX    ; &11CD
     CPX      #&7    ; &11CE
-    BNE      addr_11AD    ; &11D0
+    BNE      draw_next_legend_graphic    ; &11D0
     LDA      #&0    ; &11D2
     STA      object_y_by_index    ; &11D4
     LDA      #&3d    ; &11D7
@@ -698,12 +698,12 @@ org runtime_start
     LDX      #&de    ; &1217
     JSR      copy_encoded_text_stream_to_buffer    ; &1219
     LDA      level_tens_digit    ; &121C
-    BEQ      addr_1227    ; &121F
+    BEQ      write_level_units_digit    ; &121F
     CLC    ; &1221
     ADC      #&10    ; &1222
     STA      &0CD6    ; &1224
 
-.addr_1227
+.write_level_units_digit
     LDA      level_units_digit    ; &1227
     CLC    ; &122A
     ADC      #&10    ; &122B
@@ -720,15 +720,15 @@ org runtime_start
     LDA      #&60    ; &1245
     STA      object_screen_high_by_index    ; &1247
     LDA      level_tens_digit    ; &124A
-    BNE      addr_1256    ; &124D
+    BNE      cap_level_intro_target_count    ; &124D
     LDA      level_units_digit    ; &124F
     CMP      #&6    ; &1252
-    BMI      addr_1258    ; &1254
+    BMI      begin_level_intro_target_loop    ; &1254
 
-.addr_1256
+.cap_level_intro_target_count
     LDA      #&5    ; &1256
 
-.addr_1258
+.begin_level_intro_target_loop
     TAX    ; &1258
     DEX    ; &1259
 
