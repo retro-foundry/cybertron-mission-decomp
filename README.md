@@ -55,7 +55,9 @@ Validation performs a clean source assembly and requires the resulting runtime
 to be exactly `$2280` bytes with SHA-256
 `29d4bed6a2bf6a3f93302f01b05fe43ec930528eaf702e679b73d2fd2476beef`.
 That digest is the byte-exact authority established by the reverse-engineering
-project, so validation requires no copyrighted original media.
+project, so validation requires no copyrighted original media. It also runs
+standalone port preflight contracts for graphic pointers, player animation
+selection, player starts, and projectile address updates.
 
 ## Layout and provenance
 

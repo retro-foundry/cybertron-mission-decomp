@@ -26,6 +26,7 @@ accepted as evidence for gameplay identity.
 | Graphic bank meaning | Every record has a semantic source label and `graphic_usage` annotation; `$16E1` proves eight player direction families and three selected lower animation frames | Behavioral |
 | Room data | Sixteen 18-byte packed room records are bounded by the room selector and tile renderer | Behavioral |
 | Static gameplay semantics | Input, player movement, collision, projectile, object, status, score, sound, room, and screen-flow code is source-owned and behaviorally named | Behavioral, static |
+| Port address preflight | `validate_port_contracts.py` checks 64 graphic pointers, 32 player animation selections, four player starts, 32 shot projections, and 32 movement projections against the source-built runtime | Port-contract |
 | Full active-frame parity | No deterministic full-frame replay oracle is bundled in this standalone repository | Not proved |
 
 ## Source quality metrics
@@ -49,7 +50,7 @@ The source reconstruction itself is complete and byte-exact, but the dynamic
 validation depth is not yet equivalent to the Quest repository. Completion of
 that broader standard requires:
 
-1. Bundle deterministic address/pointer, room-render, status-render, and
+1. Extend the executable preflight with room-render, status-render, and
    sprite-render fixtures that exercise the source-built runtime.
 2. Add replay-backed input, movement, collision, projectile, object lifecycle,
    score, sound, and screen-flow contracts.

@@ -20,6 +20,7 @@ $requiredFiles = @(
     'source_acorn_electron/reconstruction.json'
     'analysis/reconstruction/semantic_completion_audit.md'
     'tools/reconstruction/render_graphic_sheet.py'
+    'tools/reconstruction/validate_port_contracts.py'
     'analysis/reconstruction/composed_sprite_sheet.png'
 )
 foreach ($relativePath in $requiredFiles) {
@@ -39,6 +40,7 @@ $maintainedFiles = @(
     (Join-Path $repoRoot 'source_acorn_electron\reconstruction.json')
     (Join-Path $repoRoot 'analysis\reconstruction\semantic_completion_audit.md')
     (Join-Path $repoRoot 'tools\reconstruction\render_graphic_sheet.py')
+    (Join-Path $repoRoot 'tools\reconstruction\validate_port_contracts.py')
 )
 foreach ($maintainedFile in $maintainedFiles) {
     $nonAsciiByte = [System.IO.File]::ReadAllBytes($maintainedFile) |
@@ -169,6 +171,12 @@ if ($actualLength -ne $expectedLength) {
 $actualSha256 = (Get-FileHash -LiteralPath $payload -Algorithm SHA256).Hash
 if ($actualSha256 -ne $expectedSha256) {
     throw "CYBRUN SHA-256 is $actualSha256, expected $expectedSha256."
+}
+
+$portContractScript = Join-Path $repoRoot 'tools\reconstruction\validate_port_contracts.py'
+& $pythonCommand.Source $portContractScript $payload
+if ($LASTEXITCODE -ne 0) {
+    throw 'CYBRUN failed the standalone port preflight contracts.'
 }
 
 Write-Output ('Validated CYBRUN: {0} bytes, SHA-256 {1}' -f $actualLength, $actualSha256)
