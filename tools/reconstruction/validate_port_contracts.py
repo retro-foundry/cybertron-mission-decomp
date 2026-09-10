@@ -1619,6 +1619,72 @@ def main() -> None:
             fail(f"validated enemy move {name}: {actual}, expected {expected}")
         enemy_move_validation_cpu_replays += 1
 
+    # Replay the phase-3 player collision pipeline with controlled renderer and
+    # spook probes. The actual $18DF-$1929 instructions establish early-failure
+    # routing and target/scalar/fatal outcome priority.
+    player_collision_cpu_replays = 0
+    player_collision_cases = (
+        ("clear", 0, 0, 0, 0, ()),
+        ("pretest_collision", 1, 0, 0, 0, (0x1972,)),
+        ("spook_collision", 0, 1, 0, 0, (0x1972,)),
+        ("target", 0, 0, 1, 0, (0x0FD6, 0x2345)),
+        ("player_hit", 0, 0, 0, 1, (0x19F3,)),
+        ("fatal_bits", 0, 0, 0, 0, (0x2493, 0x1A59)),
+        ("all_postdraw", 0, 0, 1, 1, (0x0FD6, 0x2345, 0x19F3)),
+    )
+    for name, pretest_collision, spook_collision, target_flag, player_hit_flag, expected_outcomes in player_collision_cases:
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        draw_calls = []
+        input_calls = []
+        outcome_calls = []
+        fatal_bits = 0xC0 if name in ("fatal_bits", "all_postdraw") else 0
+
+        def player_collision_handler(cpu: Replay6502, target: int) -> bool:
+            if target == 0x13FB:
+                draw_calls.append((cpu.x, memory[0x0031]))
+                if len(draw_calls) == 2 and pretest_collision:
+                    memory[0x0030] = pretest_collision
+                if len(draw_calls) == 4:
+                    memory[0x004A] = target_flag
+                    memory[0x0C07] = player_hit_flag
+                    memory[0x0030] = fatal_bits
+                return True
+            if target == 0x1311:
+                if spook_collision:
+                    memory[0x0030] = spook_collision
+                return True
+            if target == 0x16E1:
+                input_calls.append(target)
+                return True
+            if target in (0x0FD6, 0x2345, 0x1972, 0x2493, 0x1A59):
+                outcome_calls.append(target)
+                return True
+            return False
+
+        def player_collision_tail(cpu: Replay6502, target: int) -> bool:
+            if target == 0x19F3:
+                outcome_calls.append(target)
+                return True
+            return False
+
+        cpu = Replay6502(memory, player_collision_handler, player_collision_tail)
+        try:
+            cpu.run_subroutine(0x18DF, stop_addresses=(0x1937,))
+        except AssertionError as error:
+            fail(f"player collision {name}: replay failed: {error}")
+        expected_draws = (
+            [(0x10, 4), (0x11, 4)]
+            if pretest_collision or spook_collision
+            else [(0x10, 4), (0x11, 4), (0x10, 3), (0x11, 3)]
+        )
+        expected_input = [] if pretest_collision or spook_collision else [0x16E1]
+        actual = (draw_calls, input_calls, tuple(outcome_calls))
+        expected = (expected_draws, expected_input, expected_outcomes)
+        if actual != expected:
+            fail(f"player collision {name}: {actual}, expected {expected}")
+        player_collision_cpu_replays += 1
+
     # $1B41 recognizes four masked screen-byte classes. Exhaust all byte
     # values so ports cannot accidentally compare unmasked pixels or merge the
     # special $A0 spook-pause outcome with ordinary expiry.
@@ -2268,6 +2334,7 @@ def main() -> None:
         f"{enemy_decision_cpu_replays} enemy-decision CPU replays, "
         f"{enemy_policy_cpu_replays} enemy-policy CPU replays, "
         f"{enemy_move_validation_cpu_replays} enemy-move-validation CPU replays, "
+        f"{player_collision_cpu_replays} player-collision CPU replays, "
         f"{expiry_rows} projectile expiry bytes, "
         f"{projectile_expiry_cpu_replays} projectile expiry CPU replays, "
         f"{target_outcome_cpu_replays} target-outcome CPU replays, "

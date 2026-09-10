@@ -1,0 +1,29 @@
+runtime_player_collision_contract
+Purpose: port-facing player collision and outcome-priority contract.
+Authority: source-built CYBRUN $18CB-$1963, target handler $0FD6, saved redraw $2493, and life reset $1A59.
+Port rule: preserve control-flow order; renderer flags are distinct signals, not a generic collision boolean.
+
+phase3_pipeline
+1 $18DF draws player cells $10/$11 in render mode 4; any accumulated collision calls clear-player path $1972 before movement.
+2 $1311 tests the spook pair; any accumulated collision calls clear-player path $1972 before movement.
+3 $16E1 applies player input, direction, animation, coordinates, and pointers.
+4 collision class $0C07 and target flag $004A are cleared.
+5 player cells $10/$11 are drawn in render mode 3 to classify the new position.
+6 target flag $004A calls $0FD6 then status redraw $2345.
+7 player collision class $0C07 jumps to flash/life-loss path $19F3.
+8 fatal accumulator bits $0030&$C0 call saved-player redraw $2493 then life reset $1A59.
+9 otherwise processing continues at the shot/hazard movement loop $1937.
+
+priority
+If target, scalar player-hit, and fatal accumulator signals coexist, target handling and status redraw occur first, then scalar player-hit dispatch wins over the fatal accumulator path.
+Pre-move player or spook collision bypasses input and the render-mode-3 classification draw, calling $1972 directly rather than the phase-selecting $1964 entry.
+
+direct_active_object_hit
+$1964 tests frame phase modulo 4.
+Outside player render phase it calls saved-player redraw $2493 before life reset.
+During player render phase it clears player cells $10/$11 in render mode 0 before life reset.
+
+separate_outcomes
+Life loss $1A59 decrements lives and installs transition delay $96.
+Room exit $1AAC/$172A changes room and restarts setup without decrementing lives.
+Target collection $0FD6 owns score, status, bonus-life, and level-completion effects and is not damage.
