@@ -455,7 +455,9 @@ SPOOK_STATE_CLEAR = &00
 
 ; Zero-page gameplay and renderer state.
 renderer_collision_accumulator = &0030
-render_mode_or_text_scratch = &0031
+; Shared by mutually exclusive renderer and bitmap-font paths.
+object_render_mode = &0031
+font_expanded_pixel_pair = &0031
 room_area = &0032
 movement_delta_x = &0033
 movement_delta_y = &0034
@@ -465,8 +467,12 @@ saved_level_loop_seed_or_status = &0037
 active_object_index = &0039
 logical_item_slot_index = &003A
 room_tile_column_or_fill_index = &003B
-zp_scratch_3c = &003C
-zp_scratch_3d = &003D
+; Shared work bytes; contextual aliases document each bounded consumer.
+playfield_screen_tile_row_index = &003C
+unused_clear_row_counter = &003C
+playfield_gap_cell_counter = &003D
+unused_clear_column_index = &003D
+player_base_graphic_id_work = &003D
 fire_edge_request = &003E
 input_delta_x = &003F
 input_delta_y = &0040
@@ -488,10 +494,22 @@ zp_calc_ptr_72_low = &0072
 zp_calc_ptr_72_high = &0073
 zp_indirect_74_low = &0074
 zp_indirect_74_high = &0075
-zp_scratch_76 = &0076
-zp_scratch_77 = &0077
-zp_scratch_78 = &0078
-zp_scratch_79 = &0079
+; Shared high zero-page workspace. These aliases are deliberately contextual:
+; each lifetime is bounded by its named routine/loop.
+level_fill_pattern_selector_work = &0076
+attract_timeout_inner_counter = &0076
+tile_pattern_source_ptr_high = &0076
+score_increment_remaining_units = &0076
+status_loop_saved_index = &0076
+tile_generated_byte_index = &0077
+collected_target_saved_slot = &0077
+wait_strip_source_index = &0077
+random_placement_saved_object_index = &0077
+compact_tile_outer_index_work = &0078
+legend_text_stream_offset = &0078
+wait_strip_screen_position = &0078
+legend_loop_saved_index = &0079
+level_intro_target_saved_index = &0079
 rng_shift_register_low = &007A
 rng_shift_register_middle = &007B
 rng_shift_register_high = &007C

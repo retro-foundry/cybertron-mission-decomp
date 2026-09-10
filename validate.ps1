@@ -117,6 +117,9 @@ if ($assemblyText -match '(?im)^\s*\.addr_[0-9A-F]+\s*$') {
 if ($assemblyText -match '(?im)^\s*\.(?:byte_decoded|unclassified)_[A-Za-z0-9_]+\s*$') {
     throw 'Generic decoded/unclassified labels are not permitted in cyber1.asm; document the proven source role.'
 }
+if (($assemblyText + "`n" + $memoryMapText) -match '(?i)\b(?:zp_)?scratch[A-Za-z0-9_]*\b') {
+    throw 'Generic scratch names are not permitted; use a contextual alias for each bounded lifetime.'
+}
 
 $assemblyLines = Get-Content -LiteralPath $source
 $activeDataOwner = $null
