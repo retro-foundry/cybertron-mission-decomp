@@ -19,6 +19,7 @@ $requiredFiles = @(
     'source_acorn_electron/README.md'
     'source_acorn_electron/reconstruction.json'
     'analysis/reconstruction/semantic_completion_audit.md'
+    'analysis/reconstruction/runtime_room_render_reference.txt'
     'tools/reconstruction/render_graphic_sheet.py'
     'tools/reconstruction/validate_port_contracts.py'
     'analysis/reconstruction/composed_sprite_sheet.png'
@@ -39,6 +40,7 @@ $maintainedFiles = @(
     (Join-Path $repoRoot 'source_acorn_electron\README.md')
     (Join-Path $repoRoot 'source_acorn_electron\reconstruction.json')
     (Join-Path $repoRoot 'analysis\reconstruction\semantic_completion_audit.md')
+    (Join-Path $repoRoot 'analysis\reconstruction\runtime_room_render_reference.txt')
     (Join-Path $repoRoot 'tools\reconstruction\render_graphic_sheet.py')
     (Join-Path $repoRoot 'tools\reconstruction\validate_port_contracts.py')
 )

@@ -27,6 +27,7 @@ accepted as evidence for gameplay identity.
 | Room data | Sixteen 18-byte packed room records are bounded by the room selector and tile renderer | Behavioral |
 | Static gameplay semantics | Input, player movement, collision, projectile, object, status, score, sound, room, and screen-flow code is source-owned and behaviorally named | Behavioral, static |
 | Port address preflight | `validate_port_contracts.py` checks 64 graphic pointers, 32 player animation selections, four player starts, 32 shot projections, and 32 movement projections against the source-built runtime | Port-contract |
+| Room-render oracle | `runtime_room_render_reference.txt` preserves 256 original-output `$3000-$7FFF` digests for 64 rooms and four fill-pattern variants | Oracle bundled; executable source-model comparison pending |
 | Full active-frame parity | No deterministic full-frame replay oracle is bundled in this standalone repository | Not proved |
 
 ## Source quality metrics
@@ -50,8 +51,9 @@ The source reconstruction itself is complete and byte-exact, but the dynamic
 validation depth is not yet equivalent to the Quest repository. Completion of
 that broader standard requires:
 
-1. Extend the executable preflight with room-render, status-render, and
-   sprite-render fixtures that exercise the source-built runtime.
+1. Add an executable room-render model that must match all 256 bundled
+   original-output digests, then add equivalent status- and sprite-render
+   fixtures.
 2. Add replay-backed input, movement, collision, projectile, object lifecycle,
    score, sound, and screen-flow contracts.
 3. Add an active-loop/full-frame comparison that records RAM and display
