@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_RUNTIME = ROOT / "build" / "reconstruction" / "CYBRUN"
 ROOM_FIXTURE = ROOT / "analysis" / "reconstruction" / "room_render_fixture.json"
 STATUS_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_status_panel_reference.txt"
+SPRITE_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_sprite_renderer_reference.txt"
 LOAD_ADDRESS = 0x0D80
 
 
@@ -384,6 +385,115 @@ def main() -> None:
                 )
             status_rows += 1
 
+    # G3: independently reproduce the split source/destination walk at
+    # $1426-$1464, then apply store mode 1 (EOR) to both player cells from
+    # each $1735 start. Odd Y is deliberately non-linear across Mode 2 rows.
+    sprite_reference = SPRITE_REFERENCE.read_text(encoding="ascii")
+
+    def renderer_steps(object_y: int) -> tuple[tuple[int, int], ...]:
+        if not object_y & 1:
+            return tuple((index, index) for index in range(24))
+        steps = []
+        source_index = 0
+        destination_y = 4
+        pointer_delta = 0
+        while True:
+            steps.append((source_index, pointer_delta + destination_y))
+            destination_y += 1
+            source_index += 1
+            if source_index & 3 == 0:
+                source_index += 4
+                destination_y += 4
+            if destination_y == 0x98:
+                return tuple(steps)
+            if source_index == 0x18:
+                source_index = 4
+                destination_y = 0x80
+                pointer_delta += 0x200
+
+    def reference_steps(section: str, following_section: str) -> tuple[tuple[int, int], ...]:
+        rows = sprite_reference.split(f"{section}\n", 1)[1].split(
+            f"\n{following_section}\n", 1
+        )[0]
+        return tuple(
+            (int(match.group(1), 16), int(match.group(2), 16))
+            for match in re.finditer(r"^([0-9a-f]{2}) ([0-9a-f]{3})$", rows, re.MULTILINE)
+        )
+
+    expected_even_steps = reference_steps(
+        "even_object_y_destination_sequence_1426",
+        "odd_object_y_destination_sequence_143a",
+    )
+    expected_odd_steps = reference_steps(
+        "odd_object_y_destination_sequence_143a",
+        "player_start_cells_from_1735",
+    )
+    if renderer_steps(0) != expected_even_steps or renderer_steps(1) != expected_odd_steps:
+        fail("sprite renderer even/odd source walk differs from original-output reference")
+    if len(expected_even_steps) != 24 or len(expected_odd_steps) != 24:
+        fail("sprite renderer reference must contain 24 even and 24 odd writes")
+
+    digest_text = sprite_reference.split("player_start_blank_layer_digests\n", 1)[1].split(
+        "\nmovement_parity_note\n", 1
+    )[0]
+    player_digest_pattern = re.compile(
+        r"^(?P<start>[0-3]) (?P<x>[0-9a-f]{2}) (?P<y>[0-9a-f]{2}) "
+        r"(?P<direction>[0-7]) (?P<graphic0>[0-9a-f]{2}) (?P<graphic1>[0-9a-f]{2}) "
+        r"(?P<nonzero>[0-9]+) (?P<digest>[0-9a-f]{64})$",
+        re.MULTILINE,
+    )
+    expected_player_layers = {
+        int(match["start"]): match.groupdict()
+        for match in player_digest_pattern.finditer(digest_text)
+    }
+    if len(expected_player_layers) != 4:
+        fail(f"sprite reference has {len(expected_player_layers)} player layers; expected 4")
+
+    first_graphic = block(0x254F, 4)
+    second_graphic = block(0x254B, 4)
+    start_direction = block(0x2553, 4)
+
+    def draw_xor(screen: bytearray, pointer: int, object_y: int, graphic_id: int) -> None:
+        source = graphic_records[graphic_id]
+        for source_index, destination_offset in renderer_steps(object_y):
+            offset = pointer + destination_offset - 0x3000
+            if not 0 <= offset < len(screen):
+                fail(f"graphic ${graphic_id:02X}: destination outside bitmap")
+            screen[offset] ^= source[source_index]
+
+    player_layer_rows = 0
+    for start in range(4):
+        expected = expected_player_layers[start]
+        actual_fields = (
+            start_x[start],
+            start_y[start],
+            start_direction[start],
+            first_graphic[start],
+            second_graphic[start],
+        )
+        expected_fields = tuple(
+            int(expected[name], 16 if name != "direction" else 10)
+            for name in ("x", "y", "direction", "graphic0", "graphic1")
+        )
+        if actual_fields != expected_fields:
+            fail(f"player start {start}: source tables {actual_fields}, expected {expected_fields}")
+        screen = bytearray(0x5000)
+        draw_xor(screen, first_low[start] | first_high[start] << 8, start_y[start], first_graphic[start])
+        draw_xor(
+            screen,
+            second_low[start] | second_high[start] << 8,
+            start_y[start] + 2,
+            second_graphic[start],
+        )
+        actual_nonzero = sum(value != 0 for value in screen)
+        actual_digest = hashlib.sha256(screen).hexdigest()
+        if (actual_nonzero, actual_digest) != (int(expected["nonzero"]), expected["digest"]):
+            fail(
+                f"player start {start} layer: actual {(actual_nonzero, actual_digest)}, "
+                f"expected {(expected['nonzero'], expected['digest'])}"
+            )
+        player_layer_rows += 1
+
     print(
         "Validated port preflight: "
         "64 graphic pointers, "
@@ -392,7 +502,8 @@ def main() -> None:
         f"{projectile_rows} shot projections, "
         f"{movement_rows} movement projections, "
         f"{room_rows} room-render digests, "
-        f"{status_rows} status-render digests"
+        f"{status_rows} status-render digests, "
+        f"{player_layer_rows} player sprite layers"
     )
 
 

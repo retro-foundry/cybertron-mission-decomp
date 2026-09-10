@@ -22,6 +22,7 @@ $requiredFiles = @(
     'analysis/reconstruction/runtime_room_render_reference.txt'
     'analysis/reconstruction/room_render_fixture.json'
     'analysis/reconstruction/runtime_status_panel_reference.txt'
+    'analysis/reconstruction/runtime_sprite_renderer_reference.txt'
     'tools/reconstruction/render_graphic_sheet.py'
     'tools/reconstruction/validate_port_contracts.py'
     'analysis/reconstruction/composed_sprite_sheet.png'
@@ -45,6 +46,7 @@ $maintainedFiles = @(
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_room_render_reference.txt')
     (Join-Path $repoRoot 'analysis\reconstruction\room_render_fixture.json')
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_status_panel_reference.txt')
+    (Join-Path $repoRoot 'analysis\reconstruction\runtime_sprite_renderer_reference.txt')
     (Join-Path $repoRoot 'tools\reconstruction\render_graphic_sheet.py')
     (Join-Path $repoRoot 'tools\reconstruction\validate_port_contracts.py')
 )

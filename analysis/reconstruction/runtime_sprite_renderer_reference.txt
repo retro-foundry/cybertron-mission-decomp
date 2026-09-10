@@ -1,0 +1,101 @@
+runtime_sprite_renderer_reference
+Purpose: port-facing reference for the $13FB/$1404 24-byte renderer source/destination walk, plus $1735 player-start layer digests.
+Original authority: $13FB object pointer load through $233A, $1404 renderer source setup, $1426-$1464 even/odd destination loops, bootstrap-copied $0CF0/$0CF8 store vectors, and $1735 player start tables.
+Scope: this is a renderer-address/layer oracle, not a complete gameplay frame. It does not include randomized $1E3A/$243E object placement or frame-update collision side effects.
+
+store_vector_table_0cf0_from_payload_3f80
+mode low high address role
+0 65 14 1465 render_store_eor_source
+1 6a 14 146a render_store_eor_source_track_collision_bits
+2 79 14 1479 render_store_clear_byte
+3 7e 14 147e render_collision_test_and_conditional_store
+4 af 14 14af render_compare_source_to_screen
+5 a8 14 14a8 render_collision_accumulate_only
+6 00 00 0000 unused_or_unclassified_store_vector
+7 00 50 5000 unused_or_unclassified_store_vector
+
+renderer_source_formula
+$1404 patches $1434 to read from $2900 + graphic_id*$18 via $2F80/$2F40.
+The renderer consumes 24 source bytes per graphic id. Even object Y writes source bytes contiguously; odd object Y uses the split offset sequence below.
+
+even_object_y_destination_sequence_1426
+source_index dest_offset
+00 000
+01 001
+02 002
+03 003
+04 004
+05 005
+06 006
+07 007
+08 008
+09 009
+0a 00a
+0b 00b
+0c 00c
+0d 00d
+0e 00e
+0f 00f
+10 010
+11 011
+12 012
+13 013
+14 014
+15 015
+16 016
+17 017
+
+odd_object_y_destination_sequence_143a
+source_index dest_offset
+00 004
+01 005
+02 006
+03 007
+08 00c
+09 00d
+0a 00e
+0b 00f
+10 014
+11 015
+12 016
+13 017
+04 280
+05 281
+06 282
+07 283
+0c 288
+0d 289
+0e 28a
+0f 28b
+14 290
+15 291
+16 292
+17 293
+
+player_start_cells_from_1735
+start object graphic object_y pointer parity write_sequence
+0 10 08 1e 55b8 even src00->+000 src01->+001 src02->+002 src03->+003 src04->+004 src05->+005 src06->+006 src07->+007 src08->+008 src09->+009 src0a->+00a src0b->+00b src0c->+00c src0d->+00d src0e->+00e src0f->+00f src10->+010 src11->+011 src12->+012 src13->+013 src14->+014 src15->+015 src16->+016 src17->+017
+0 11 0a 20 5838 even src00->+000 src01->+001 src02->+002 src03->+003 src04->+004 src05->+005 src06->+006 src07->+007 src08->+008 src09->+009 src0a->+00a src0b->+00b src0c->+00c src0d->+00d src0e->+00e src0f->+00f src10->+010 src11->+011 src12->+012 src13->+013 src14->+014 src15->+015 src16->+016 src17->+017
+1 10 0c 1e 57a8 even src00->+000 src01->+001 src02->+002 src03->+003 src04->+004 src05->+005 src06->+006 src07->+007 src08->+008 src09->+009 src0a->+00a src0b->+00b src0c->+00c src0d->+00d src0e->+00e src0f->+00f src10->+010 src11->+011 src12->+012 src13->+013 src14->+014 src15->+015 src16->+016 src17->+017
+1 11 0e 20 5a28 even src00->+000 src01->+001 src02->+002 src03->+003 src04->+004 src05->+005 src06->+006 src07->+007 src08->+008 src09->+009 src0a->+00a src0b->+00b src0c->+00c src0d->+00d src0e->+00e src0f->+00f src10->+010 src11->+011 src12->+012 src13->+013 src14->+014 src15->+015 src16->+016 src17->+017
+2 10 04 32 6fb8 even src00->+000 src01->+001 src02->+002 src03->+003 src04->+004 src05->+005 src06->+006 src07->+007 src08->+008 src09->+009 src0a->+00a src0b->+00b src0c->+00c src0d->+00d src0e->+00e src0f->+00f src10->+010 src11->+011 src12->+012 src13->+013 src14->+014 src15->+015 src16->+016 src17->+017
+2 11 06 34 7238 even src00->+000 src01->+001 src02->+002 src03->+003 src04->+004 src05->+005 src06->+006 src07->+007 src08->+008 src09->+009 src0a->+00a src0b->+00b src0c->+00c src0d->+00d src0e->+00e src0f->+00f src10->+010 src11->+011 src12->+012 src13->+013 src14->+014 src15->+015 src16->+016 src17->+017
+3 10 00 0a 3db8 even src00->+000 src01->+001 src02->+002 src03->+003 src04->+004 src05->+005 src06->+006 src07->+007 src08->+008 src09->+009 src0a->+00a src0b->+00b src0c->+00c src0d->+00d src0e->+00e src0f->+00f src10->+010 src11->+011 src12->+012 src13->+013 src14->+014 src15->+015 src16->+016 src17->+017
+3 11 02 0c 4038 even src00->+000 src01->+001 src02->+002 src03->+003 src04->+004 src05->+005 src06->+006 src07->+007 src08->+008 src09->+009 src0a->+00a src0b->+00b src0c->+00c src0d->+00d src0e->+00e src0f->+00f src10->+010 src11->+011 src12->+012 src13->+013 src14->+014 src15->+015 src16->+016 src17->+017
+
+player_start_blank_layer_digests
+These draw the two $1735 player cells with store mode 1's EOR effect onto a blank $3000-$7FFF layer.
+start player_x player_y direction graphic0 graphic1 nonzero_bytes sha256_screen_3000_7fff
+0 07 1e 2 08 0a 36 929d548294be7be751cffa827b6f49fb0358c51096cdb61fa493f1ffc437ad59
+1 45 1e 3 0c 0e 36 d6c654a40c189409015a66a385652d33e62655237269a108e6437e8d824ff564
+2 27 32 1 04 06 38 d8ac606b0db6876006807860b04107690932d454df56cfa08d4128fc8de050de
+3 27 0a 0 00 02 40 fc6414311fa65e637390ec2ef524843921f76409df1b70141d160481b17dec23
+
+movement_parity_note
+$1735 seeds all four player starts with even Y values for both cells, but $1718/$16BE movement can later make object Y odd. Ports need both destination sequences.
+$1849-$1863 draws player objects $10/$11 with store mode 1 on phase 3 when $0082 is zero, then saves visible graphics in $008E/$008D.
+
+port_rules
+Preserve the odd-Y renderer source order and destination offsets exactly; it is not row-major over the 24-byte source record.
+Use the player-start layer digests as isolated renderer checks after validating source records and before validating full frames with room/status/object layers.
+Do not treat these layer digests as gameplay-state frames; randomized object placement and collision/update side effects are intentionally out of scope.

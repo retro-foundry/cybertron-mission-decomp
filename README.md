@@ -58,7 +58,8 @@ That digest is the byte-exact authority established by the reverse-engineering
 project, so validation requires no copyrighted original media. It also runs
 standalone port preflight contracts for graphic pointers, player animation
 selection, player starts, projectile address updates, all 256 clean room
-render variants, and all 640 room/level status-panel composites.
+render variants, all 640 room/level status-panel composites, both sprite
+destination walks, and all four isolated player-start layers.
 
 ## Layout and provenance
 
@@ -80,6 +81,9 @@ variants.
 The [status-panel oracle](analysis/reconstruction/runtime_status_panel_reference.txt)
 adds every room with every displayed level digit, plus explicit life and target
 slot placement references.
+The [sprite renderer oracle](analysis/reconstruction/runtime_sprite_renderer_reference.txt)
+records the distinct even/odd-Y write sequences and exact player-start layer
+digests.
 
 The decoded 24-byte artwork can be reviewed in the
 [composed sprite and graphic sheet](analysis/reconstruction/composed_sprite_sheet.png).
