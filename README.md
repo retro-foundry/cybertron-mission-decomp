@@ -82,6 +82,8 @@ projectile expiry input bytes.
 The assembled `$1B41` expiry routine is also replayed for all 256 pixel bytes
 in both a player-shot and a spawned-hazard slot, checking separate counters,
 deactivation, and the special spook-pause flag.
+The assembled phase-zero `$1812` erase/retire and `$1876` draw/advance passes
+are replayed for every lifecycle state, preserving their two-pass ordering.
 The actual assembled score routine is CPU-replayed across all 10,000 valid
 four-character score states, including every carry and extra-life boundary.
 

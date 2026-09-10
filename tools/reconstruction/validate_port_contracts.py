@@ -1030,6 +1030,67 @@ def main() -> None:
             fail(f"lifecycle state ${state_before:02X}: {actual}, expected {expected_states[state_before]}")
         lifecycle_rows += 1
 
+    lifecycle_cpu_replays = 0
+    for state_before in range(6):
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        render_slot = 0x14
+        memory[0x0C53 + render_slot] = state_before
+        memory[0x2F00 + render_slot] = {
+            0: 0x2A,
+            1: 0x2A,
+            2: 0x2A,
+            3: 0x3A,
+            4: 0x3B,
+            5: 0x3C,
+        }[state_before]
+        draw_calls = []
+
+        def lifecycle_draw_handler(cpu: Replay6502, target: int) -> bool:
+            if target == 0x13FB:
+                draw_calls.append(
+                    (cpu.x, cpu.memory[0x0031], cpu.memory[0x2F00 + cpu.x])
+                )
+                return True
+            return False
+
+        cpu = Replay6502(memory, lifecycle_draw_handler)
+        cpu.run_subroutine(0x1812, stop_addresses=(0x1837,))
+        state_after_erase, expected_graphic, state_after_draw = expected_states[state_before]
+        expected_calls = []
+        if state_before >= 2:
+            expected_calls.append((render_slot, 0, memory[0x2F00 + render_slot]))
+        if memory[0x0C53 + render_slot] != state_after_erase:
+            fail(f"lifecycle CPU erase state ${state_before:02X} differs")
+
+        calls_after_erase = len(draw_calls)
+        cpu.run_subroutine(0x1876, stop_addresses=(0x189C,))
+        if expected_graphic is not None:
+            expected_calls.append((render_slot, 0, expected_graphic))
+        actual = (
+            memory[0x0C53 + render_slot],
+            memory[0x2F00 + render_slot],
+            draw_calls,
+        )
+        expected_final_graphic = (
+            expected_graphic
+            if expected_graphic is not None
+            else {
+                0: 0x2A,
+                1: 0x2A,
+                2: 0x2A,
+                3: 0x3A,
+                4: 0x3B,
+                5: 0x3C,
+            }[state_before]
+        )
+        expected = (state_after_draw, expected_final_graphic, expected_calls)
+        if actual != expected:
+            fail(f"lifecycle CPU state ${state_before:02X}: {actual}, expected {expected}")
+        if calls_after_erase != (1 if state_before >= 2 else 0):
+            fail(f"lifecycle CPU state ${state_before:02X}: erase draw count differs")
+        lifecycle_cpu_replays += 1
+
     # $1B41 recognizes four masked screen-byte classes. Exhaust all byte
     # values so ports cannot accidentally compare unmasked pixels or merge the
     # special $A0 spook-pause outcome with ordinary expiry.
@@ -1176,6 +1237,7 @@ def main() -> None:
         f"{setup_rows} deterministic setup frames, "
         f"{len(window_roles)} object-slot roles, "
         f"{lifecycle_rows} lifecycle states, "
+        f"{lifecycle_cpu_replays} lifecycle CPU replays, "
         f"{expiry_rows} projectile expiry bytes, "
         f"{projectile_expiry_cpu_replays} projectile expiry CPU replays, "
         f"{score_replays} score CPU replays"

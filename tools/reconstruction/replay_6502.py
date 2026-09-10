@@ -46,10 +46,14 @@ class Replay6502:
                 displacement -= 0x100
             self.pc = (self.pc + displacement) & 0xFFFF
 
-    def run_subroutine(self, address: int, max_steps: int = 100000) -> int:
+    def run_subroutine(
+        self, address: int, max_steps: int = 100000, stop_addresses=()
+    ) -> int:
         self.pc = address
         return_stack = []
         for steps in range(1, max_steps + 1):
+            if self.pc in stop_addresses and not return_stack:
+                return steps - 1
             opcode_address = self.pc
             opcode = self._fetch()
             if opcode == 0x60:  # RTS
