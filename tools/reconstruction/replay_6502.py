@@ -115,6 +115,8 @@ class Replay6502:
                 self.y = self._flags(self._fetch())
             elif opcode == 0xAA:  # TAX
                 self.x = self._flags(self.a)
+            elif opcode == 0xA8:  # TAY
+                self.y = self._flags(self.a)
             elif opcode == 0x8A:  # TXA
                 self.a = self._flags(self.x)
             elif opcode == 0x29:  # AND #imm

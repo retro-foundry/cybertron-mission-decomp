@@ -122,6 +122,79 @@ def main() -> None:
                 )
             projectile_pointer_cpu_replays += 1
 
+    # Replay $1C4D allocation for every direction in each legal first-free
+    # player-shot slot. The two refusal edges prove that no-fire is inert while
+    # a capacity rejection still consumes the fire request before returning.
+    shot_spawn_cpu_replays = 0
+    for start in range(4):
+        for direction in range(8):
+            for free_slot in range(4):
+                memory = bytearray(0x10000)
+                memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+                memory[0x003E] = 1
+                memory[0x0042] = free_slot
+                memory[0x0035] = direction
+                memory[0x0A10] = start_x[start]
+                memory[0x0A50] = start_y[start]
+                memory[0x0C4E:0x0C56] = bytes(
+                    0 if slot < free_slot else 0xFF for slot in range(8)
+                )
+                sound_calls = []
+
+                def shot_spawn_handler(cpu: Replay6502, target: int) -> bool:
+                    if target == 0x21EA:
+                        sound_calls.append(cpu.a)
+                        return True
+                    return False
+
+                cpu = Replay6502(memory, shot_spawn_handler)
+                cpu.run_subroutine(0x1C4D)
+                expected_x = (start_x[start] + shot_x_offsets[direction]) & 0xFF
+                expected_y = (start_y[start] + shot_y_offsets[direction]) & 0xFF
+                expected_pointer = projectile_pointer(expected_x, expected_y)
+                actual_pointer = (
+                    memory[0x0C1E + free_slot] | memory[0x0C26 + free_slot] << 8
+                )
+                actual = (
+                    memory[0x003E],
+                    memory[0x0042],
+                    memory[0x0C4E + free_slot],
+                    memory[0x0C56 + free_slot],
+                    memory[0x0C3E + free_slot],
+                    memory[0x0C46 + free_slot],
+                    actual_pointer,
+                    sound_calls,
+                )
+                expected = (0, free_slot + 1, direction, 0, expected_x, expected_y, expected_pointer, [0])
+                if actual != expected:
+                    fail(
+                        f"shot spawn start {start} direction {direction} slot {free_slot}: "
+                        f"{actual}, expected {expected}"
+                    )
+                shot_spawn_cpu_replays += 1
+
+    for fire, count in ((0, 0), (1, 4)):
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        memory[0x003E] = fire
+        memory[0x0042] = count
+        memory[0x0C4E:0x0C56] = bytes((0x55,) * 8)
+        before = bytes(memory[0x003E:0x0043]), bytes(memory[0x0C1E:0x0C5E])
+        cpu = Replay6502(memory, lambda cpu, target: False)
+        cpu.run_subroutine(0x1C4D)
+        after = bytes(memory[0x003E:0x0043]), bytes(memory[0x0C1E:0x0C5E])
+        expected_after = before
+        if fire and count == 4:
+            expected_control = bytearray(before[0])
+            expected_control[0] = 0
+            expected_after = bytes(expected_control), before[1]
+        if after != expected_after:
+            fail(
+                f"shot refusal edge fire={fire} count={count}: "
+                f"{after}, expected {expected_after}"
+            )
+        shot_spawn_cpu_replays += 1
+
     # $1B87 movement deltas must reproduce $1BFC for both even and odd Y.
     delta_y = tuple(value if value < 0x80 else value - 0x100 for value in block(0x2798, 8))
     delta_x = tuple(value if value < 0x80 else value - 0x100 for value in block(0x27A0, 8))
@@ -1050,6 +1123,7 @@ def main() -> None:
         "4 player starts, "
         f"{projectile_rows} shot projections, "
         f"{projectile_pointer_cpu_replays} shot-pointer CPU replays, "
+        f"{shot_spawn_cpu_replays} shot-spawn CPU replays, "
         f"{movement_rows} movement projections, "
         f"{movement_cpu_replays} movement CPU replays, "
         f"{keyboard_rows} keyboard masks, "

@@ -71,6 +71,11 @@ All 32 representative direction/parity projectile movements also execute the
 assembled `$1B87` pointer-update routine and compare every mutated slot field.
 The 32 player-start/direction shot positions execute `$1BFC` and its real
 nested pointer helpers to verify the computed bitmap address.
+The assembled `$1C4D` allocator is replayed through 128 admitted combinations
+and both refusal edges, checking slot choice, counters, offsets, visibility,
+pointer calculation, fire consumption, and sound dispatch.
+The capacity-rejection case deliberately checks the original ordering in which
+the fire edge is consumed before the four-shot limit returns.
 Object validation covers every setup-count row, all 41 render slots in the
 overlapping lifecycle windows, all six hit-animation states, and all 256
 projectile expiry input bytes.
