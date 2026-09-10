@@ -117,6 +117,23 @@ if ($assemblyText -match '(?im)^\s*\.addr_[0-9A-F]+\s*$') {
 if ($assemblyText -match '(?im)^\s*\.(?:byte_decoded|unclassified)_[A-Za-z0-9_]+\s*$') {
     throw 'Generic decoded/unclassified labels are not permitted in cyber1.asm; document the proven source role.'
 }
+if ($assemblyText -match '(?im)^\s*\.graphic_record_[0-9A-F]+\s*$') {
+    throw 'Numeric graphic-record labels are not permitted; name the proved artwork or runtime role.'
+}
+$graphicIdMatches = [regex]::Matches($assemblyText, '(?im)^\s*; graphic_id \$(?<id>[0-9A-F]{2})\s*$')
+if ($graphicIdMatches.Count -ne 64) {
+    throw "cyber1.asm must annotate exactly 64 graphic records with consecutive graphic_id comments; found $($graphicIdMatches.Count)."
+}
+for ($graphicIdIndex = 0; $graphicIdIndex -lt 64; $graphicIdIndex++) {
+    $actualGraphicId = [Convert]::ToInt32($graphicIdMatches[$graphicIdIndex].Groups['id'].Value, 16)
+    if ($actualGraphicId -ne $graphicIdIndex) {
+        throw ('Graphic ID annotation {0} is ${1:X2}; expected ${0:X2}.' -f $graphicIdIndex, $actualGraphicId)
+    }
+}
+$graphicUsageCount = [regex]::Matches($assemblyText, '(?im)^\s*; graphic_usage status=').Count
+if ($graphicUsageCount -ne 64) {
+    throw "Every graphic record must carry a graphic_usage evidence annotation; found $graphicUsageCount of 64."
+}
 if (($assemblyText + "`n" + $memoryMapText) -match '(?i)\b(?:zp_)?scratch[A-Za-z0-9_]*\b') {
     throw 'Generic scratch names are not permitted; use a contextual alias for each bounded lifetime.'
 }

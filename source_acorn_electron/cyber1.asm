@@ -4106,7 +4106,8 @@ org runtime_start
 ; a stronger identity. Graphic IDs select these records through the tables at
 ; graphic_record_high_pointer_table_1404 and graphic_record_low_pointer_table_1404.
 
-.graphic_record_00
+.player_down_upper_graphic
+    ; graphic_id $00
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame; $254F/$254B $1735 start index 3
@@ -4115,7 +4116,8 @@ org runtime_start
     EQUB &33,&0F,&0F,&0F,&0F,&0C,&0C,&03
     EQUB &00,&22,&0A,&0A,&00,&18,&18,&30
 
-.graphic_record_01
+.player_down_lower_frame_1
+    ; graphic_id $01
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame
@@ -4124,7 +4126,8 @@ org runtime_start
     EQUB &03,&03,&03,&03,&00,&00,&00,&00
     EQUB &20,&08,&08,&08,&08,&08,&0C,&0C
 
-.graphic_record_02
+.player_down_lower_frame_2
+    ; graphic_id $02
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame; $254B $1735 start index 3 and stationary dir0
@@ -4133,7 +4136,8 @@ org runtime_start
     EQUB &03,&03,&03,&03,&00,&00,&00,&00
     EQUB &20,&08,&08,&08,&08,&08,&0C,&0C
 
-.graphic_record_03
+.player_down_lower_initial_frame_3
+    ; graphic_id $03
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame
@@ -4142,7 +4146,8 @@ org runtime_start
     EQUB &03,&03,&03,&03,&00,&00,&00,&00
     EQUB &20,&08,&0C,&0C,&00,&00,&00,&3C
 
-.graphic_record_04
+.player_up_upper_graphic
+    ; graphic_id $04
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame; $254F $1735 start index 2
@@ -4151,7 +4156,8 @@ org runtime_start
     EQUB &33,&33,&33,&0F,&0F,&0C,&0C,&0C
     EQUB &00,&22,&22,&0A,&00,&18,&18,&18
 
-.graphic_record_05
+.player_up_lower_frame_1
+    ; graphic_id $05
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame
@@ -4160,7 +4166,8 @@ org runtime_start
     EQUB &0C,&0C,&00,&00,&00,&00,&00,&00
     EQUB &08,&08,&08,&08,&08,&08,&0C,&0C
 
-.graphic_record_06
+.player_up_lower_frame_2
+    ; graphic_id $06
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame; $254B $1735 start index 2 and stationary dir1
@@ -4169,7 +4176,8 @@ org runtime_start
     EQUB &0C,&0C,&00,&00,&00,&00,&00,&00
     EQUB &08,&08,&08,&08,&08,&08,&0C,&0C
 
-.graphic_record_07
+.player_up_lower_frame_3_unselected
+    ; graphic_id $07
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame
@@ -4178,7 +4186,8 @@ org runtime_start
     EQUB &0C,&0C,&00,&00,&00,&00,&00,&00
     EQUB &08,&08,&0C,&0C,&00,&00,&00,&3C
 
-.graphic_record_08
+.player_right_upper_graphic
+    ; graphic_id $08
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame; $254F $1735 start index 0
@@ -4187,7 +4196,8 @@ org runtime_start
     EQUB &22,&0F,&0F,&0F,&0A,&08,&0C,&0C
     EQUB &00,&00,&3C,&00,&00,&00,&00,&00
 
-.graphic_record_09
+.player_right_lower_frame_1
+    ; graphic_id $09
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame
@@ -4196,7 +4206,8 @@ org runtime_start
     EQUB &21,&21,&08,&0C,&0C,&04,&04,&04
     EQUB &03,&03,&00,&00,&00,&00,&08,&08
 
-.graphic_record_0a
+.player_right_lower_frame_2
+    ; graphic_id $0A
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame; $254B $1735 start index 0 and stationary dir2
@@ -4205,7 +4216,8 @@ org runtime_start
     EQUB &21,&21,&08,&08,&08,&08,&0C,&0C
     EQUB &03,&03,&00,&00,&00,&00,&00,&3C
 
-.graphic_record_0b
+.player_right_lower_frame_3_unselected
+    ; graphic_id $0B
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame
@@ -4214,7 +4226,8 @@ org runtime_start
     EQUB &21,&21,&08,&0C,&0C,&04,&04,&00
     EQUB &03,&03,&00,&00,&00,&08,&08,&00
 
-.graphic_record_0c
+.player_left_upper_graphic
+    ; graphic_id $0C
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame; $254F $1735 start index 1
@@ -4223,7 +4236,8 @@ org runtime_start
     EQUB &11,&0F,&0F,&0F,&05,&04,&0C,&0C
     EQUB &22,&1B,&1B,&0F,&0A,&20,&18,&18
 
-.graphic_record_0d
+.player_left_lower_frame_1
+    ; graphic_id $0D
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame
@@ -4232,7 +4246,8 @@ org runtime_start
     EQUB &12,&12,&04,&0C,&0C,&08,&08,&08
     EQUB &30,&30,&08,&08,&08,&0C,&0C,&00
 
-.graphic_record_0e
+.player_left_lower_frame_2
+    ; graphic_id $0E
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame; $254B $1735 start index 1 and stationary dir3
@@ -4241,7 +4256,8 @@ org runtime_start
     EQUB &12,&12,&04,&04,&04,&04,&0C,&0C
     EQUB &30,&30,&08,&08,&08,&08,&08,&08
 
-.graphic_record_0f
+.player_left_lower_frame_3_unselected
+    ; graphic_id $0F
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame
@@ -4250,7 +4266,8 @@ org runtime_start
     EQUB &12,&12,&04,&0C,&0C,&08,&08,&00
     EQUB &30,&30,&08,&08,&08,&08,&0C,&0C
 
-.graphic_record_10
+.player_up_right_upper_graphic
+    ; graphic_id $10
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
@@ -4259,7 +4276,8 @@ org runtime_start
     EQUB &22,&0F,&0F,&0F,&0A,&08,&21,&21
     EQUB &00,&00,&3C,&00,&01,&03,&02,&00
 
-.graphic_record_11
+.player_up_right_lower_frame_1
+    ; graphic_id $11
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
@@ -4268,7 +4286,8 @@ org runtime_start
     EQUB &0C,&0C,&08,&0C,&0C,&04,&04,&04
     EQUB &00,&00,&00,&00,&00,&00,&08,&08
 
-.graphic_record_12
+.player_up_right_lower_frame_2
+    ; graphic_id $12
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
@@ -4277,7 +4296,8 @@ org runtime_start
     EQUB &0C,&0C,&08,&08,&08,&08,&0C,&0C
     EQUB &00,&00,&00,&00,&00,&00,&00,&3C
 
-.graphic_record_13
+.player_up_right_lower_frame_3_unselected
+    ; graphic_id $13
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and retained initial lower frame
@@ -4286,7 +4306,8 @@ org runtime_start
     EQUB &0C,&0C,&08,&0C,&0C,&04,&04,&00
     EQUB &00,&00,&00,&00,&00,&08,&08,&00
 
-.graphic_record_14
+.player_down_right_upper_graphic
+    ; graphic_id $14
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
@@ -4295,7 +4316,8 @@ org runtime_start
     EQUB &22,&0F,&0F,&0F,&0A,&08,&0C,&0C
     EQUB &00,&00,&3C,&00,&00,&00,&00,&00
 
-.graphic_record_15
+.player_down_right_lower_frame_1
+    ; graphic_id $15
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
@@ -4304,7 +4326,8 @@ org runtime_start
     EQUB &21,&21,&08,&0C,&0C,&04,&04,&04
     EQUB &00,&02,&03,&01,&00,&00,&08,&08
 
-.graphic_record_16
+.player_down_right_lower_frame_2
+    ; graphic_id $16
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
@@ -4313,7 +4336,8 @@ org runtime_start
     EQUB &21,&21,&08,&08,&08,&08,&0C,&0C
     EQUB &00,&02,&03,&01,&00,&00,&00,&3C
 
-.graphic_record_17
+.player_down_right_lower_frame_3_unselected
+    ; graphic_id $17
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=structural role=player_direction_frame_family sources=family-aligned fourth record; no active selector proved
@@ -4322,7 +4346,8 @@ org runtime_start
     EQUB &21,&21,&08,&0C,&0C,&04,&04,&00
     EQUB &00,&02,&03,&01,&00,&08,&08,&00
 
-.graphic_record_18
+.player_up_left_upper_graphic
+    ; graphic_id $18
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
@@ -4331,7 +4356,8 @@ org runtime_start
     EQUB &11,&0F,&0F,&0F,&05,&04,&12,&12
     EQUB &22,&1B,&1B,&0F,&0A,&20,&18,&30
 
-.graphic_record_19
+.player_up_left_lower_frame_1
+    ; graphic_id $19
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
@@ -4340,7 +4366,8 @@ org runtime_start
     EQUB &0C,&0C,&04,&0C,&0C,&08,&08,&08
     EQUB &30,&08,&08,&08,&08,&0C,&0C,&00
 
-.graphic_record_1a
+.player_up_left_lower_frame_2
+    ; graphic_id $1A
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
@@ -4349,7 +4376,8 @@ org runtime_start
     EQUB &0C,&0C,&04,&04,&04,&04,&0C,&0C
     EQUB &30,&08,&08,&08,&08,&08,&08,&08
 
-.graphic_record_1b
+.player_up_left_lower_frame_3_unselected
+    ; graphic_id $1B
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=structural role=player_direction_frame_family sources=family-aligned fourth record; no active selector proved
@@ -4358,7 +4386,8 @@ org runtime_start
     EQUB &0C,&0C,&04,&0C,&0C,&08,&08,&00
     EQUB &30,&08,&08,&08,&08,&08,&0C,&0C
 
-.graphic_record_1c
+.player_down_left_upper_graphic
+    ; graphic_id $1C
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
@@ -4367,7 +4396,8 @@ org runtime_start
     EQUB &11,&0F,&0F,&0F,&05,&04,&0C,&0C
     EQUB &22,&1B,&1B,&0F,&0A,&20,&18,&30
 
-.graphic_record_1d
+.player_down_left_lower_frame_1
+    ; graphic_id $1D
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
@@ -4376,7 +4406,8 @@ org runtime_start
     EQUB &12,&12,&04,&0C,&0C,&08,&08,&08
     EQUB &30,&08,&08,&08,&08,&0C,&0C,&00
 
-.graphic_record_1e
+.player_down_left_lower_frame_2
+    ; graphic_id $1E
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
@@ -4385,7 +4416,8 @@ org runtime_start
     EQUB &12,&12,&04,&04,&04,&04,&0C,&0C
     EQUB &30,&08,&08,&08,&08,&08,&08,&08
 
-.graphic_record_1f
+.player_down_left_lower_frame_3_unselected
+    ; graphic_id $1F
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=structural role=player_direction_frame_family sources=family-aligned fourth record; no active selector proved
@@ -4394,7 +4426,8 @@ org runtime_start
     EQUB &12,&12,&04,&0C,&0C,&08,&08,&00
     EQUB &30,&08,&08,&08,&08,&08,&0C,&0C
 
-.graphic_record_20
+.status_digit_0_and_letter_o_graphic
+    ; graphic_id $20
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits; $1CAB fixed status blank/space and $2319 trailing glyph
@@ -4403,7 +4436,8 @@ org runtime_start
     EQUB &3F,&00,&00,&00,&15,&15,&15,&3F
     EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A
 
-.graphic_record_21
+.status_digit_1_graphic
+    ; graphic_id $21
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits
@@ -4412,7 +4446,8 @@ org runtime_start
     EQUB &15,&15,&15,&15,&3F,&3F,&3F,&3F
     EQUB &00,&00,&00,&00,&00,&00,&00,&00
 
-.graphic_record_22
+.status_digit_2_graphic
+    ; graphic_id $22
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits
@@ -4421,7 +4456,8 @@ org runtime_start
     EQUB &3F,&00,&00,&3F,&00,&00,&3F,&3F
     EQUB &2A,&2A,&2A,&2A,&00,&00,&2A,&2A
 
-.graphic_record_23
+.status_digit_3_graphic
+    ; graphic_id $23
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits
@@ -4430,7 +4466,8 @@ org runtime_start
     EQUB &3F,&00,&00,&3F,&15,&15,&3F,&3F
     EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A
 
-.graphic_record_24
+.status_digit_4_graphic
+    ; graphic_id $24
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits
@@ -4439,7 +4476,8 @@ org runtime_start
     EQUB &00,&00,&3F,&3F,&3F,&3F,&3F,&3F
     EQUB &00,&00,&00,&00,&2A,&00,&00,&00
 
-.graphic_record_25
+.status_digit_5_and_letter_s_graphic
+    ; graphic_id $25
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits; $1CAB fixed status-panel glyph
@@ -4448,7 +4486,8 @@ org runtime_start
     EQUB &3F,&00,&00,&3F,&15,&15,&3F,&3F
     EQUB &2A,&00,&00,&2A,&2A,&2A,&2A,&2A
 
-.graphic_record_26
+.status_digit_6_graphic
+    ; graphic_id $26
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits
@@ -4457,7 +4496,8 @@ org runtime_start
     EQUB &3F,&00,&00,&3F,&00,&00,&3F,&3F
     EQUB &2A,&00,&00,&2A,&2A,&2A,&2A,&2A
 
-.graphic_record_27
+.status_digit_7_graphic
+    ; graphic_id $27
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits
@@ -4466,7 +4506,8 @@ org runtime_start
     EQUB &3F,&00,&00,&00,&15,&15,&15,&15
     EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A
 
-.graphic_record_28
+.status_digit_8_graphic
+    ; graphic_id $28
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits
@@ -4475,7 +4516,8 @@ org runtime_start
     EQUB &3F,&00,&00,&3F,&00,&00,&3F,&3F
     EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A
 
-.graphic_record_29
+.status_digit_9_graphic
+    ; graphic_id $29
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits
@@ -4484,7 +4526,8 @@ org runtime_start
     EQUB &3F,&00,&00,&3F,&15,&15,&15,&15
     EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A
 
-.graphic_record_2a
+.spinner_graphic
+    ; graphic_id $2A
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role SPINNER
     ; graphic_usage status=assigned role=legend_and_enemy_SPINNER sources=$2557 legend table and $1E3A spinner placement
@@ -4493,7 +4536,8 @@ org runtime_start
     EQUB &FC,&A8,&0C,&0C,&0C,&0C,&54,&FC
     EQUB &FF,&F3,&51,&FC,&54,&FF,&55,&F3
 
-.graphic_record_2b
+.clone_graphic
+    ; graphic_id $2B
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role CLONE
     ; graphic_usage status=assigned role=legend_and_enemy_CLONE sources=$2557 legend table and $1E3A clone placement
@@ -4502,7 +4546,8 @@ org runtime_start
     EQUB &30,&30,&30,&FB,&FB,&30,&30,&30
     EQUB &00,&20,&30,&FD,&FD,&30,&20,&00
 
-.graphic_record_2c
+.cyberdroid_graphic
+    ; graphic_id $2C
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role CYBERDROID
     ; graphic_usage status=assigned role=legend_and_enemy_CYBERDROID sources=$2557 legend table and $1E3A cyberdroid placement
@@ -4511,7 +4556,8 @@ org runtime_start
     EQUB &CC,&0F,&0F,&30,&0F,&33,&30,&33
     EQUB &00,&0A,&71,&74,&55,&22,&31,&22
 
-.graphic_record_2d
+.bonus_target_and_room_fill_probe_graphic
+    ; graphic_id $2D
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role bonus_target_status_and_room_fill_probe
     ; graphic_usage status=assigned role=bonus_target_status_and_room_fill_probe sources=$2F36 target/status slot 6 and $1EC8/$1F19 room fill probes
@@ -4520,7 +4566,8 @@ org runtime_start
     EQUB &00,&00,&AA,&54,&AA,&54,&F7,&CF
     EQUB &CF,&8A,&8A,&45,&45,&E7,&45,&8A
 
-.graphic_record_2e
+.spook_first_cell_graphic
+    ; graphic_id $2E
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role SPOOK_first_cell
     ; graphic_usage status=assigned role=legend_and_spook_pair sources=$1175 SPOOK immediate and $1E3A spook first cell
@@ -4529,7 +4576,8 @@ org runtime_start
     EQUB &50,&F0,&F0,&50,&50,&F0,&F0,&F0
     EQUB &00,&A0,&F0,&50,&50,&F0,&F0,&F0
 
-.graphic_record_2f
+.spook_second_cell_graphic
+    ; graphic_id $2F
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role SPOOK_second_cell
     ; graphic_usage status=assigned role=legend_and_spook_pair sources=$1175 SPOOK immediate and $1E3A spook second cell
@@ -4538,7 +4586,8 @@ org runtime_start
     EQUB &F0,&F0,&F0,&A0,&A0,&00,&00,&00
     EQUB &50,&00,&00,&00,&00,&00,&00,&00
 
-.graphic_record_30
+.player_collision_flash_first_cell_graphic
+    ; graphic_id $30
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_collision_flash
     ; graphic_usage status=assigned role=player_collision_flash sources=$19F3 player collision flash first cell
@@ -4547,7 +4596,8 @@ org runtime_start
     EQUB &3F,&00,&00,&3F,&00,&3F,&00,&3F
     EQUB &00,&2A,&2A,&2A,&00,&3F,&00,&15
 
-.graphic_record_31
+.player_collision_flash_second_cell_graphic
+    ; graphic_id $31
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_collision_flash
     ; graphic_usage status=assigned role=player_collision_flash sources=$19F3 player collision flash second cell
@@ -4556,7 +4606,8 @@ org runtime_start
     EQUB &00,&3F,&00,&3F,&00,&00,&00,&00
     EQUB &15,&00,&00,&2A,&00,&2A,&2A,&3F
 
-.graphic_record_32
+.pot_of_gold_graphic
+    ; graphic_id $32
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role POT_OF_GOLD
     ; graphic_usage status=assigned role=legend_and_required_target_POT_OF_GOLD sources=$2557 legend table, $2700 level intro, and $2F36 target/status table
@@ -4565,7 +4616,8 @@ org runtime_start
     EQUB &00,&CF,&CF,&CF,&CF,&CF,&CF,&CF
     EQUB &00,&8A,&00,&8A,&CF,&CF,&8A,&00
 
-.graphic_record_33
+.player_life_loss_first_cell_graphic
+    ; graphic_id $33
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_life_loss_reset
     ; graphic_usage status=assigned role=player_life_loss_reset sources=$1A59 player life-loss reset first cell
@@ -4574,7 +4626,8 @@ org runtime_start
     EQUB &00,&00,&00,&00,&0A,&0A,&1A,&1A
     EQUB &00,&00,&00,&00,&01,&09,&30,&30
 
-.graphic_record_34
+.player_life_loss_second_cell_graphic
+    ; graphic_id $34
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_life_loss_reset
     ; graphic_usage status=assigned role=player_life_loss_reset sources=$1A59 player life-loss reset second cell
@@ -4583,7 +4636,8 @@ org runtime_start
     EQUB &00,&00,&00,&00,&00,&00,&0C,&0C
     EQUB &00,&00,&00,&00,&04,&04,&0C,&0C
 
-.graphic_record_35
+.status_letter_c_graphic
+    ; graphic_id $35
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role static_status_panel_glyph
     ; graphic_usage status=assigned role=static_status_panel_glyph sources=$1CAB fixed status-panel glyph
@@ -4592,7 +4646,8 @@ org runtime_start
     EQUB &3F,&00,&00,&00,&00,&00,&00,&3F
     EQUB &2A,&00,&00,&00,&00,&00,&00,&2A
 
-.graphic_record_36
+.status_letter_r_graphic
+    ; graphic_id $36
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role static_status_panel_glyph
     ; graphic_usage status=assigned role=static_status_panel_glyph sources=$1CAB fixed status-panel glyph and $2F36 target table
@@ -4601,7 +4656,8 @@ org runtime_start
     EQUB &3F,&15,&15,&15,&3F,&00,&00,&00
     EQUB &00,&00,&00,&2A,&2A,&2A,&2A,&2A
 
-.graphic_record_37
+.status_letter_e_graphic
+    ; graphic_id $37
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role static_status_panel_glyph
     ; graphic_usage status=assigned role=static_status_panel_glyph sources=$1CAB fixed status-panel glyph and $2F36 target table
@@ -4610,7 +4666,8 @@ org runtime_start
     EQUB &3F,&00,&00,&3F,&00,&00,&3F,&3F
     EQUB &2A,&00,&00,&2A,&00,&00,&2A,&2A
 
-.graphic_record_38
+.status_letter_m_graphic
+    ; graphic_id $38
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role static_status_panel_glyph
     ; graphic_usage status=assigned role=static_status_panel_glyph sources=$1CAB fixed status-panel glyph and $2F36 target table
@@ -4619,7 +4676,8 @@ org runtime_start
     EQUB &3F,&15,&15,&00,&00,&00,&00,&00
     EQUB &3F,&15,&15,&15,&3F,&3F,&3F,&3F
 
-.graphic_record_39
+.life_status_marker_graphic
+    ; graphic_id $39
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role lives_status_marker
     ; graphic_usage status=assigned role=lives_status_marker sources=$2345 lives/status marker
@@ -4628,7 +4686,8 @@ org runtime_start
     EQUB &0A,&0A,&00,&21,&00,&00,&00,&08
     EQUB &00,&00,&00,&00,&00,&00,&00,&00
 
-.graphic_record_3a
+.object_hit_animation_frame_2_graphic
+    ; graphic_id $3A
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role object_hit_animation_frame
     ; graphic_usage status=assigned role=object_hit_animation_frame sources=$1876 object hit animation state 2
@@ -4637,7 +4696,8 @@ org runtime_start
     EQUB &00,&05,&02,&07,&0B,&05,&00,&00
     EQUB &00,&2A,&00,&2A,&00,&2A,&00,&00
 
-.graphic_record_3b
+.object_hit_animation_frame_3_graphic
+    ; graphic_id $3B
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role object_hit_animation_frame
     ; graphic_usage status=assigned role=object_hit_animation_frame sources=$1876 object hit animation state 3
@@ -4646,7 +4706,8 @@ org runtime_start
     EQUB &05,&02,&03,&03,&03,&0F,&05,&2A
     EQUB &1F,&2A,&00,&1F,&0A,&02,&00,&1F
 
-.graphic_record_3c
+.object_hit_animation_frame_4_graphic
+    ; graphic_id $3C
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role object_hit_animation_frame
     ; graphic_usage status=assigned role=object_hit_animation_frame sources=$1876 object hit animation state 4
@@ -4655,7 +4716,8 @@ org runtime_start
     EQUB &15,&00,&00,&00,&00,&00,&15,&2A
     EQUB &00,&2A,&15,&00,&2A,&15,&2A,&00
 
-.graphic_record_3d
+.safe_graphic
+    ; graphic_id $3D
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role SAFE
     ; graphic_usage status=assigned role=legend_and_target_SAFE sources=$2557 legend table and $2F36 target/status slot 0
@@ -4664,7 +4726,8 @@ org runtime_start
     EQUB &CF,&00,&00,&45,&00,&00,&00,&CF
     EQUB &CF,&45,&45,&45,&45,&45,&45,&CF
 
-.graphic_record_3e
+.ring_graphic
+    ; graphic_id $3E
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role RING
     ; graphic_usage status=assigned role=legend_and_required_target_RING sources=$2557 legend table, $2700 level intro, and $2F36 target/status table
@@ -4673,7 +4736,8 @@ org runtime_start
     EQUB &CF,&CF,&00,&00,&00,&00,&CF,&00
     EQUB &00,&00,&8A,&45,&45,&45,&8A,&00
 
-.graphic_record_3f
+.key_graphic
+    ; graphic_id $3F
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role KEY
     ; graphic_usage status=assigned role=legend_and_required_target_KEY sources=$2557 legend table, $2700 level intro, and $2F36 target/status table

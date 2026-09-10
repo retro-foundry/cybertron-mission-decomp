@@ -51,23 +51,28 @@ def colour(value: int, packed_pixel: int) -> tuple[int, int, int]:
 
 
 def read_records(source: str) -> list[tuple[int, str, list[int]]]:
-    start = source.index(".graphic_record_00")
+    start = source.index(".player_down_upper_graphic")
     end = source.index(".object_graphic_id_by_index", start)
     block = source[start:end]
     records = []
-    pattern = r"(?ms)^\.graphic_record_([0-9a-f]{2})\s*$\n(.*?)(?=^\.graphic_record_|\Z)"
+    pattern = (
+        r"(?ms)^\.([a-z][a-z0-9_]*)\s*$\n"
+        r"(?=\s*; 24-byte renderer graphic record)(.*?)"
+        r"(?=^\.[a-z][a-z0-9_]*\s*$|\Z)"
+    )
     for record_match in re.finditer(pattern, block):
-        record_id = int(record_match.group(1), 16)
+        record_id = len(records)
+        source_label = record_match.group(1)
         body = record_match.group(2)
         data_lines = "\n".join(line for line in body.splitlines() if "EQUB" in line)
         values = [int(value, 16) for value in re.findall(r"&([0-9A-Fa-f]{2})", data_lines)]
         if len(values) != RECORD_SIZE:
-            raise ValueError(f"graphic_record_{record_id:02x} has {len(values)} bytes")
+            raise ValueError(f"{source_label} (graphic ${record_id:02X}) has {len(values)} bytes")
         role_match = re.search(r"(?m)^\s*; graphic_role (.+)$", body)
         role = role_match.group(1).strip() if role_match else "identity_not_proven"
         records.append((record_id, role, values))
-    if [record_id for record_id, _role, _values in records] != list(range(64)):
-        raise ValueError("expected consecutive graphic records 00-3f")
+    if len(records) != 64:
+        raise ValueError(f"expected 64 consecutive graphic records, found {len(records)}")
     return records
 
 
