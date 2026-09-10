@@ -21,6 +21,7 @@ OBJECT_SLOT_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_object_s
 PROJECTILE_LIFECYCLE_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_projectile_lifecycle.txt"
 SCORE_STATUS_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_score_status_contract.txt"
 ACTIVE_FRAME_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_active_frame_edge_contract.txt"
+SOUND_DISPATCH_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_sound_dispatch_audit.txt"
 LOAD_ADDRESS = 0x0D80
 
 
@@ -1216,6 +1217,45 @@ def main() -> None:
             )
         score_replays += 1
 
+    # Replay $21EA for every loader sound-table row with sound enabled and
+    # disabled. The runtime owns gating and the OSWORD-7 pointer calculation;
+    # the loader-owned eight-byte sound blocks remain documented separately.
+    sound_reference = SOUND_DISPATCH_REFERENCE.read_text(encoding="ascii")
+    sound_rows = {
+        int(match.group(1)): bytes.fromhex(match.group(2).replace("_", ""))
+        for match in re.finditer(
+            r"^([0-9]{2}) ([0-9a-f_]{23}) channel=",
+            sound_reference,
+            re.MULTILINE,
+        )
+    }
+    if len(sound_rows) != 22 or set(sound_rows) != set(range(22)):
+        fail(f"sound dispatch reference has ids {sorted(sound_rows)}; expected 0-21")
+    sound_cpu_replays = 0
+    for sound_id in range(22):
+        for disabled in (0, 1):
+            memory = bytearray(0x10000)
+            memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+            memory[0x0CEA] = disabled
+            osword_calls = []
+
+            def sound_osword_handler(cpu: Replay6502, target: int) -> bool:
+                if target == 0xFFF1:
+                    osword_calls.append((cpu.a, cpu.x, cpu.y))
+                    return True
+                return False
+
+            cpu = Replay6502(memory, jmp_handler=sound_osword_handler)
+            cpu.a = sound_id
+            cpu.run_subroutine(0x21EA)
+            expected_calls = [] if disabled else [(7, sound_id * 8, 0x0B)]
+            if osword_calls != expected_calls:
+                fail(
+                    f"sound id {sound_id:02d} disabled={disabled}: "
+                    f"OSWORD calls {osword_calls}, expected {expected_calls}"
+                )
+            sound_cpu_replays += 1
+
     # Replay the assembled $17BF-$195B frame spine with leaf systems captured
     # as ordered probes. This isolates the rare delay branches without
     # pretending that transition delay is a global gameplay pause.
@@ -1324,6 +1364,7 @@ def main() -> None:
         f"{expiry_rows} projectile expiry bytes, "
         f"{projectile_expiry_cpu_replays} projectile expiry CPU replays, "
         f"{score_replays} score CPU replays"
+        f", {sound_cpu_replays} sound-dispatch CPU replays"
         f", {active_frame_cpu_replays} active-frame spine CPU replays"
     )
 

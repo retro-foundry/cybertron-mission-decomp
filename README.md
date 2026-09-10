@@ -129,6 +129,11 @@ routine rather than replacing it with the port model under test.
 The [active-frame edge contract](analysis/reconstruction/runtime_active_frame_edge_contract.txt)
 is enforced by bounded CPU replays of normal, terminal-delay, active-delay,
 and spook-pause-consumption frame spines, including exact leaf-call order.
+The [sound dispatch audit](analysis/reconstruction/runtime_sound_dispatch_audit.txt)
+and [sound port semantics](analysis/reconstruction/runtime_sound_port_semantics.txt)
+preserve all 22 loader-owned sound rows and their BBC channel/envelope meaning.
+The assembled `$21EA` dispatcher is replayed for every ID with sound both on
+and off, checking gating and the exact OSWORD 7 block pointer.
 
 The decoded 24-byte artwork can be reviewed in the
 [composed sprite and graphic sheet](analysis/reconstruction/composed_sprite_sheet.png).

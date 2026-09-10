@@ -1,0 +1,93 @@
+runtime_sound_dispatch_audit
+dispatcher=$21EA play_sound_id_if_enabled
+runtime_source=cybertron_runtime_0d80_2280.bin base $0D80
+loader_table_source=loader_basic_listing.txt loader_sound_osword7_blocks_0b00
+static_scope=Ghidra references to $21EA plus raw 6502 absolute-transfer byte patterns in loaded memory
+
+direct_transfer_references_to_21ea
+count=15 resolved_id_count=15 unresolved_id_count=0 out_of_loader_range_count=0 used_ids=00,02,03,04,05,11,12,13,16,18,19,20,21
+callsite=0e07 transfer=JSR id=12 function=runtime_entry_after_bootstrap role_hint=startup_or_screen_cycle_sound_12 prior_lda=0e05:LDA_#0xc
+callsite=0e0c transfer=JSR id=16 function=runtime_entry_after_bootstrap role_hint=startup_or_screen_cycle_sound_16 prior_lda=0e0a:LDA_#0x10
+callsite=0ef2 transfer=JSR id=19 function=level_active_loop role_hint=life_count_negative_return_to_title_sound_19 prior_lda=0ef0:LDA_#0x13
+callsite=0ffb transfer=JSR id=05 function=handle_collected_target_or_level_done role_hint=target_or_bonus_collected_sound_5 prior_lda=0ff9:LDA_#0x5
+callsite=1062 transfer=JSR id=18 function=handle_collected_target_or_level_done role_hint=level_complete_sound_18 prior_lda=1060:LDA_#0x12
+callsite=1277 transfer=JSR id=13 function=show_level_intro_and_required_targets role_hint=level_intro_required_target_glyph_sound_13 prior_lda=1275:LDA_#0xd
+callsite=18c1 transfer=JSR id=20 function=frame_update role_hint=projectile_spook_pause_collision_sound_20 prior_lda=18bf:LDA_#0x14
+callsite=19f5 transfer=JSR id=04 function=player_collision_flash_sequence role_hint=player_collision_flash_sound_4 prior_lda=19f3:LDA_#0x4
+callsite=1a61 transfer=JSR id=03 function=lose_life_and_reset_player role_hint=life_loss_reset_sound_3 prior_lda=1a5f:LDA_#0x3
+callsite=1c89 transfer=JSR id=00 function=spawn_player_shot_if_fire_pressed role_hint=player_shot_spawn_sound_0 prior_lda=1c87:LDA_#0x0
+callsite=21cf transfer=JMP id=02 function=handle_shot_or_hazard_overlap_collisions role_hint=shot_or_hazard_object_overlap_sound_2 prior_lda=21cd:LDA_#0x2
+callsite=22c2 transfer=JMP id=11 function=maybe_spawn_hazard_from_moving_object role_hint=hazard_spawn_sound_11 prior_lda=22c0:LDA_#0xb
+callsite=230c transfer=JSR id=21 function=increment_four_char_score_or_counter role_hint=score_rollover_life_increment_sound_21 prior_lda=230a:LDA_#0x15
+callsite=2485 transfer=JSR id=12 function=handle_sound_on_off_keys role_hint=sound_off_acknowledgement_sound_12 prior_lda=2483:LDA_#0xc
+callsite=248a transfer=JSR id=16 function=handle_sound_on_off_keys role_hint=sound_off_acknowledgement_sound_16 prior_lda=2488:LDA_#0x10
+
+raw_opcode_scan_for_21ea_operands
+patterns=20 EA 21 JSR_abs_21EA; 4C EA 21 JMP_abs_21EA; 6C EA 21 JMP_indirect_ptr_21EA
+JSR_abs_21EA_count=13
+JMP_abs_21EA_count=2
+JMP_indirect_ptr_21EA_count=0
+raw_direct_pattern_count=15 reference_transfer_count=15 raw_direct_matches_references=true
+raw_pattern_locations
+address=0e07 kind=JSR_abs_21EA disassembled_transfer=true instruction=JSR_0x21ea
+address=0e0c kind=JSR_abs_21EA disassembled_transfer=true instruction=JSR_0x21ea
+address=0ef2 kind=JSR_abs_21EA disassembled_transfer=true instruction=JSR_0x21ea
+address=0ffb kind=JSR_abs_21EA disassembled_transfer=true instruction=JSR_0x21ea
+address=1062 kind=JSR_abs_21EA disassembled_transfer=true instruction=JSR_0x21ea
+address=1277 kind=JSR_abs_21EA disassembled_transfer=true instruction=JSR_0x21ea
+address=18c1 kind=JSR_abs_21EA disassembled_transfer=true instruction=JSR_0x21ea
+address=19f5 kind=JSR_abs_21EA disassembled_transfer=true instruction=JSR_0x21ea
+address=1a61 kind=JSR_abs_21EA disassembled_transfer=true instruction=JSR_0x21ea
+address=1c89 kind=JSR_abs_21EA disassembled_transfer=true instruction=JSR_0x21ea
+address=21cf kind=JMP_abs_21EA disassembled_transfer=true instruction=JMP_0x21ea
+address=22c2 kind=JMP_abs_21EA disassembled_transfer=true instruction=JMP_0x21ea
+address=230c kind=JSR_abs_21EA disassembled_transfer=true instruction=JSR_0x21ea
+address=2485 kind=JSR_abs_21EA disassembled_transfer=true instruction=JSR_0x21ea
+address=248a kind=JSR_abs_21EA disassembled_transfer=true instruction=JSR_0x21ea
+
+loader_rows_with_static_direct_uses
+id bytes channel amplitude_or_envelope pitch duration direct_uses duplicate_ids classification
+00 01_00_01_00_96_00_04_00 channel=1 amplitude_or_envelope=1 pitch=150 duration=4 direct_uses=1 duplicate_ids=none classification=used_by_direct_runtime_dispatch
+01 00_00_00_00_00_00_00_00 channel=0 amplitude_or_envelope=0 pitch=0 duration=0 direct_uses=0 duplicate_ids=01,07,08,09,10 classification=unused_all_zero_silent_row_no_direct_dispatch
+02 11_00_04_00_c8_00_04_00 channel=17 amplitude_or_envelope=4 pitch=200 duration=4 direct_uses=1 duplicate_ids=none classification=used_by_direct_runtime_dispatch
+03 10_00_ff_ff_05_00_19_00 channel=16 amplitude_or_envelope=-1 pitch=5 duration=25 direct_uses=1 duplicate_ids=none classification=used_by_direct_runtime_dispatch
+04 11_00_03_00_c8_00_1e_00 channel=17 amplitude_or_envelope=3 pitch=200 duration=30 direct_uses=1 duplicate_ids=none classification=used_by_direct_runtime_dispatch
+05 11_00_04_00_64_00_04_00 channel=17 amplitude_or_envelope=4 pitch=100 duration=4 direct_uses=1 duplicate_ids=none classification=used_by_direct_runtime_dispatch
+06 11_00_04_00_8c_00_14_00 channel=17 amplitude_or_envelope=4 pitch=140 duration=20 direct_uses=0 duplicate_ids=none classification=unused_audible_unique_reserved_row_no_direct_dispatch
+07 00_00_00_00_00_00_00_00 channel=0 amplitude_or_envelope=0 pitch=0 duration=0 direct_uses=0 duplicate_ids=01,07,08,09,10 classification=unused_all_zero_silent_row_no_direct_dispatch
+08 00_00_00_00_00_00_00_00 channel=0 amplitude_or_envelope=0 pitch=0 duration=0 direct_uses=0 duplicate_ids=01,07,08,09,10 classification=unused_all_zero_silent_row_no_direct_dispatch
+09 00_00_00_00_00_00_00_00 channel=0 amplitude_or_envelope=0 pitch=0 duration=0 direct_uses=0 duplicate_ids=01,07,08,09,10 classification=unused_all_zero_silent_row_no_direct_dispatch
+10 00_00_00_00_00_00_00_00 channel=0 amplitude_or_envelope=0 pitch=0 duration=0 direct_uses=0 duplicate_ids=01,07,08,09,10 classification=unused_all_zero_silent_row_no_direct_dispatch
+11 11_00_01_00_64_00_0a_00 channel=17 amplitude_or_envelope=1 pitch=100 duration=10 direct_uses=1 duplicate_ids=none classification=used_by_direct_runtime_dispatch
+12 11_00_00_00_00_00_00_00 channel=17 amplitude_or_envelope=0 pitch=0 duration=0 direct_uses=2 duplicate_ids=12,16 classification=used_by_direct_runtime_dispatch
+13 10_00_ff_ff_04_00_01_00 channel=16 amplitude_or_envelope=-1 pitch=4 duration=1 direct_uses=1 duplicate_ids=none classification=used_by_direct_runtime_dispatch
+14 11_00_02_00_1e_00_28_00 channel=17 amplitude_or_envelope=2 pitch=30 duration=40 direct_uses=0 duplicate_ids=14,15 classification=unused_audible_duplicate_reserved_row_no_direct_dispatch
+15 11_00_02_00_1e_00_28_00 channel=17 amplitude_or_envelope=2 pitch=30 duration=40 direct_uses=0 duplicate_ids=14,15 classification=unused_audible_duplicate_reserved_row_no_direct_dispatch
+16 11_00_00_00_00_00_00_00 channel=17 amplitude_or_envelope=0 pitch=0 duration=0 direct_uses=2 duplicate_ids=12,16 classification=used_by_direct_runtime_dispatch
+17 01_00_00_00_00_00_00_00 channel=1 amplitude_or_envelope=0 pitch=0 duration=0 direct_uses=0 duplicate_ids=none classification=unused_silent_stop_row_no_direct_dispatch
+18 11_00_07_00_00_00_2d_00 channel=17 amplitude_or_envelope=7 pitch=0 duration=45 direct_uses=1 duplicate_ids=none classification=used_by_direct_runtime_dispatch
+19 11_00_08_00_00_00_1e_00 channel=17 amplitude_or_envelope=8 pitch=0 duration=30 direct_uses=1 duplicate_ids=none classification=used_by_direct_runtime_dispatch
+20 11_00_09_00_00_00_06_00 channel=17 amplitude_or_envelope=9 pitch=0 duration=6 direct_uses=1 duplicate_ids=none classification=used_by_direct_runtime_dispatch
+21 11_00_0a_00_c8_00_19_00 channel=17 amplitude_or_envelope=10 pitch=200 duration=25 direct_uses=1 duplicate_ids=none classification=used_by_direct_runtime_dispatch
+
+unused_row_retention_summary
+direct_uses_zero_ids=01,06,07,08,09,10,14,15,17
+all_zero_silent_rows=01,07,08,09,10
+silent_nonzero_channel_rows=17
+audible_duplicate_reserved_rows=14,15
+audible_unique_reserved_rows=06
+id=01 classification=unused_all_zero_silent_row_no_direct_dispatch source=id_01_line_5020_addr_0b08_bytes=00_00_00_00_00_00_00_00_channel=0_amplitude_or_envelope=0_pitch=0_duration=0
+id=06 classification=unused_audible_unique_reserved_row_no_direct_dispatch source=id_06_line_5070_addr_0b30_bytes=11_00_04_00_8c_00_14_00_channel=17_amplitude_or_envelope=4_pitch=140_duration=20
+id=07 classification=unused_all_zero_silent_row_no_direct_dispatch source=id_07_line_5080_addr_0b38_bytes=00_00_00_00_00_00_00_00_channel=0_amplitude_or_envelope=0_pitch=0_duration=0
+id=08 classification=unused_all_zero_silent_row_no_direct_dispatch source=id_08_line_5090_addr_0b40_bytes=00_00_00_00_00_00_00_00_channel=0_amplitude_or_envelope=0_pitch=0_duration=0
+id=09 classification=unused_all_zero_silent_row_no_direct_dispatch source=id_09_line_5100_addr_0b48_bytes=00_00_00_00_00_00_00_00_channel=0_amplitude_or_envelope=0_pitch=0_duration=0
+id=10 classification=unused_all_zero_silent_row_no_direct_dispatch source=id_10_line_5110_addr_0b50_bytes=00_00_00_00_00_00_00_00_channel=0_amplitude_or_envelope=0_pitch=0_duration=0
+id=14 classification=unused_audible_duplicate_reserved_row_no_direct_dispatch source=id_14_line_5150_addr_0b70_bytes=11_00_02_00_1e_00_28_00_channel=17_amplitude_or_envelope=2_pitch=30_duration=40
+id=15 classification=unused_audible_duplicate_reserved_row_no_direct_dispatch source=id_15_line_5160_addr_0b78_bytes=11_00_02_00_1e_00_28_00_channel=17_amplitude_or_envelope=2_pitch=30_duration=40
+id=17 classification=unused_silent_stop_row_no_direct_dispatch source=id_17_line_5180_addr_0b88_bytes=01_00_00_00_00_00_00_00_channel=1_amplitude_or_envelope=0_pitch=0_duration=0
+
+port_rules
+Preserve all 22 loader sound rows in the port asset table: $21EA indexes the original $0B00+$08*id table.
+Wire gameplay events only from proven direct dispatches in runtime_sound_usage.txt/runtime_sound_dispatch_audit.txt.
+Do not delete, repurpose, or renumber ids with direct_uses=0; this audit proves no direct runtime dispatch in this binary, not that the original table row was meaningless.
+Rows with direct_uses=0 should remain available as reserved original data until a later full-program dynamic proof gives stronger evidence.

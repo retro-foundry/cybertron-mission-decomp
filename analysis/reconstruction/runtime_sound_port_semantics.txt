@@ -1,0 +1,57 @@
+runtime_sound_port_semantics
+Purpose: non-BBC sound-backend guide derived from Cybertron loader SOUND/ENVELOPE data and runtime $21EA call sites.
+Original authority: loader BASIC lines 170-290 ENVELOPE, 1360-1390 PROCsound, 5010-5220 sound DATA; runtime $21EA OSWORD 7 dispatch.
+Reference semantics: BBC User Guide SOUND/ENVELOPE and OSWORD A=7; Acorn Electron User Guide Chapter 22 for Electron envelope/channel behavior.
+
+bbc_sound_semantics_for_port
+OSWORD A=7 block: channel, amplitude_or_envelope, pitch, duration as four signed little-endian 16-bit values.
+channel is decoded as hex nibbles $HSFC: H=hold/continue, S=synchronization group, F=flush, C=channel; C=0 noise, C=1..3 tone channels.
+duration_seconds = duration / 20 for duration 0..254; duration -1 means continue until stopped. Cybertron uses duration 0 as a silent flush/stop parameter on ids 12 and 16.
+tone_pitch_hz = 440 * 2^((pitch - 89) / 48) for tone channels before pitch-envelope deltas; pitch wraps to 0..255.
+positive amplitude selects an envelope number; negative amplitude is fixed loudness where -15 is loudest and 0 is silence.
+noise channel pitch classes: 0 high periodic, 1 medium periodic, 2 low periodic, 3 periodic tied to channel 1, 4 high white, 5 medium white, 6 low white, 7 white tied to channel 1.
+Pitch-envelope increments are pitch units; one pitch unit is a quarter semitone. Envelope step time is (T & $7F) centiseconds; T bit 7 set means hold final pitch instead of auto-repeating the pitch envelope.
+
+sound_id_port_table
+id role channel_raw H S F C channel_kind amp_kind amp_value pitch tone_hz_or_noise duration_ticks duration_seconds envelope_step_summary
+00 player_shot_spawn_sound_0 $0001 0 0 0 1 tone_squarewave envelope 1 150 1061.72Hz 4 0.200 env1:90steps/1cs:-90quartersteps:hold
+01 unused_or_reserved $0000 0 0 0 0 noise_high_periodic silence 0 0 high_periodic 0 0.000 none
+02 shot_or_hazard_object_overlap_sound_2 $0011 0 0 1 1 tone_squarewave envelope 4 200 2185.67Hz 4 0.200 env4:20steps/1cs:+0quartersteps:repeat
+03 life_loss_reset_sound_3 $0010 0 0 1 0 noise_medium_white fixed_loudness -1 5 medium_white 25 1.250 none
+04 player_collision_flash_sound_4 $0011 0 0 1 1 tone_squarewave envelope 3 200 2185.67Hz 30 1.500 env3:3steps/1cs:+0quartersteps:repeat
+05 target_or_bonus_collected_sound_5 $0011 0 0 1 1 tone_squarewave envelope 4 100 515.75Hz 4 0.200 env4:20steps/1cs:+0quartersteps:repeat
+06 unused_or_reserved $0011 0 0 1 1 tone_squarewave envelope 4 140 918.96Hz 20 1.000 env4:20steps/1cs:+0quartersteps:repeat
+07 unused_or_reserved $0000 0 0 0 0 noise_high_periodic silence 0 0 high_periodic 0 0.000 none
+08 unused_or_reserved $0000 0 0 0 0 noise_high_periodic silence 0 0 high_periodic 0 0.000 none
+09 unused_or_reserved $0000 0 0 0 0 noise_high_periodic silence 0 0 high_periodic 0 0.000 none
+10 unused_or_reserved $0000 0 0 0 0 noise_high_periodic silence 0 0 high_periodic 0 0.000 none
+11 hazard_spawn_sound_11 $0011 0 0 1 1 tone_squarewave envelope 1 100 515.75Hz 10 0.500 env1:90steps/1cs:-90quartersteps:hold
+12 startup_or_screen_cycle_sound_12,sound_off_acknowledgement_sound_12 $0011 0 0 1 1 tone_squarewave silence 0 0 121.70Hz 0 0.000 none
+13 level_intro_required_target_glyph_sound_13 $0010 0 0 1 0 noise_high_white fixed_loudness -1 4 high_white 1 0.050 none
+14 unused_or_reserved $0011 0 0 1 1 tone_squarewave envelope 2 30 187.69Hz 40 2.000 env2:0steps/1cs:+0quartersteps:repeat
+15 unused_or_reserved $0011 0 0 1 1 tone_squarewave envelope 2 30 187.69Hz 40 2.000 env2:0steps/1cs:+0quartersteps:repeat
+16 startup_or_screen_cycle_sound_16,sound_off_acknowledgement_sound_16 $0011 0 0 1 1 tone_squarewave silence 0 0 121.70Hz 0 0.000 none
+17 unused_or_reserved $0001 0 0 0 1 tone_squarewave silence 0 0 121.70Hz 0 0.000 none
+18 level_complete_sound_18 $0011 0 0 1 1 tone_squarewave envelope 7 0 121.70Hz 45 2.250 env7:300steps/1cs:+3900quartersteps:hold
+19 life_count_negative_return_to_title_sound_19 $0011 0 0 1 1 tone_squarewave envelope 8 0 121.70Hz 30 1.500 env8:210steps/1cs:+13510quartersteps:hold
+20 projectile_spook_pause_collision_sound_20 $0011 0 0 1 1 tone_squarewave envelope 9 0 121.70Hz 6 0.300 env9:300steps/1cs:+4800quartersteps:hold
+21 score_rollover_life_increment_sound_21 $0011 0 0 1 1 tone_squarewave envelope 10 200 2185.67Hz 25 1.250 env10:0steps/1cs:+0quartersteps:hold
+
+envelope_port_table
+id step_cs pitch_repeat pitch_steps pitch_duration_s pitch_delta_total amp_attack amp_decay amp_sustain amp_release attack_target decay_target source
+01 1 hold_final 90 0.900 -90 +100 -1 -1 -1 100 0 line_170_envelope=1_T=129_step_time_centiseconds=1_pitch_auto_repeat=false_PI1=-1_PI2=-1_PI3=-1_PN1=30_PN2=30_PN3=30_AA=100_AD=-1_AS=-1_AR=-1_ALA=100_ALD=0
+02 1 auto_repeat 0 0.000 +0 +127 -1 +0 +0 126 0 line_180_envelope=2_T=1_step_time_centiseconds=1_pitch_auto_repeat=true_PI1=0_PI2=0_PI3=0_PN1=0_PN2=0_PN3=0_AA=127_AD=-1_AS=0_AR=0_ALA=126_ALD=0
+03 1 auto_repeat 3 0.030 +0 +126 +0 +0 -126 127 0 line_190_envelope=3_T=1_step_time_centiseconds=1_pitch_auto_repeat=true_PI1=-50_PI2=100_PI3=-50_PN1=1_PN2=1_PN3=1_AA=126_AD=0_AS=0_AR=-126_ALA=127_ALD=0
+04 1 auto_repeat 20 0.200 +0 +126 +0 +0 -126 127 0 line_200_envelope=4_T=1_step_time_centiseconds=1_pitch_auto_repeat=true_PI1=4_PI2=4_PI3=-4_PN1=5_PN2=5_PN3=10_AA=126_AD=0_AS=0_AR=-126_ALA=127_ALD=0
+05 1 auto_repeat 30 0.300 +0 +126 +0 +0 +0 20 0 line_240_envelope=5_T=1_step_time_centiseconds=1_pitch_auto_repeat=true_PI1=1_PI2=-2_PI3=1_PN1=10_PN2=10_PN3=10_AA=126_AD=0_AS=0_AR=0_ALA=20_ALD=0
+06 1 auto_repeat 0 0.000 +0 +126 +0 +0 -4 127 0 line_250_envelope=6_T=1_step_time_centiseconds=1_pitch_auto_repeat=true_PI1=0_PI2=0_PI3=0_PN1=0_PN2=0_PN3=0_AA=126_AD=0_AS=0_AR=-4_ALA=127_ALD=0
+07 1 hold_final 300 3.000 +3900 +127 +0 +0 -2 126 0 line_260_envelope=7_T=129_step_time_centiseconds=1_pitch_auto_repeat=false_PI1=13_PI2=13_PI3=13_PN1=100_PN2=100_PN3=100_AA=127_AD=0_AS=0_AR=-2_ALA=126_ALD=0
+08 1 hold_final 210 2.100 +13510 +127 +0 +0 -2 126 0 line_270_envelope=8_T=129_step_time_centiseconds=1_pitch_auto_repeat=false_PI1=45_PI2=85_PI3=63_PN1=70_PN2=70_PN3=70_AA=127_AD=0_AS=0_AR=-2_ALA=126_ALD=0
+09 1 hold_final 300 3.000 +4800 +6 +0 +0 -1 126 0 line_280_envelope=9_T=129_step_time_centiseconds=1_pitch_auto_repeat=false_PI1=16_PI2=16_PI3=16_PN1=100_PN2=100_PN3=100_AA=6_AD=0_AS=0_AR=-1_ALA=126_ALD=0
+10 1 hold_final 0 0.000 +0 +127 -1 -1 -1 126 0 line_290_envelope=10_T=129_step_time_centiseconds=1_pitch_auto_repeat=false_PI1=0_PI2=0_PI3=0_PN1=0_PN2=0_PN3=0_AA=127_AD=-1_AS=-1_AR=-1_ALA=126_ALD=0
+
+port_rules
+Do not map positive amplitudes 5-10 to fixed volume. Cybertron defines envelopes 5-10 in the loader, despite the loader comment about older OS versions.
+Preserve flush bit F=1 on ids whose channel_raw is $0010 or $0011; these are immediate effect/stop-style requests, not queued notes.
+Treat ids with uses=0 as reserved original table rows until a whole-program proof says otherwise; keep the data available to the port asset table.
+For a non-BBC backend, synthesize tone channels as square waves and noise channel classes separately; apply envelope pitch deltas in quarter-semitone units at the exported centisecond step cadence.
