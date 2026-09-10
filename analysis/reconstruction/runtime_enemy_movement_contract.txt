@@ -34,4 +34,4 @@ replay_coverage
 Scheduler replay covers every slot $14-$1F, frame phase 0-15, each recognized graphic, inactive state, and an unrecognized graphic.
 Shared decision replay covers all sixteen four-bit RNG inputs to $20B3 and all nine relative X/Y outcomes from $23A3.
 Policy replay covers SPINNER success at each retry stage and total failure, CLONE stored/random success and failure, and CYBERDROID random initialization, persistence, both alignment retargets, and blocked-delta reset.
-The shared $205D renderer-collision and bounds validator remains to be replayed with integrated movement/render leaves.
+The shared $205D validator is replayed with the real incremental mover, pointer-save logic, and bounds test for clear, renderer-collision, and all four boundary failures. The bitmap renderer is a controlled collision oracle.

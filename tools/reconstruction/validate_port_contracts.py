@@ -1556,6 +1556,69 @@ def main() -> None:
             fail(f"cyberdroid policy {name}: {actual}, expected {expected}")
         enemy_policy_cpu_replays += 1
 
+    # Integrate $205D with the original $16BE mover, pointer calculation, and
+    # $1FBD bounds test. Only $13FB is a controlled bitmap-collision oracle.
+    enemy_move_validation_cpu_replays = 0
+    validated_move_cases = (
+        ("inside_clear", 0x20, 0x20, 1, 1, 0, 1, 0),
+        ("inside_collision", 0x20, 0x20, 1, 1, 1, 0, 0),
+        ("left_outside", 0x04, 0x20, 0xFF, 0, 0, 0, 1),
+        ("right_outside", 0x49, 0x20, 1, 0, 0, 0, 1),
+        ("top_outside", 0x20, 0x08, 0, 0xFF, 0, 0, 1),
+        ("bottom_outside", 0x20, 0x36, 0, 1, 0, 0, 1),
+    )
+    for name, old_x, old_y, delta_x, delta_y, collision, expected_success, expected_bounds in validated_move_cases:
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        render_slot = 0x14
+        memory[0x0039] = render_slot
+        memory[0x0031] = 5
+        memory[0x0033] = delta_x
+        memory[0x0034] = delta_y
+        memory[0x0A00 + render_slot] = old_x
+        memory[0x0A40 + render_slot] = old_y
+        old_pointer = object_pointer(old_x, old_y)
+        memory[0x0A80 + render_slot] = old_pointer & 0xFF
+        memory[0x0AC0 + render_slot] = old_pointer >> 8
+        draw_calls = []
+
+        def validated_move_handler(cpu: Replay6502, target: int) -> bool:
+            if target == 0x13FB:
+                draw_calls.append((cpu.x, memory[0x0031]))
+                memory[0x0030] = collision
+                return True
+            return False
+
+        cpu = Replay6502(memory, validated_move_handler)
+        cpu.x = render_slot
+        cpu.run_subroutine(0x205D)
+        new_x = (old_x + delta_x) & 0xFF
+        new_y = (old_y + delta_y) & 0xFF
+        actual_pointer = memory[0x0A80 + render_slot] | memory[0x0AC0 + render_slot] << 8
+        actual = (
+            memory[0x0A00 + render_slot],
+            memory[0x0A40 + render_slot],
+            memory[0x0BC0 + render_slot],
+            memory[0x0D00 + render_slot] | memory[0x0D40 + render_slot] << 8,
+            actual_pointer,
+            memory[0x0C99],
+            memory[0x0041],
+            draw_calls,
+        )
+        expected = (
+            new_x,
+            new_y,
+            old_y,
+            old_pointer,
+            object_pointer(new_x, new_y),
+            expected_success,
+            expected_bounds,
+            [(render_slot, 5)],
+        )
+        if actual != expected:
+            fail(f"validated enemy move {name}: {actual}, expected {expected}")
+        enemy_move_validation_cpu_replays += 1
+
     # $1B41 recognizes four masked screen-byte classes. Exhaust all byte
     # values so ports cannot accidentally compare unmasked pixels or merge the
     # special $A0 spook-pause outcome with ordinary expiry.
@@ -2204,6 +2267,7 @@ def main() -> None:
         f"{enemy_scheduler_cpu_replays} enemy-scheduler CPU replays, "
         f"{enemy_decision_cpu_replays} enemy-decision CPU replays, "
         f"{enemy_policy_cpu_replays} enemy-policy CPU replays, "
+        f"{enemy_move_validation_cpu_replays} enemy-move-validation CPU replays, "
         f"{expiry_rows} projectile expiry bytes, "
         f"{projectile_expiry_cpu_replays} projectile expiry CPU replays, "
         f"{target_outcome_cpu_replays} target-outcome CPU replays, "
