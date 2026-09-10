@@ -70,6 +70,8 @@ class Replay6502:
                 self.memory[self._fetch()] = self.x
             elif opcode == 0x8E:  # STX abs
                 self.memory[self._word()] = self.x
+            elif opcode == 0x8C:  # STY abs
+                self.memory[self._word()] = self.y
             elif opcode == 0xA2:  # LDX #imm
                 self.x = self._flags(self._fetch())
             elif opcode == 0xA4:  # LDY zp
@@ -93,6 +95,8 @@ class Replay6502:
                 self.x = self._flags(self.memory[self._word()])
             elif opcode == 0xC9:  # CMP #imm
                 self._compare(self.a, self._fetch())
+            elif opcode == 0xC5:  # CMP zp
+                self._compare(self.a, self.memory[self._fetch()])
             elif opcode == 0xDD:  # CMP abs,X
                 self._compare(self.a, self.memory[(self._word() + self.x) & 0xFFFF])
             elif opcode == 0xC0:  # CPY #imm
@@ -132,6 +136,8 @@ class Replay6502:
                 self.y = self._flags(self.a)
             elif opcode == 0x8A:  # TXA
                 self.a = self._flags(self.x)
+            elif opcode == 0x98:  # TYA
+                self.a = self._flags(self.y)
             elif opcode == 0x29:  # AND #imm
                 self.a = self._flags(self.a & self._fetch())
             elif opcode == 0x49:  # EOR #imm
@@ -160,6 +166,11 @@ class Replay6502:
                 self.carry = True
             elif opcode == 0x79:  # ADC abs,Y
                 value = self.memory[(self._word() + self.y) & 0xFFFF]
+                total = self.a + value + int(self.carry)
+                self.carry = total > 0xFF
+                self.a = self._flags(total)
+            elif opcode == 0x7D:  # ADC abs,X
+                value = self.memory[(self._word() + self.x) & 0xFFFF]
                 total = self.a + value + int(self.carry)
                 self.carry = total > 0xFF
                 self.a = self._flags(total)

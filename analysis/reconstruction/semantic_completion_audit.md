@@ -30,6 +30,7 @@ accepted as evidence for gameplay identity.
 | Projectile movement replay | The actual source-built `$1B87` routine is CPU-replayed for all eight directions from four representative even/odd-Y positions; current/previous pointers and X/Y fields are checked | Port-contract |
 | Projectile pointer replay | The actual source-built `$1BFC` routine and nested pointer helpers are CPU-replayed for all 32 player-start/direction shot positions | Port-contract |
 | Player-shot spawn replay | The actual source-built `$1C4D` allocator is CPU-replayed through 128 admitted start/direction/free-slot combinations and both refusal edges | Port-contract |
+| Hazard spawn replay | The actual source-built `$2235` allocator is CPU-replayed for all eight movement directions in every eligible first-free slot 4-7, plus the Electron escape-condition pulse path; source selection, offsets, pointer calculation, slot writes, counter ownership, and sound dispatch are checked | Port-contract |
 | Input replay and projection | The actual source-built `$1609` scanner is CPU-replayed for all 16 keyboard masks, `$1287` for 72 joystick X/Y/fire edge combinations, and `$2207` for all eight non-idle direction vectors; four fire-latch transitions are also checked | Port-contract |
 | Room-render parity | `validate_port_contracts.py` independently reconstructs `$14B9/$1516/$0EFE/$1EC8/$1F19` and matches all 256 original-output `$3000-$7FFF` digests, draw/fill counts, and nonzero-byte totals | Port-contract |
 | Status-render parity | `validate_port_contracts.py` independently reconstructs `$1CAB/$1D3C/$2319/$2345` and matches all 640 original-output room/level composite digests; the bundled oracle also records life and target-slot placement | Port-contract |
@@ -69,8 +70,9 @@ validation depth is not yet equivalent to the Quest repository. Completion of
 that broader standard requires:
 
 1. Add actual-code replay coverage for player collision outcomes, enemy AI
-   movement decisions, and hazard spawning/recycling. Current contracts for
-   these areas are static or cover only their setup/lifecycle edges.
+   movement decisions, hazard-spawn rejection gates, and hit-object recycling.
+   Current contracts for these areas are static or cover only their setup and
+   lifecycle edges.
 2. Add an active-loop/full-frame comparison that records complete RAM and display
    effects for fixed initial state and input sequences.
 3. Replace the active-frame spine's leaf probes with integrated subsystem

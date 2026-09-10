@@ -35,7 +35,7 @@ dir x_offset y_offset
 
 hazard_spawn_slot_summary_2235
 Authority: $2235 finds a free shot/hazard slot but only accepts slots >=4; it increments $0BB8 after seeding direction/position/pointer.
-Hazard offset tables are listed in runtime_enemy_movement.txt and runtime_player_movement.txt; lifecycle after spawn is identical to $1B87/$1B41 slot handling.
+Hazard offset tables are listed above from the source-owned `$26DE/$26E6` data; lifecycle after spawn is identical to `$1B87/$1B41` slot handling.
 
 slot_allocation_projection_1c4d_2235
 Authority: $1C4D and $2235 allocate from the shared $0C4E/$0C56 shot/hazard slot arrays but rely on separate counters and invariants.

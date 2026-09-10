@@ -198,6 +198,127 @@ def main() -> None:
             )
         shot_spawn_cpu_replays += 1
 
+    # $2235 shares projectile storage with player shots but explicitly owns
+    # slots 4-7. Replay every direction into every eligible first-free slot,
+    # including the source-object RNG selection and real pointer computation.
+    hazard_y_offsets = tuple(value if value < 0x80 else value - 0x100 for value in block(0x26DE, 8))
+    hazard_x_offsets = tuple(value if value < 0x80 else value - 0x100 for value in block(0x26E6, 8))
+    hazard_deltas = (
+        (0, 1),
+        (0, -1),
+        (1, 0),
+        (-1, 0),
+        (1, -1),
+        (1, 1),
+        (-1, -1),
+        (-1, 1),
+    )
+    hazard_spawn_cpu_replays = 0
+    for direction, (delta_x, delta_y) in enumerate(hazard_deltas):
+        for free_slot in range(4, 8):
+            memory = bytearray(0x10000)
+            memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+            source_index = 0x19 + ((direction + free_slot) & 0x0F)
+            source_x = 0x24
+            source_y = 0x20
+            memory[0x00B8] = 7
+            memory[0x0BB8] = free_slot - 4
+            memory[0x0C03] = 1
+            memory[0x0C53 + source_index] = 1
+            memory[0x0C86 + source_index] = delta_x & 0xFF
+            memory[0x0C9E + source_index] = delta_y & 0xFF
+            memory[0x0A00 + source_index] = source_x
+            memory[0x0A40 + source_index] = source_y
+            for slot in range(4, 8):
+                memory[0x0C4E + slot] = 0 if slot < free_slot else 0xFF
+            rng_values = [0, source_index - 0x19]
+            calls = []
+
+            def hazard_spawn_handler(cpu: Replay6502, target: int) -> bool:
+                if target == 0x1D61:
+                    cpu.a = rng_values.pop(0)
+                    calls.append((target, cpu.a))
+                    return True
+                return False
+
+            def hazard_spawn_tail(cpu: Replay6502, target: int) -> bool:
+                if target == 0x21EA:
+                    calls.append((target, cpu.a))
+                    return True
+                return False
+
+            cpu = Replay6502(memory, hazard_spawn_handler, hazard_spawn_tail)
+            cpu.run_subroutine(0x2235)
+            expected_x = (source_x + hazard_x_offsets[direction]) & 0xFF
+            expected_y = (source_y + hazard_y_offsets[direction]) & 0xFF
+            actual_pointer = memory[0x0C1E + free_slot] | memory[0x0C26 + free_slot] << 8
+            actual = (
+                memory[0x0BB9],
+                memory[0x0BBA],
+                memory[0x0BBB],
+                memory[0x0C4E + free_slot],
+                memory[0x0C56 + free_slot],
+                memory[0x0C3E + free_slot],
+                memory[0x0C46 + free_slot],
+                actual_pointer,
+                memory[0x0BB8],
+                calls,
+            )
+            expected = (
+                source_index,
+                direction,
+                free_slot,
+                direction,
+                0,
+                expected_x,
+                expected_y,
+                projectile_pointer(expected_x, expected_y),
+                free_slot - 3,
+                [(0x1D61, 0), (0x1D61, source_index - 0x19), (0x21EA, 0x0B)],
+            )
+            if actual != expected:
+                fail(
+                    f"hazard spawn direction {direction} slot {free_slot}: "
+                    f"{actual}, expected {expected}"
+                )
+            hazard_spawn_cpu_replays += 1
+
+    # A zero bootstrap flag pulses the MOS escape condition around a successful
+    # spawn. This is a distinct platform-visible side effect of $2235.
+    memory = bytearray(0x10000)
+    memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+    memory[0x00B8] = 7
+    memory[0x0C03] = 0
+    memory[0x0C53 + 0x19] = 1
+    memory[0x0C86 + 0x19] = 1
+    memory[0x0C9E + 0x19] = 0
+    memory[0x0A00 + 0x19] = 0x24
+    memory[0x0A40 + 0x19] = 0x20
+    memory[0x0C4E + 4:0x0C4E + 8] = bytes((0xFF,) * 4)
+    rng_values = [0, 0]
+    calls = []
+
+    def hazard_escape_handler(cpu: Replay6502, target: int) -> bool:
+        if target == 0x1D61:
+            cpu.a = rng_values.pop(0)
+            return True
+        if target == 0xFFF4:
+            calls.append((target, cpu.a))
+            return True
+        return False
+
+    def hazard_escape_tail(cpu: Replay6502, target: int) -> bool:
+        if target == 0x21EA:
+            calls.append((target, cpu.a))
+            return True
+        return False
+
+    cpu = Replay6502(memory, hazard_escape_handler, hazard_escape_tail)
+    cpu.run_subroutine(0x2235)
+    if calls != [(0xFFF4, 0x7D), (0xFFF4, 0x7E), (0x21EA, 0x0B)]:
+        fail(f"hazard escape pulse calls {calls}")
+    hazard_spawn_cpu_replays += 1
+
     # $1B87 movement deltas must reproduce $1BFC for both even and odd Y.
     delta_y = tuple(value if value < 0x80 else value - 0x100 for value in block(0x2798, 8))
     delta_x = tuple(value if value < 0x80 else value - 0x100 for value in block(0x27A0, 8))
@@ -1722,6 +1843,7 @@ def main() -> None:
         f"{projectile_rows} shot projections, "
         f"{projectile_pointer_cpu_replays} shot-pointer CPU replays, "
         f"{shot_spawn_cpu_replays} shot-spawn CPU replays, "
+        f"{hazard_spawn_cpu_replays} hazard-spawn CPU replays, "
         f"{movement_rows} movement projections, "
         f"{movement_cpu_replays} movement CPU replays, "
         f"{keyboard_rows} keyboard masks, "
