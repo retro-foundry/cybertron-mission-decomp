@@ -138,6 +138,10 @@ The [screen-flow contract](analysis/reconstruction/runtime_screen_flow_contract.
 records the original help, legend, and level-intro order without the archived
 report's incorrect Mode-5 previews. Actual `$110E` and `$111B` CPU replays
 verify all three VDU streams and all fourteen compact text streams.
+Additional CPU replays enforce the text-buffer clear, help-before-legend menu
+order, and every level-intro target-count/glyph/sound/wait sequence.
+They also guard the original distinction between the five-glyph intro cap and
+the inclusive highest-required-target slot used during gameplay.
 
 The decoded 24-byte artwork can be reviewed in the
 [composed sprite and graphic sheet](analysis/reconstruction/composed_sprite_sheet.png).

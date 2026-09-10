@@ -1324,6 +1324,103 @@ def main() -> None:
     if block(0x2700, 6) != bytes((0x3F, 0x3E, 0x32, 0x3E, 0x32, 0x32)):
         fail("level-intro required-target order differs")
 
+    memory = bytearray(0x10000)
+    memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+    memory[0x0CCA:0x0CDE] = bytes((0xA5,) * 20)
+    Replay6502(memory).run_subroutine(0x112D)
+    if memory[0x0CCA:0x0CDE] != bytes(20):
+        fail("text-buffer clear CPU replay did not clear all 20 bytes")
+
+    menu_cpu_replays = 0
+    for wait_results, expected_calls in (
+        (
+            (True,),
+            [0x21EA, 0x21EA, 0x0DB7, 0x1145, 0x1F71, 0x0E2E],
+        ),
+        (
+            (False, True),
+            [
+                0x21EA,
+                0x21EA,
+                0x0DB7,
+                0x1145,
+                0x1F71,
+                0x0E2E,
+                0x0DB7,
+                0x1175,
+                0x1F71,
+                0x0E2E,
+            ],
+        ),
+    ):
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        calls = []
+        wait_index = 0
+
+        def menu_handler(cpu: Replay6502, target: int) -> bool:
+            nonlocal wait_index
+            calls.append(target)
+            if target == 0x0E2E:
+                cpu.carry = wait_results[wait_index]
+                wait_index += 1
+            return True
+
+        cpu = Replay6502(memory, menu_handler)
+        cpu.run_subroutine(0x0E05, stop_addresses=(0x0E85,))
+        if calls != expected_calls:
+            fail(f"menu screen-flow calls {calls}, expected {expected_calls}")
+        menu_cpu_replays += 1
+
+    level_intro_cpu_replays = 0
+    required_graphics = tuple(block(0x2700, 6))
+    for level_tens, level_ones, required_count in (
+        (0, 1, 1),
+        (0, 2, 2),
+        (0, 3, 3),
+        (0, 4, 4),
+        (0, 5, 5),
+        (0, 6, 5),
+        (1, 0, 5),
+    ):
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        memory[0x0BB7] = level_tens
+        memory[0x0BB6] = level_ones
+        draws = []
+        sounds = []
+        waits = []
+
+        def intro_handler(cpu: Replay6502, target: int) -> bool:
+            if target == 0x13FB:
+                draws.append(cpu.memory[0x2F00])
+            elif target == 0x21EA:
+                sounds.append(cpu.a)
+            elif target == 0x1307:
+                waits.append(cpu.a)
+            return True
+
+        def intro_tail_handler(cpu: Replay6502, target: int) -> bool:
+            return target == 0x0DB7
+
+        cpu = Replay6502(memory, intro_handler, intro_tail_handler)
+        cpu.run_subroutine(0x11FE)
+        expected_draws = list(reversed(required_graphics[:required_count]))
+        if draws != expected_draws:
+            fail(
+                f"level {level_tens}{level_ones}: intro graphics {draws}, "
+                f"expected {expected_draws}"
+            )
+        if sounds != [0x0D] * required_count:
+            fail(f"level {level_tens}{level_ones}: intro sounds {sounds}")
+        if waits != [0x14] * required_count + [0x64]:
+            fail(f"level {level_tens}{level_ones}: intro waits {waits}")
+        if memory[0x0CD7] != level_ones + 0x10:
+            fail(f"level {level_tens}{level_ones}: units glyph byte differs")
+        if level_tens and memory[0x0CD6] != level_tens + 0x10:
+            fail(f"level {level_tens}{level_ones}: tens glyph byte differs")
+        level_intro_cpu_replays += 1
+
     # Replay the assembled $17BF-$195B frame spine with leaf systems captured
     # as ordered probes. This isolates the rare delay branches without
     # pretending that transition delay is a global gameplay pause.
@@ -1435,6 +1532,9 @@ def main() -> None:
         f", {sound_cpu_replays} sound-dispatch CPU replays"
         f", {zero_text_cpu_replays} zero-text CPU replays"
         f", {compact_text_cpu_replays} compact-text CPU replays"
+        f", 1 text-clear CPU replay"
+        f", {menu_cpu_replays} menu-flow CPU replays"
+        f", {level_intro_cpu_replays} level-intro CPU replays"
         f", {active_frame_cpu_replays} active-frame spine CPU replays"
     )
 

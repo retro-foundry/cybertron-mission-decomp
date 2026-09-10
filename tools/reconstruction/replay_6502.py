@@ -97,6 +97,8 @@ class Replay6502:
                 self._compare(self.y, self._fetch())
             elif opcode == 0x90:  # BCC rel
                 self._branch(not self.carry)
+            elif opcode == 0xB0:  # BCS rel
+                self._branch(self.carry)
             elif opcode == 0xF0:  # BEQ rel
                 self._branch(self.zero)
             elif opcode == 0x30:  # BMI rel

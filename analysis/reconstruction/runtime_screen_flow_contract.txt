@@ -29,6 +29,7 @@ legend_graphics
 SPINNER=$2A CLONE=$2B CYBERDROID=$2C SAFE=$3D KEY=$3F POT_OF_GOLD=$32 RING=$3E SPOOK=$2E+$2F
 
 required_target_order
+$11FE displays the first level_units entries for levels 1-5, then caps the displayed count at five. This display count is distinct from the inclusive highest-required-slot state used by gameplay setup.
 $3F KEY
 $3E RING
 $32 POT_OF_GOLD
