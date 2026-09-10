@@ -5,6 +5,27 @@
 
 runtime_start = &0D80
 runtime_entry = &0E02
+
+; Direction codes returned by direction_from_delta_xy and stored for shots.
+direction_down = &00
+direction_up = &01
+direction_right = &02
+direction_left = &03
+direction_up_right = &04
+direction_down_right = &05
+direction_up_left = &06
+direction_down_left = &07
+
+; Object renderer graphic IDs proved by scheduler and setup consumers.
+graphic_id_spinner = &2A
+graphic_id_clone = &2B
+graphic_id_cyberdroid = &2C
+graphic_id_room_fill_probe = &2D
+graphic_id_spook_first_cell = &2E
+graphic_id_spook_second_cell = &2F
+
+object_slot_count = &2C
+
 renderer_collision_accumulator = &0030
 render_mode_or_text_scratch = &0031
 room_area = &0032

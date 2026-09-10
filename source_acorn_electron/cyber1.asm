@@ -672,7 +672,7 @@ org runtime_start
     STA      object_screen_high_by_index
     LDA      #&10
     STA      object_screen_low_by_index
-    LDA      #&2e
+    LDA      #graphic_id_spook_first_cell
     STA      object_graphic_id_by_index
     LDX      #&0
     JSR      draw_object_by_index
@@ -1872,7 +1872,7 @@ org runtime_start
     CMP      #&1
     BNE      advance_active_moving_object_slot
     LDA      object_graphic_id_by_index,X
-    CMP      #&2a
+    CMP      #graphic_id_spinner
     BNE      test_active_clone_object
     TXA
     AND      #&f
@@ -1885,7 +1885,7 @@ org runtime_start
 
 .test_active_clone_object
     LDA      object_graphic_id_by_index,X
-    CMP      #&2b
+    CMP      #graphic_id_clone
     BNE      test_active_cyberdroid_object
     TXA
     AND      #&7
@@ -1901,7 +1901,7 @@ org runtime_start
 
 .test_active_cyberdroid_object
     LDA      object_graphic_id_by_index,X
-    CMP      #&2c
+    CMP      #graphic_id_cyberdroid
     BNE      advance_active_moving_object_slot
     TXA
     AND      #&f
@@ -2494,9 +2494,9 @@ org runtime_start
     RTS
 
 .setup_spinner_clone_cyberdroid_counts
-    LDA      #&2e
+    LDA      #graphic_id_spook_first_cell
     STA      spook_graphic_id_first_cell
-    LDA      #&2f
+    LDA      #graphic_id_spook_second_cell
     STA      spook_graphic_id_second_cell
     LDX      level_index_and_hazard_gate
     LDA      spook_release_timer_by_level_index_1e3a,X
@@ -2536,21 +2536,21 @@ org runtime_start
 .place_next_spinner
     DEC      pending_spinner_count
     BMI      place_next_clone
-    LDA      #&2a
+    LDA      #graphic_id_spinner
     JSR      set_item_graphic_and_random_place
     JMP      place_next_spinner
 
 .place_next_clone
     DEC      pending_clone_count
     BMI      place_next_cyberdroid
-    LDA      #&2b
+    LDA      #graphic_id_clone
     JSR      set_item_graphic_and_random_place
     JMP      place_next_clone
 
 .place_next_cyberdroid
     DEC      pending_cyberdroid_count
     BMI      return_from_enemy_placement
-    LDA      #&2c
+    LDA      #graphic_id_cyberdroid
     JSR      set_item_graphic_and_random_place
     JMP      place_next_cyberdroid
 
@@ -2582,7 +2582,7 @@ org runtime_start
     ADC      room_tile_column_or_fill_index
     ADC      #&1
     STA      object_x_by_index
-    LDA      #&2d
+    LDA      #graphic_id_room_fill_probe
     STA      object_graphic_id_by_index
     LDA      #&6
     STA      object_y_by_index
@@ -2628,7 +2628,7 @@ org runtime_start
     SEC
     SBC      #&2
     STA      object_x_by_index
-    LDA      #&2d
+    LDA      #graphic_id_room_fill_probe
     STA      object_graphic_id_by_index
     LDA      #&6
     STA      object_y_by_index
@@ -3012,7 +3012,7 @@ org runtime_start
 
 .advance_shot_or_hazard_object_scan
     INY
-    CPY      #&2c
+    CPY      #object_slot_count
     BNE      test_next_object_for_shot_or_hazard_overlap
     RTS
 
@@ -3048,41 +3048,41 @@ org runtime_start
     BPL      return_rightward_direction_from_delta
     CPY      #&0
     BNE      return_left_diagonal_direction_from_delta
-    LDA      #&3
+    LDA      #direction_left
     RTS
 
 .return_left_diagonal_direction_from_delta
     BPL      return_down_left_direction
-    LDA      #&6
+    LDA      #direction_up_left
     RTS
 
 .return_down_left_direction
-    LDA      #&7
+    LDA      #direction_down_left
     RTS
 
 .return_rightward_direction_from_delta
     CPY      #&0
     BNE      return_right_diagonal_direction_from_delta
-    LDA      #&2
+    LDA      #direction_right
     RTS
 
 .return_right_diagonal_direction_from_delta
     BPL      return_down_right_direction
-    LDA      #&4
+    LDA      #direction_up_right
     RTS
 
 .return_down_right_direction
-    LDA      #&5
+    LDA      #direction_down_right
     RTS
 
 .return_vertical_direction_from_delta
     CPY      #&0
     BPL      return_down_direction
-    LDA      #&1
+    LDA      #direction_up
     RTS
 
 .return_down_direction
-    LDA      #&0
+    LDA      #direction_down
     RTS
 
 .maybe_spawn_hazard_from_moving_object
