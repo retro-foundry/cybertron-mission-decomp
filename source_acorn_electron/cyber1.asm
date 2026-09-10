@@ -1861,57 +1861,57 @@ org runtime_start
 .update_active_spinner_clone_cyberdroid_objects
     LDX      #&14
 
-.addr_198E
+.scan_next_active_moving_object
     STX      active_object_index
     LDA      object_lifecycle_base_for_indexed_refs,X
     CMP      #&1
-    BNE      addr_19EB
+    BNE      advance_active_moving_object_slot
     LDA      object_graphic_id_by_index,X
     CMP      #&2a
-    BNE      addr_19B1
+    BNE      test_active_clone_object
     TXA
     AND      #&f
     CMP      frame_phase
-    BNE      addr_19B1
+    BNE      test_active_clone_object
     JSR      begin_target_enemy_move_test
     JSR      move_spinner_towards_player_x_then_y
     JSR      end_target_enemy_move_test
-    JMP      addr_19EB
+    JMP      advance_active_moving_object_slot
 
-.addr_19B1
+.test_active_clone_object
     LDA      object_graphic_id_by_index,X
     CMP      #&2b
-    BNE      addr_19D1
+    BNE      test_active_cyberdroid_object
     TXA
     AND      #&7
     STA      zp_indirect_74_low
     LDA      frame_phase
     AND      #&7
     CMP      zp_indirect_74_low
-    BNE      addr_19D1
+    BNE      test_active_cyberdroid_object
     JSR      begin_target_enemy_move_test
     JSR      move_clone_continue_or_random
     JSR      end_target_enemy_move_test
-    JMP      addr_19EB
+    JMP      advance_active_moving_object_slot
 
-.addr_19D1
+.test_active_cyberdroid_object
     LDA      object_graphic_id_by_index,X
     CMP      #&2c
-    BNE      addr_19EB
+    BNE      advance_active_moving_object_slot
     TXA
     AND      #&f
     CMP      frame_phase
-    BNE      addr_19EB
+    BNE      advance_active_moving_object_slot
     JSR      begin_target_enemy_move_test
     JSR      move_cyberdroid_persistent
     JSR      end_target_enemy_move_test
-    JMP      addr_19EB
+    JMP      advance_active_moving_object_slot
 
-.addr_19EB
+.advance_active_moving_object_slot
     LDX      active_object_index
     INX
     CPX      #&20
-    BNE      addr_198E
+    BNE      scan_next_active_moving_object
     RTS
 
 .player_collision_flash_sequence
@@ -1924,7 +1924,7 @@ org runtime_start
     LDA      #&32
     STA      frame_phase
 
-.addr_1A06
+.player_collision_flash_next_frame
     JSR      wait_one_frame_tick
     LDA      frame_phase
     AND      #&f
@@ -1950,7 +1950,7 @@ org runtime_start
     LDX      #&11
     JSR      draw_object_using_saved_screen_ptr
     DEC      frame_phase
-    BPL      addr_1A06
+    BPL      player_collision_flash_next_frame
     LDA      #&2
     STA      render_mode_or_text_scratch
     LDX      #&10
@@ -2001,33 +2001,33 @@ org runtime_start
     STA      bounds_or_outside_flag
     LDA      player_x_first_cell
     CMP      #&2
-    BPL      addr_1ABC
+    BPL      test_player_right_boundary
     LDX      #&1
-    JMP      addr_1ADB
+    JMP      restart_after_area_transition
 
-.addr_1ABC
+.test_player_right_boundary
     CMP      #&4c
-    BMI      addr_1AC5
+    BMI      test_player_vertical_boundaries
     LDX      #&0
-    JMP      addr_1ADB
+    JMP      restart_after_area_transition
 
-.addr_1AC5
+.test_player_vertical_boundaries
     LDA      player_y_first_cell
     CMP      #&7
-    BPL      addr_1AD1
+    BPL      test_player_bottom_boundary
     LDX      #&2
-    JMP      addr_1ADB
+    JMP      restart_after_area_transition
 
-.addr_1AD1
+.test_player_bottom_boundary
     CMP      #&36
-    BMI      addr_1ADA
+    BMI      return_from_bounds_or_invisible_shot
     LDX      #&3
-    JMP      addr_1ADB
+    JMP      restart_after_area_transition
 
-.addr_1ADA
+.return_from_bounds_or_invisible_shot
     RTS
 
-.addr_1ADB
+.restart_after_area_transition
     JSR      add_direction_score_or_state_delta
     JSR      clear_all_palette_entries
     LDA      #&c
@@ -2036,32 +2036,32 @@ org runtime_start
 
 .erase_visible_shot_or_hazard_previous_bytes
     LDA      shot_visible_flag_by_slot,X
-    BEQ      addr_1ADA
+    BEQ      return_from_bounds_or_invisible_shot
     LDA      shot_screen_low_previous,X
     STA      zp_screen_ptr_70_low
     LDA      shot_screen_high_previous,X
     STA      zp_screen_ptr_70_high
     LDY      #&1
 
-.addr_1AFA
+.erase_next_shot_or_hazard_byte
     LDA      (zp_screen_ptr_70_low),Y
     EOR      #&2a
     STA      (zp_screen_ptr_70_low),Y
     DEY
-    BPL      addr_1AFA
+    BPL      erase_next_shot_or_hazard_byte
     LDA      shot_direction_or_inactive_by_slot,X
-    BPL      addr_1B0D
+    BPL      return_from_shot_or_hazard_deactivation
     LDA      #&0
     STA      shot_visible_flag_by_slot,X
 
-.addr_1B0D
+.return_from_shot_or_hazard_deactivation
     RTS
 
 .draw_active_shot_or_hazard_and_test
     LDA      #&0
     STA      renderer_collision_accumulator
     LDA      shot_direction_or_inactive_by_slot,X
-    BMI      addr_1ADA
+    BMI      return_from_bounds_or_invisible_shot
     LDA      #&1
     STA      shot_visible_flag_by_slot,X
     LDA      shot_screen_low_current,X
@@ -2070,7 +2070,7 @@ org runtime_start
     STA      zp_screen_ptr_70_high
     LDY      #&1
 
-.addr_1B28
+.accumulate_next_shot_collision_byte
     LDA      (zp_screen_ptr_70_low),Y
     AND      #&aa
     ORA      renderer_collision_accumulator
@@ -2079,17 +2079,17 @@ org runtime_start
     EOR      #&2a
     STA      (zp_screen_ptr_70_low),Y
     DEY
-    BPL      addr_1B28
+    BPL      accumulate_next_shot_collision_byte
     LDA      renderer_collision_accumulator
-    BNE      addr_1B3E
+    BNE      dispatch_shot_or_hazard_collisions
     RTS
 
-.addr_1B3E
+.dispatch_shot_or_hazard_collisions
     JMP      handle_shot_or_hazard_overlap_collisions
 
 .expire_projectile_or_hazard_on_collision
     LDA      shot_direction_or_inactive_by_slot,X
-    BMI      addr_1ADA
+    BMI      return_from_bounds_or_invisible_shot
     LDA      #&0
     STA      projectile_spook_pause_collision_flag
     LDA      shot_screen_low_current,X
@@ -2098,7 +2098,7 @@ org runtime_start
     STA      zp_screen_ptr_70_high
     LDY      #&1
 
-.addr_1B56
+.inspect_next_shot_collision_byte
     LDA      (zp_screen_ptr_70_low),Y
     AND      #&aa
     CMP      #&a0
@@ -2110,7 +2110,7 @@ org runtime_start
     CMP      #&8a
     BEQ      deactivate_shot_or_hazard_slot
     DEY
-    BPL      addr_1B56
+    BPL      inspect_next_shot_collision_byte
     JSR      test_projectile_inside_playfield
     LDA      bounds_or_outside_flag
     BNE      deactivate_shot_or_hazard_slot
@@ -2123,17 +2123,17 @@ org runtime_start
     LDA      #&ff
     STA      shot_direction_or_inactive_by_slot,X
     CPX      #&4
-    BPL      addr_1B83
+    BPL      decrement_active_hazard_count
     DEC      active_player_shot_count
     RTS
 
-.addr_1B83
+.decrement_active_hazard_count
     DEC      active_spawned_hazard_count
     RTS
 
 .move_active_shot_or_hazard
     LDY      shot_direction_or_inactive_by_slot,X
-    BMI      addr_1BE2
+    BMI      return_from_shot_screen_pointer_update
     LDA      shot_screen_low_current,X
     STA      shot_screen_low_previous,X
     STA      zp_screen_ptr_70_low
@@ -2156,11 +2156,11 @@ org runtime_start
     ADC      projectile_ptr_high_delta_by_dir_1b87,Y
     STA      shot_screen_high_current,X
     LDA      projectile_grid_y_delta_by_dir_1b87,Y
-    BEQ      addr_1BE2
-    BPL      addr_1BE3
+    BEQ      return_from_shot_screen_pointer_update
+    BPL      adjust_even_y_shot_screen_row
     LDA      shot_y_by_slot,X
     AND      #&1
-    BEQ      addr_1BE2
+    BEQ      return_from_shot_screen_pointer_update
     LDA      shot_screen_low_current,X
     SEC
     SBC      #&78
@@ -2169,13 +2169,13 @@ org runtime_start
     SBC      #&2
     STA      shot_screen_high_current,X
 
-.addr_1BE2
+.return_from_shot_screen_pointer_update
     RTS
 
-.addr_1BE3
+.adjust_even_y_shot_screen_row
     LDA      shot_y_by_slot,X
     AND      #&1
-    BNE      addr_1BE2
+    BNE      return_from_shot_screen_pointer_update
     LDA      shot_screen_low_current,X
     CLC
     ADC      #&78
@@ -2202,11 +2202,11 @@ org runtime_start
     LDX      zp_indirect_74_low
     LDA      shot_y_by_slot,X
     AND      #&1
-    BEQ      addr_1C26
+    BEQ      add_shot_horizontal_screen_offset
     LDA      #&4
     JSR      add_a_to_pointer_70
 
-.addr_1C26
+.add_shot_horizontal_screen_offset
     LDA      shot_x_by_slot,X
     STA      zp_calc_ptr_72_low
     LDA      #&0
@@ -2229,19 +2229,19 @@ org runtime_start
 
 .spawn_player_shot_if_fire_pressed
     LDA      fire_edge_request
-    BEQ      addr_1C8C
+    BEQ      return_from_player_shot_request
     LDA      #&0
     STA      fire_edge_request
     LDA      active_player_shot_count
     CMP      #&4
-    BEQ      addr_1C8C
+    BEQ      return_from_player_shot_request
     INC      active_player_shot_count
     LDX      #&ff
 
-.addr_1C5F
+.find_inactive_player_shot_slot
     INX
     LDA      shot_direction_or_inactive_by_slot,X
-    BPL      addr_1C5F
+    BPL      find_inactive_player_shot_slot
     LDA      player_direction
     STA      shot_direction_or_inactive_by_slot,X
     TAY
@@ -2259,7 +2259,7 @@ org runtime_start
     LDA      #&0
     JSR      play_sound_id_if_enabled
 
-.addr_1C8C
+.return_from_player_shot_request
     RTS
 
 .test_projectile_inside_playfield
@@ -2267,17 +2267,17 @@ org runtime_start
     STA      bounds_or_outside_flag
     LDA      shot_x_by_slot,X
     CMP      #&2
-    BMI      addr_1CA8
+    BMI      mark_projectile_outside_playfield
     CMP      #&4e
-    BPL      addr_1CA8
+    BPL      mark_projectile_outside_playfield
     LDA      shot_y_by_slot,X
     CMP      #&7
-    BMI      addr_1CA8
+    BMI      mark_projectile_outside_playfield
     CMP      #&39
-    BPL      addr_1CA8
+    BPL      mark_projectile_outside_playfield
     RTS
 
-.addr_1CA8
+.mark_projectile_outside_playfield
     INC      bounds_or_outside_flag
     RTS
 
@@ -2319,7 +2319,7 @@ org runtime_start
     LDA      room_area
     AND      #&f
     CMP      #&9
-    BMI      addr_1D1C
+    BMI      draw_single_digit_room_number
     LDA      #&21
     JSR      draw_status_glyph_at_current_ptr
     LDA      room_area
@@ -2327,9 +2327,9 @@ org runtime_start
     CLC
     ADC      #&17
     JSR      draw_status_glyph_at_current_ptr
-    JMP      addr_1D29
+    JMP      draw_status_level_number
 
-.addr_1D1C
+.draw_single_digit_room_number
     JSR      advance_status_glyph_ptr
     LDA      room_area
     AND      #&f
@@ -2337,7 +2337,7 @@ org runtime_start
     ADC      #&21
     JSR      draw_status_glyph_at_current_ptr
 
-.addr_1D29
+.draw_status_level_number
     JSR      advance_status_glyph_ptr
     LDA      level_tens_digit
     ADC      #&20
@@ -2371,7 +2371,7 @@ org runtime_start
     LDA      #&0
     STA      rng_output_byte
 
-.addr_1D67
+.generate_next_rng_output_bit
     LDA      rng_shift_register_low
     AND      #&48
     ADC      #&38
@@ -2388,7 +2388,7 @@ org runtime_start
     ORA      rng_output_byte
     STA      rng_output_byte
     DEY
-    BNE      addr_1D67
+    BNE      generate_next_rng_output_bit
     RTS
 
 .compute_item_screen_ptr
