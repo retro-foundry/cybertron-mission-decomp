@@ -1361,6 +1361,66 @@ def main() -> None:
                 )
             enemy_scheduler_cpu_replays += 1
 
+    # The shared $20B3 random-delta generator consumes two low RNG bits per
+    # axis and stores (second-first). Exhaust all sixteen bit combinations so
+    # ports preserve both values and the original 1:2:1 distribution.
+    enemy_decision_cpu_replays = 0
+    for rng_bits in range(16):
+        scripted_bits = [(rng_bits >> shift) & 1 for shift in range(4)]
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        render_slot = 0x14
+        memory[0x0039] = render_slot
+        rng_values = list(scripted_bits)
+
+        def random_delta_handler(cpu: Replay6502, target: int) -> bool:
+            if target == 0x1D61:
+                cpu.a = rng_values.pop(0)
+                return True
+            return False
+
+        cpu = Replay6502(memory, random_delta_handler)
+        cpu.run_subroutine(0x20B3)
+        expected_x = (scripted_bits[1] - scripted_bits[0]) & 0xFF
+        expected_y = (scripted_bits[3] - scripted_bits[2]) & 0xFF
+        actual = (
+            memory[0x0033],
+            memory[0x0034],
+            memory[0x0C86 + render_slot],
+            memory[0x0C9E + render_slot],
+            rng_values,
+        )
+        expected = (expected_x, expected_y, expected_x, expected_y, [])
+        if actual != expected:
+            fail(f"random enemy delta bits={scripted_bits}: {actual}, expected {expected}")
+        enemy_decision_cpu_replays += 1
+
+    # $23A3 is the common chase-vector resolver for SPINNER and the spook
+    # pair. Its Y comparison deliberately uses player Y+1.
+    for player_x in (0x1F, 0x20, 0x21):
+        for player_y in (0x1F, 0x20, 0x21):
+            memory = bytearray(0x10000)
+            memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+            render_slot = 0x14
+            memory[0x0A10] = player_x
+            memory[0x0A50] = player_y
+            memory[0x0A00 + render_slot] = 0x20
+            memory[0x0A40 + render_slot] = 0x21
+            cpu = Replay6502(memory)
+            cpu.x = render_slot
+            cpu.run_subroutine(0x23A3)
+            expected_x = 0xFF if player_x < 0x20 else (1 if player_x > 0x20 else 0)
+            adjusted_player_y = player_y + 1
+            expected_y = 0xFF if adjusted_player_y < 0x21 else (1 if adjusted_player_y > 0x21 else 0)
+            actual = (memory[0x0033], memory[0x0034])
+            expected = (expected_x, expected_y)
+            if actual != expected:
+                fail(
+                    f"enemy chase vector player=({player_x:02X},{player_y:02X}): "
+                    f"{actual}, expected {expected}"
+                )
+            enemy_decision_cpu_replays += 1
+
     # $1B41 recognizes four masked screen-byte classes. Exhaust all byte
     # values so ports cannot accidentally compare unmasked pixels or merge the
     # special $A0 spook-pause outcome with ordinary expiry.
@@ -2007,6 +2067,7 @@ def main() -> None:
         f"{lifecycle_rows} lifecycle states, "
         f"{lifecycle_cpu_replays} lifecycle CPU replays, "
         f"{enemy_scheduler_cpu_replays} enemy-scheduler CPU replays, "
+        f"{enemy_decision_cpu_replays} enemy-decision CPU replays, "
         f"{expiry_rows} projectile expiry bytes, "
         f"{projectile_expiry_cpu_replays} projectile expiry CPU replays, "
         f"{target_outcome_cpu_replays} target-outcome CPU replays, "

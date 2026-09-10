@@ -30,6 +30,7 @@ hazard_source
 $2235 requires hazard count below 4, RNG&7 below level gate $00B8, an active source in $19+(RNG&$0F), and a nonzero stored source delta
 the source delta selects one of eight directions; allocation and lifecycle details are in runtime_projectile_lifecycle.txt
 
-port_acceptance
-Scheduler replay must cover every slot $14-$1F, frame phase 0-15, each recognized graphic, inactive state, and an unrecognized graphic.
-Movement-policy promotion requires actual-code replay of success and collision-restoration branches, including deterministic RNG vectors for CLONE and CYBERDROID.
+replay_coverage
+Scheduler replay covers every slot $14-$1F, frame phase 0-15, each recognized graphic, inactive state, and an unrecognized graphic.
+Shared decision replay covers all sixteen four-bit RNG inputs to $20B3 and all nine relative X/Y outcomes from $23A3.
+Movement-policy promotion still requires actual-code replay of each enemy's success and collision-restoration branches.

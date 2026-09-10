@@ -189,6 +189,11 @@ class Replay6502:
                 total = self.a - value - int(not self.carry)
                 self.carry = total >= 0
                 self.a = self._flags(total)
+            elif opcode == 0xE5:  # SBC zp
+                value = self.memory[self._fetch()]
+                total = self.a - value - int(not self.carry)
+                self.carry = total >= 0
+                self.a = self._flags(total)
             elif opcode == 0x0A:  # ASL A
                 self.carry = bool(self.a & 0x80)
                 self.a = self._flags(self.a << 1)

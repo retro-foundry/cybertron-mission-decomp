@@ -39,6 +39,7 @@ accepted as evidence for gameplay identity.
 | Object/projectile lifecycle projection | All six enemy-count rows, 41 overlapping render-slot roles, six hit-animation states, and 256 masked projectile-expiry bytes are checked against bundled contracts | Port-contract |
 | Hit lifecycle replay | The actual source-built `$1812` erase/retire and `$1876` draw/advance passes are CPU-replayed for all six lifecycle states with renderer calls captured | Port-contract, exhaustive |
 | Enemy scheduler replay | The complete source-built `$198C` scheduler is CPU-replayed for all 12 active-object slots, all 16 frame phases, and all three enemy graphics, plus inactive and unrecognized-graphic rejection cases; cadence and erase/move/redraw dispatch order are checked in 600 cases | Port-contract, exhaustive |
+| Enemy decision primitives | The source-built `$20B3` random-delta generator is CPU-replayed for all 16 low-bit inputs and `$23A3` chase-vector resolution for all nine relative axis outcomes, including its adjusted player-Y comparison | Port-contract, exhaustive |
 | Hazard recycle replay | The actual source-built `$22D0` path is CPU-replayed for every first-free logical item slot 0-11 and the slot-12 refusal boundary; graphic transfer, active state, saved slot, placement tail, and bounded ownership are checked | Port-contract, exhaustive |
 | Projectile expiry replay | The actual source-built `$1B41` routine is CPU-replayed for all 256 screen-byte values in both player-shot and hazard slots, including counter ownership and the `$A0` spook-pause class | Port-contract, exhaustive |
 | Target outcome replay | The actual source-built `$0FD6-$1069` handler is CPU-replayed for required slots 1-5, the bonus target, the incomplete completion gate, and level advance with and without decimal carry; matching, status consumption, movement reversal/cancellation, score/sound dispatch, lives, level digits, and room-bank rotation are checked | Port-contract |
@@ -72,8 +73,8 @@ validation depth is not yet equivalent to the Quest repository. Completion of
 that broader standard requires:
 
 1. Add actual-code replay coverage for player collision outcomes and the
-   internal SPINNER, CLONE, and CYBERDROID movement decisions. Scheduler
-   cadence is exhaustive, but movement success/collision/RNG branches are not.
+   internal SPINNER, CLONE, and CYBERDROID success/collision-restoration
+   branches. Scheduler cadence and shared decision primitives are exhaustive.
 2. Add an active-loop/full-frame comparison that records complete RAM and display
    effects for fixed initial state and input sequences.
 3. Replace the active-frame spine's leaf probes with integrated subsystem
