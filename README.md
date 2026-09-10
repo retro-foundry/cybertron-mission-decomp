@@ -16,6 +16,8 @@ This repository covers the runtime loaded at `$0D80-$2FFF`, with entry point
 `$0E02`. The original title program, bootstrap, cassette/disc structure, and
 other release media are outside this source reconstruction.
 
+Original image: https://bbcmicro.co.uk/game.php?id=58
+
 ## Community
 
 Join the project discussion on [Discord](https://discord.gg/QjARJ67V9U).
