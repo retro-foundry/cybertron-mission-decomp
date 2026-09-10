@@ -48,17 +48,23 @@ class Replay6502:
 
     def run_subroutine(self, address: int, max_steps: int = 100000) -> int:
         self.pc = address
+        return_stack = []
         for steps in range(1, max_steps + 1):
             opcode_address = self.pc
             opcode = self._fetch()
             if opcode == 0x60:  # RTS
-                return steps
+                if not return_stack:
+                    return steps
+                self.pc = return_stack.pop()
+                continue
             if opcode == 0x85:  # STA zp
                 self.memory[self._fetch()] = self.a
             elif opcode == 0x8D:  # STA abs
                 self.memory[self._word()] = self.a
             elif opcode == 0x86:  # STX zp
                 self.memory[self._fetch()] = self.x
+            elif opcode == 0x8E:  # STX abs
+                self.memory[self._word()] = self.x
             elif opcode == 0xA2:  # LDX #imm
                 self.x = self._flags(self._fetch())
             elif opcode == 0xA4:  # LDY zp
@@ -78,6 +84,8 @@ class Replay6502:
                 self.y = self._flags(self.memory[(self._word() + self.x) & 0xFFFF])
             elif opcode == 0xA6:  # LDX zp
                 self.x = self._flags(self.memory[self._fetch()])
+            elif opcode == 0xAE:  # LDX abs
+                self.x = self._flags(self.memory[self._word()])
             elif opcode == 0xC9:  # CMP #imm
                 self._compare(self.a, self._fetch())
             elif opcode == 0xC0:  # CPY #imm
@@ -119,10 +127,10 @@ class Replay6502:
                 self._branch(not self.negative)
             elif opcode == 0x20:  # JSR abs
                 target = self._word()
-                if self.jsr_handler is None or not self.jsr_handler(self, target):
-                    raise AssertionError(
-                        f"unhandled JSR ${target:04X} at ${opcode_address:04X}"
-                    )
+                if self.jsr_handler is not None and self.jsr_handler(self, target):
+                    continue
+                return_stack.append(self.pc)
+                self.pc = target
             elif opcode == 0x18:  # CLC
                 self.carry = False
             elif opcode == 0x38:  # SEC
@@ -137,11 +145,30 @@ class Replay6502:
                 total = self.a + value + int(self.carry)
                 self.carry = total > 0xFF
                 self.a = self._flags(total)
+            elif opcode == 0x65:  # ADC zp
+                value = self.memory[self._fetch()]
+                total = self.a + value + int(self.carry)
+                self.carry = total > 0xFF
+                self.a = self._flags(total)
             elif opcode == 0xE9:  # SBC #imm
                 value = self._fetch()
                 total = self.a - value - int(not self.carry)
                 self.carry = total >= 0
                 self.a = self._flags(total)
+            elif opcode == 0x0A:  # ASL A
+                self.carry = bool(self.a & 0x80)
+                self.a = self._flags(self.a << 1)
+            elif opcode == 0x06:  # ASL zp
+                target = self._fetch()
+                value = self.memory[target]
+                self.carry = bool(value & 0x80)
+                self.memory[target] = self._flags(value << 1)
+            elif opcode == 0x26:  # ROL zp
+                target = self._fetch()
+                value = self.memory[target]
+                carry_in = int(self.carry)
+                self.carry = bool(value & 0x80)
+                self.memory[target] = self._flags((value << 1) | carry_in)
             elif opcode == 0x4C:  # JMP abs (tail-call handler may end replay)
                 target = self._word()
                 if self.jsr_handler is not None and self.jsr_handler(self, target):

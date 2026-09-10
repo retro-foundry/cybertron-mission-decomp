@@ -94,6 +94,7 @@ def main() -> None:
         return object_pointer(x, y) + (4 if y & 1 else 0)
 
     projectile_rows = 0
+    projectile_pointer_cpu_replays = 0
     for start in range(4):
         for direction in range(8):
             x = (start_x[start] + shot_x_offsets[direction]) & 0xFF
@@ -105,6 +106,21 @@ def main() -> None:
                     f"screen pointer ${pointer:04X} outside bitmap"
                 )
             projectile_rows += 1
+
+            memory = bytearray(0x10000)
+            memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+            memory[0x0C3E] = x
+            memory[0x0C46] = y
+            cpu = Replay6502(memory)
+            cpu.x = 0
+            cpu.run_subroutine(0x1BFC)
+            actual_pointer = memory[0x0C1E] | memory[0x0C26] << 8
+            if actual_pointer != pointer:
+                fail(
+                    f"player start {start}, shot direction {direction}: "
+                    f"CPU pointer ${actual_pointer:04X}, expected ${pointer:04X}"
+                )
+            projectile_pointer_cpu_replays += 1
 
     # $1B87 movement deltas must reproduce $1BFC for both even and odd Y.
     delta_y = tuple(value if value < 0x80 else value - 0x100 for value in block(0x2798, 8))
@@ -1033,6 +1049,7 @@ def main() -> None:
         f"{player_selector_rows} player selector rows, "
         "4 player starts, "
         f"{projectile_rows} shot projections, "
+        f"{projectile_pointer_cpu_replays} shot-pointer CPU replays, "
         f"{movement_rows} movement projections, "
         f"{movement_cpu_replays} movement CPU replays, "
         f"{keyboard_rows} keyboard masks, "
