@@ -1,4 +1,4 @@
-"""Render every 24-byte Cybertron Mission Mode 1 graphic record."""
+"""Render composed Cybertron Mode 2 sprites and standalone graphics."""
 
 from pathlib import Path
 import re
@@ -8,15 +8,46 @@ from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "source_acorn_electron" / "cyber1.asm"
-OUTPUT = ROOT / "analysis" / "reconstruction" / "all_graphic_records.png"
+OUTPUT = ROOT / "analysis" / "reconstruction" / "composed_sprite_sheet.png"
 RECORD_SIZE = 24
-FIRST_ADDRESS = 0x2900
+
+LOGICAL_REVIEW_COLOURS = (
+    (0, 0, 0),
+    (255, 0, 0),
+    (0, 255, 0),
+    (255, 255, 0),
+    (0, 0, 255),
+    (255, 0, 255),
+    (0, 255, 255),
+    (255, 255, 255),
+    (96, 96, 96),
+    (255, 128, 0),
+    (128, 255, 0),
+    (255, 192, 0),
+    (64, 128, 255),
+    (255, 96, 192),
+    (64, 192, 192),
+    (192, 192, 192),
+)
+
+
+def logical_colour_index(value: int, packed_pixel: int) -> int:
+    """Decode one of the two four-bit BBC Mode 2 pixels in a byte."""
+    shift = 1 - packed_pixel
+    return (
+        ((value >> (6 + shift)) & 1)
+        | (((value >> (4 + shift)) & 1) << 1)
+        | (((value >> (2 + shift)) & 1) << 2)
+        | (((value >> shift) & 1) << 3)
+    )
 
 
 def colour(value: int, packed_pixel: int) -> tuple[int, int, int]:
-    low = (value >> (7 - packed_pixel)) & 1
-    high = (value >> (3 - packed_pixel)) & 1
-    return ((0, 0, 0), (255, 0, 0), (255, 255, 0), (255, 255, 255))[low | high << 1]
+    logical = logical_colour_index(value, packed_pixel)
+    # Use a stable diagnostic colour for each logical index. The runtime
+    # repeatedly remaps indices 8-15, so flattening one live palette phase can
+    # make valid records disappear into black on a static sheet.
+    return LOGICAL_REVIEW_COLOURS[logical]
 
 
 def read_records(source: str) -> list[tuple[int, str, list[int]]]:
@@ -40,41 +71,78 @@ def read_records(source: str) -> list[tuple[int, str, list[int]]]:
     return records
 
 
+def decode_record(record: list[int]) -> list[list[tuple[int, int, int]]]:
+    pixels = []
+    for y in range(8):
+        row = []
+        for byte_column in range(3):
+            value = record[y + byte_column * 8]
+            row.extend(colour(value, packed_pixel) for packed_pixel in range(2))
+        pixels.append(row)
+    return pixels
+
+
 def main() -> None:
     records = read_records(SOURCE.read_text(encoding="ascii"))
+    direction_names = (
+        "down", "up", "right", "left",
+        "up_right", "down_right", "up_left", "down_left",
+    )
+    images = []
+    for direction, direction_name in enumerate(direction_names):
+        base = direction * 4
+        upper = decode_record(records[base][2])
+        for lower_offset, frame_name in ((1, "step_a"), (2, "step_b")):
+            lower = decode_record(records[base + lower_offset][2])
+            images.append((f"player_{direction_name}_{frame_name}", upper + lower))
+
+    # The initial runtime bytes select record $03 below record $00 before the
+    # normal direction animation takes over, so preserve that composition too.
+    images.append(("player_down_initial", decode_record(records[0][2]) + decode_record(records[3][2])))
+
+    # The spook uses adjacent object slots with a two-unit Y difference, the
+    # same eight-pixel vertical composition used by the player pair.
+    images.append(("spook", decode_record(records[0x2E][2]) + decode_record(records[0x2F][2])))
+
+    # Records $20-$3F are independently drawn glyphs, enemies, hit frames, or
+    # targets. The spook halves are excluded because their meaningful view is
+    # the composition above.
+    for record_id in range(0x20, 0x40):
+        if record_id in (0x2E, 0x2F):
+            continue
+        role = records[record_id][1]
+        images.append((f"${record_id:02X}  {role}", decode_record(records[record_id][2])))
+
     columns = 4
-    scale = 8
+    x_scale = 16
+    y_scale = 8
     cell_width = 300
-    cell_height = 104
-    rows = (len(records) + columns - 1) // columns
+    cell_height = 172
+    rows = (len(images) + columns - 1) // columns
     sheet = Image.new("RGB", (columns * cell_width, rows * cell_height), (224, 224, 224))
     draw = ImageDraw.Draw(sheet)
 
-    for index, (record_id, role, record) in enumerate(records):
+    for index, (label, pixels) in enumerate(images):
         column = index % columns
         row = index // columns
         ox = column * cell_width
         oy = row * cell_height
-        address = FIRST_ADDRESS + record_id * RECORD_SIZE
-        draw.text((ox + 8, oy + 6), f"${address:04X}  ${record_id:02X}  {role}", fill=(0, 0, 0))
+        draw.text((ox + 8, oy + 6), label, fill=(0, 0, 0))
         sprite_x = ox + 8
         sprite_y = oy + 28
-        for y in range(8):
-            for byte_column in range(3):
-                value = record[y + byte_column * 8]
-                for packed_pixel in range(4):
-                    x = byte_column * 4 + packed_pixel
-                    draw.rectangle(
-                        (
-                            sprite_x + x * scale,
-                            sprite_y + y * scale,
-                            sprite_x + (x + 1) * scale - 1,
-                            sprite_y + (y + 1) * scale - 1,
-                        ),
-                        fill=colour(value, packed_pixel),
-                    )
+        for y, pixel_row in enumerate(pixels):
+            for x, pixel_colour in enumerate(pixel_row):
+                draw.rectangle(
+                    (
+                        sprite_x + x * x_scale,
+                        sprite_y + y * y_scale,
+                        sprite_x + (x + 1) * x_scale - 1,
+                        sprite_y + (y + 1) * y_scale - 1,
+                    ),
+                    fill=pixel_colour,
+                )
         draw.rectangle(
-            (sprite_x - 1, sprite_y - 1, sprite_x + 12 * scale, sprite_y + 8 * scale),
+            (sprite_x - 1, sprite_y - 1, sprite_x + 6 * x_scale, sprite_y + len(pixels) * y_scale),
             outline=(96, 96, 96),
         )
 

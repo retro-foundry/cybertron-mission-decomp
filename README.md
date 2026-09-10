@@ -71,7 +71,7 @@ See [`source_acorn_electron/README.md`](source_acorn_electron/README.md) for the
 source conventions and range manifest.
 
 The decoded 24-byte artwork can be reviewed in the
-[complete labelled graphic sheet](analysis/reconstruction/all_graphic_records.png).
+[composed sprite and graphic sheet](analysis/reconstruction/composed_sprite_sheet.png).
 
 This is reconstructed source, not the original author's source. The original
 game and its assets remain the property of their respective copyright holders.

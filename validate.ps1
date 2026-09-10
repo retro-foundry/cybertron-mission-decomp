@@ -19,7 +19,7 @@ $requiredFiles = @(
     'source_acorn_electron/README.md'
     'source_acorn_electron/reconstruction.json'
     'tools/reconstruction/render_graphic_sheet.py'
-    'analysis/reconstruction/all_graphic_records.png'
+    'analysis/reconstruction/composed_sprite_sheet.png'
 )
 foreach ($relativePath in $requiredFiles) {
     $requiredPath = Join-Path $repoRoot $relativePath

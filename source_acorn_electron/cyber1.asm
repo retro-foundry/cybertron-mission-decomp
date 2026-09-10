@@ -4110,10 +4110,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame; $254F/$254B $1735 start index 3
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 3000 / 1010 / 1010 / 0000 / 0210 / 0210 / 2200
-    ; graphic_strip_1_pixels 3300 / 1111 / 1111 / 1111 / 1111 / 0011 / 0011 / 1100
-    ; graphic_strip_2_pixels 0000 / 0300 / 0101 / 0101 / 0000 / 2001 / 2001 / 2200
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&11,&05,&05,&00,&24,&24,&30
     EQUB &33,&0F,&0F,&0F,&0F,&0C,&0C,&03
     EQUB &00,&22,&0A,&0A,&00,&18,&18,&30
@@ -4122,10 +4119,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 2000 / 0010 / 0011 / 0011 / 0000 / 0000 / 0000 / 2211
-    ; graphic_strip_1_pixels 1100 / 1100 / 1100 / 1100 / 0000 / 0000 / 0000 / 0000
-    ; graphic_strip_2_pixels 0200 / 0001 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &10,&04,&0C,&0C,&00,&00,&00,&3C
     EQUB &03,&03,&03,&03,&00,&00,&00,&00
     EQUB &20,&08,&08,&08,&08,&08,&0C,&0C
@@ -4134,10 +4128,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame; $254B $1735 start index 3 and stationary dir0
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 2000 / 0010 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
-    ; graphic_strip_1_pixels 1100 / 1100 / 1100 / 1100 / 0000 / 0000 / 0000 / 0000
-    ; graphic_strip_2_pixels 0200 / 0001 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &10,&04,&04,&04,&04,&04,&0C,&0C
     EQUB &03,&03,&03,&03,&00,&00,&00,&00
     EQUB &20,&08,&08,&08,&08,&08,&0C,&0C
@@ -4146,10 +4137,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 2000 / 0010 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
-    ; graphic_strip_1_pixels 1100 / 1100 / 1100 / 1100 / 0000 / 0000 / 0000 / 0000
-    ; graphic_strip_2_pixels 0200 / 0001 / 0011 / 0011 / 0000 / 0000 / 0000 / 2211
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &10,&04,&04,&04,&04,&04,&0C,&0C
     EQUB &03,&03,&03,&03,&00,&00,&00,&00
     EQUB &20,&08,&0C,&0C,&00,&00,&00,&3C
@@ -4158,10 +4146,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame; $254F $1735 start index 2
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 3000 / 3000 / 1010 / 0000 / 0210 / 0210 / 0210
-    ; graphic_strip_1_pixels 3300 / 3300 / 3300 / 1111 / 1111 / 0011 / 0011 / 0011
-    ; graphic_strip_2_pixels 0000 / 0300 / 0300 / 0101 / 0000 / 2001 / 2001 / 2001
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&11,&11,&05,&00,&24,&24,&24
     EQUB &33,&33,&33,&0F,&0F,&0C,&0C,&0C
     EQUB &00,&22,&22,&0A,&00,&18,&18,&18
@@ -4170,10 +4155,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0010 / 0010 / 0011 / 0011 / 0000 / 0000 / 0000 / 2211
-    ; graphic_strip_1_pixels 0011 / 0011 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
-    ; graphic_strip_2_pixels 0001 / 0001 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &04,&04,&0C,&0C,&00,&00,&00,&3C
     EQUB &0C,&0C,&00,&00,&00,&00,&00,&00
     EQUB &08,&08,&08,&08,&08,&08,&0C,&0C
@@ -4182,10 +4164,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame; $254B $1735 start index 2 and stationary dir1
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0010 / 0010 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
-    ; graphic_strip_1_pixels 0011 / 0011 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
-    ; graphic_strip_2_pixels 0001 / 0001 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &04,&04,&04,&04,&04,&04,&0C,&0C
     EQUB &0C,&0C,&00,&00,&00,&00,&00,&00
     EQUB &08,&08,&08,&08,&08,&08,&0C,&0C
@@ -4194,10 +4173,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0010 / 0010 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
-    ; graphic_strip_1_pixels 0011 / 0011 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
-    ; graphic_strip_2_pixels 0001 / 0001 / 0011 / 0011 / 0000 / 0000 / 0000 / 2211
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &04,&04,&04,&04,&04,&04,&0C,&0C
     EQUB &0C,&0C,&00,&00,&00,&00,&00,&00
     EQUB &08,&08,&0C,&0C,&00,&00,&00,&3C
@@ -4206,10 +4182,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame; $254F $1735 start index 0
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 3000 / 1310 / 1310 / 1111 / 1010 / 2000 / 0210 / 0210
-    ; graphic_strip_1_pixels 0300 / 1111 / 1111 / 1111 / 0101 / 0001 / 0011 / 0011
-    ; graphic_strip_2_pixels 0000 / 0000 / 2211 / 0000 / 0000 / 0000 / 0000 / 0000
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &11,&27,&27,&0F,&05,&10,&24,&24
     EQUB &22,&0F,&0F,&0F,&0A,&08,&0C,&0C
     EQUB &00,&00,&3C,&00,&00,&00,&00,&00
@@ -4218,10 +4191,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 2200 / 2200 / 0010 / 0010 / 0010 / 0011 / 0011 / 0000
-    ; graphic_strip_1_pixels 1200 / 1200 / 0001 / 0011 / 0011 / 0010 / 0010 / 0010
-    ; graphic_strip_2_pixels 1100 / 1100 / 0000 / 0000 / 0000 / 0000 / 0001 / 0001
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &30,&30,&04,&04,&04,&0C,&0C,&00
     EQUB &21,&21,&08,&0C,&0C,&04,&04,&04
     EQUB &03,&03,&00,&00,&00,&00,&08,&08
@@ -4230,10 +4200,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame; $254B $1735 start index 0 and stationary dir2
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 2200 / 2200 / 0010 / 0010 / 0010 / 0010 / 0010 / 0010
-    ; graphic_strip_1_pixels 1200 / 1200 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
-    ; graphic_strip_2_pixels 1100 / 1100 / 0000 / 0000 / 0000 / 0000 / 0000 / 2211
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &30,&30,&04,&04,&04,&04,&04,&04
     EQUB &21,&21,&08,&08,&08,&08,&0C,&0C
     EQUB &03,&03,&00,&00,&00,&00,&00,&3C
@@ -4242,10 +4209,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 2200 / 2200 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
-    ; graphic_strip_1_pixels 1200 / 1200 / 0001 / 0011 / 0011 / 0010 / 0010 / 0000
-    ; graphic_strip_2_pixels 1100 / 1100 / 0000 / 0000 / 0000 / 0001 / 0001 / 0000
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &30,&30,&04,&04,&04,&04,&0C,&0C
     EQUB &21,&21,&08,&0C,&0C,&04,&04,&00
     EQUB &03,&03,&00,&00,&00,&08,&08,&00
@@ -4254,10 +4218,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame; $254F $1735 start index 1
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 2211 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
-    ; graphic_strip_1_pixels 3000 / 1111 / 1111 / 1111 / 1010 / 0010 / 0011 / 0011
-    ; graphic_strip_2_pixels 0300 / 3101 / 3101 / 1111 / 0101 / 0200 / 2001 / 2001
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&3C,&00,&00,&00,&00,&00,&00
     EQUB &11,&0F,&0F,&0F,&05,&04,&0C,&0C
     EQUB &22,&1B,&1B,&0F,&0A,&20,&18,&18
@@ -4266,10 +4227,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 1100 / 1100 / 0000 / 0000 / 0000 / 0000 / 0010 / 0010
-    ; graphic_strip_1_pixels 2100 / 2100 / 0010 / 0011 / 0011 / 0001 / 0001 / 0001
-    ; graphic_strip_2_pixels 2200 / 2200 / 0001 / 0001 / 0001 / 0011 / 0011 / 0000
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &03,&03,&00,&00,&00,&00,&04,&04
     EQUB &12,&12,&04,&0C,&0C,&08,&08,&08
     EQUB &30,&30,&08,&08,&08,&0C,&0C,&00
@@ -4278,10 +4236,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame; $254B $1735 start index 1 and stationary dir3
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 1100 / 1100 / 0000 / 0000 / 0000 / 0000 / 0000 / 2211
-    ; graphic_strip_1_pixels 2100 / 2100 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
-    ; graphic_strip_2_pixels 2200 / 2200 / 0001 / 0001 / 0001 / 0001 / 0001 / 0001
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &03,&03,&00,&00,&00,&00,&00,&3C
     EQUB &12,&12,&04,&04,&04,&04,&0C,&0C
     EQUB &30,&30,&08,&08,&08,&08,&08,&08
@@ -4290,202 +4245,151 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
     ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 dynamic player direction/frame
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 1100 / 1100 / 0000 / 0000 / 0000 / 0010 / 0010 / 0000
-    ; graphic_strip_1_pixels 2100 / 2100 / 0010 / 0011 / 0011 / 0001 / 0001 / 0000
-    ; graphic_strip_2_pixels 2200 / 2200 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &03,&03,&00,&00,&00,&04,&04,&00
     EQUB &12,&12,&04,&0C,&0C,&08,&08,&00
     EQUB &30,&30,&08,&08,&08,&08,&0C,&0C
 
 .graphic_record_10
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
-    ; graphic_role no_current_assignment_site_keep_numeric
-    ; graphic_usage status=raw_record_only role=no_current_assignment_site_keep_numeric sources=--
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 3000 / 1310 / 1310 / 1111 / 1010 / 2000 / 0210 / 2200
-    ; graphic_strip_1_pixels 0300 / 1111 / 1111 / 1111 / 0101 / 0001 / 1200 / 1200
-    ; graphic_strip_2_pixels 0000 / 0000 / 2211 / 0000 / 1000 / 1100 / 0100 / 0000
+    ; graphic_role player_direction_frame_family
+    ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &11,&27,&27,&0F,&05,&10,&24,&30
     EQUB &22,&0F,&0F,&0F,&0A,&08,&21,&21
     EQUB &00,&00,&3C,&00,&01,&03,&02,&00
 
 .graphic_record_11
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
-    ; graphic_role no_current_assignment_site_keep_numeric
-    ; graphic_usage status=raw_record_only role=no_current_assignment_site_keep_numeric sources=--
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 2200 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011 / 0000
-    ; graphic_strip_1_pixels 0011 / 0011 / 0001 / 0011 / 0011 / 0010 / 0010 / 0010
-    ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0001 / 0001
+    ; graphic_role player_direction_frame_family
+    ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &30,&04,&04,&04,&04,&0C,&0C,&00
     EQUB &0C,&0C,&08,&0C,&0C,&04,&04,&04
     EQUB &00,&00,&00,&00,&00,&00,&08,&08
 
 .graphic_record_12
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
-    ; graphic_role no_current_assignment_site_keep_numeric
-    ; graphic_usage status=raw_record_only role=no_current_assignment_site_keep_numeric sources=--
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 2200 / 0010 / 0010 / 0010 / 0010 / 0010 / 0010 / 0010
-    ; graphic_strip_1_pixels 0011 / 0011 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
-    ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 2211
+    ; graphic_role player_direction_frame_family
+    ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &30,&04,&04,&04,&04,&04,&04,&04
     EQUB &0C,&0C,&08,&08,&08,&08,&0C,&0C
     EQUB &00,&00,&00,&00,&00,&00,&00,&3C
 
 .graphic_record_13
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
-    ; graphic_role no_current_assignment_site_keep_numeric
-    ; graphic_usage status=raw_record_only role=no_current_assignment_site_keep_numeric sources=--
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 2200 / 0010 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
-    ; graphic_strip_1_pixels 0011 / 0011 / 0001 / 0011 / 0011 / 0010 / 0010 / 0000
-    ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0001 / 0001 / 0000
+    ; graphic_role player_direction_frame_family
+    ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and retained initial lower frame
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &30,&04,&04,&04,&04,&04,&0C,&0C
     EQUB &0C,&0C,&08,&0C,&0C,&04,&04,&00
     EQUB &00,&00,&00,&00,&00,&08,&08,&00
 
 .graphic_record_14
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
-    ; graphic_role no_current_assignment_site_keep_numeric
-    ; graphic_usage status=raw_record_only role=no_current_assignment_site_keep_numeric sources=--
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 3000 / 1310 / 1310 / 1111 / 1010 / 2000 / 0210 / 2200
-    ; graphic_strip_1_pixels 0300 / 1111 / 1111 / 1111 / 0101 / 0001 / 0011 / 0011
-    ; graphic_strip_2_pixels 0000 / 0000 / 2211 / 0000 / 0000 / 0000 / 0000 / 0000
+    ; graphic_role player_direction_frame_family
+    ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &11,&27,&27,&0F,&05,&10,&24,&30
     EQUB &22,&0F,&0F,&0F,&0A,&08,&0C,&0C
     EQUB &00,&00,&3C,&00,&00,&00,&00,&00
 
 .graphic_record_15
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
-    ; graphic_role no_current_assignment_site_keep_numeric
-    ; graphic_usage status=raw_record_only role=no_current_assignment_site_keep_numeric sources=--
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 2200 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011 / 0000
-    ; graphic_strip_1_pixels 1200 / 1200 / 0001 / 0011 / 0011 / 0010 / 0010 / 0010
-    ; graphic_strip_2_pixels 0000 / 0100 / 1100 / 1000 / 0000 / 0000 / 0001 / 0001
+    ; graphic_role player_direction_frame_family
+    ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &30,&04,&04,&04,&04,&0C,&0C,&00
     EQUB &21,&21,&08,&0C,&0C,&04,&04,&04
     EQUB &00,&02,&03,&01,&00,&00,&08,&08
 
 .graphic_record_16
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
-    ; graphic_role no_current_assignment_site_keep_numeric
-    ; graphic_usage status=raw_record_only role=no_current_assignment_site_keep_numeric sources=--
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 2200 / 0010 / 0010 / 0010 / 0010 / 0010 / 0010 / 0010
-    ; graphic_strip_1_pixels 1200 / 1200 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
-    ; graphic_strip_2_pixels 0000 / 0100 / 1100 / 1000 / 0000 / 0000 / 0000 / 2211
+    ; graphic_role player_direction_frame_family
+    ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &30,&04,&04,&04,&04,&04,&04,&04
     EQUB &21,&21,&08,&08,&08,&08,&0C,&0C
     EQUB &00,&02,&03,&01,&00,&00,&00,&3C
 
 .graphic_record_17
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
-    ; graphic_role no_current_assignment_site_keep_numeric
-    ; graphic_usage status=raw_record_only role=no_current_assignment_site_keep_numeric sources=--
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 2200 / 0010 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
-    ; graphic_strip_1_pixels 1200 / 1200 / 0001 / 0011 / 0011 / 0010 / 0010 / 0000
-    ; graphic_strip_2_pixels 0000 / 0100 / 1100 / 1000 / 0000 / 0001 / 0001 / 0000
+    ; graphic_role player_direction_frame_family
+    ; graphic_usage status=structural role=player_direction_frame_family sources=family-aligned fourth record; no active selector proved
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &30,&04,&04,&04,&04,&04,&0C,&0C
     EQUB &21,&21,&08,&0C,&0C,&04,&04,&00
     EQUB &00,&02,&03,&01,&00,&08,&08,&00
 
 .graphic_record_18
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
-    ; graphic_role no_current_assignment_site_keep_numeric
-    ; graphic_usage status=raw_record_only role=no_current_assignment_site_keep_numeric sources=--
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 0000 / 2211 / 0000 / 0100 / 1100 / 1000 / 0000
-    ; graphic_strip_1_pixels 3000 / 1111 / 1111 / 1111 / 1010 / 0010 / 2100 / 2100
-    ; graphic_strip_2_pixels 0300 / 3101 / 3101 / 1111 / 0101 / 0200 / 2001 / 2200
+    ; graphic_role player_direction_frame_family
+    ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&00,&3C,&00,&02,&03,&01,&00
     EQUB &11,&0F,&0F,&0F,&05,&04,&12,&12
     EQUB &22,&1B,&1B,&0F,&0A,&20,&18,&30
 
 .graphic_record_19
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
-    ; graphic_role no_current_assignment_site_keep_numeric
-    ; graphic_usage status=raw_record_only role=no_current_assignment_site_keep_numeric sources=--
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0010 / 0010
-    ; graphic_strip_1_pixels 0011 / 0011 / 0010 / 0011 / 0011 / 0001 / 0001 / 0001
-    ; graphic_strip_2_pixels 2200 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011 / 0000
+    ; graphic_role player_direction_frame_family
+    ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&00,&00,&00,&00,&00,&04,&04
     EQUB &0C,&0C,&04,&0C,&0C,&08,&08,&08
     EQUB &30,&08,&08,&08,&08,&0C,&0C,&00
 
 .graphic_record_1a
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
-    ; graphic_role no_current_assignment_site_keep_numeric
-    ; graphic_usage status=raw_record_only role=no_current_assignment_site_keep_numeric sources=--
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 2211
-    ; graphic_strip_1_pixels 0011 / 0011 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
-    ; graphic_strip_2_pixels 2200 / 0001 / 0001 / 0001 / 0001 / 0001 / 0001 / 0001
+    ; graphic_role player_direction_frame_family
+    ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&00,&00,&00,&00,&00,&00,&3C
     EQUB &0C,&0C,&04,&04,&04,&04,&0C,&0C
     EQUB &30,&08,&08,&08,&08,&08,&08,&08
 
 .graphic_record_1b
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
-    ; graphic_role no_current_assignment_site_keep_numeric
-    ; graphic_usage status=raw_record_only role=no_current_assignment_site_keep_numeric sources=--
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0010 / 0010 / 0000
-    ; graphic_strip_1_pixels 0011 / 0011 / 0010 / 0011 / 0011 / 0001 / 0001 / 0000
-    ; graphic_strip_2_pixels 2200 / 0001 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
+    ; graphic_role player_direction_frame_family
+    ; graphic_usage status=structural role=player_direction_frame_family sources=family-aligned fourth record; no active selector proved
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&00,&00,&00,&00,&04,&04,&00
     EQUB &0C,&0C,&04,&0C,&0C,&08,&08,&00
     EQUB &30,&08,&08,&08,&08,&08,&0C,&0C
 
 .graphic_record_1c
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
-    ; graphic_role no_current_assignment_site_keep_numeric
-    ; graphic_usage status=raw_record_only role=no_current_assignment_site_keep_numeric sources=--
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 0000 / 2211 / 0000 / 0000 / 0000 / 0000 / 0000
-    ; graphic_strip_1_pixels 3000 / 1111 / 1111 / 1111 / 1010 / 0010 / 0011 / 0011
-    ; graphic_strip_2_pixels 0300 / 3101 / 3101 / 1111 / 0101 / 0200 / 2001 / 2200
+    ; graphic_role player_direction_frame_family
+    ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&00,&3C,&00,&00,&00,&00,&00
     EQUB &11,&0F,&0F,&0F,&05,&04,&0C,&0C
     EQUB &22,&1B,&1B,&0F,&0A,&20,&18,&30
 
 .graphic_record_1d
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
-    ; graphic_role no_current_assignment_site_keep_numeric
-    ; graphic_usage status=raw_record_only role=no_current_assignment_site_keep_numeric sources=--
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 1000 / 1100 / 0100 / 0000 / 0000 / 0010 / 0010
-    ; graphic_strip_1_pixels 2100 / 2100 / 0010 / 0011 / 0011 / 0001 / 0001 / 0001
-    ; graphic_strip_2_pixels 2200 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011 / 0000
+    ; graphic_role player_direction_frame_family
+    ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&01,&03,&02,&00,&00,&04,&04
     EQUB &12,&12,&04,&0C,&0C,&08,&08,&08
     EQUB &30,&08,&08,&08,&08,&0C,&0C,&00
 
 .graphic_record_1e
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
-    ; graphic_role no_current_assignment_site_keep_numeric
-    ; graphic_usage status=raw_record_only role=no_current_assignment_site_keep_numeric sources=--
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 1000 / 1100 / 0100 / 0000 / 0000 / 0000 / 2211
-    ; graphic_strip_1_pixels 2100 / 2100 / 0010 / 0010 / 0010 / 0010 / 0011 / 0011
-    ; graphic_strip_2_pixels 2200 / 0001 / 0001 / 0001 / 0001 / 0001 / 0001 / 0001
+    ; graphic_role player_direction_frame_family
+    ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 direction code times four and lower-frame offsets
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&01,&03,&02,&00,&00,&00,&3C
     EQUB &12,&12,&04,&04,&04,&04,&0C,&0C
     EQUB &30,&08,&08,&08,&08,&08,&08,&08
 
 .graphic_record_1f
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
-    ; graphic_role no_current_assignment_site_keep_numeric
-    ; graphic_usage status=raw_record_only role=no_current_assignment_site_keep_numeric sources=--
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 1000 / 1100 / 0100 / 0000 / 0010 / 0010 / 0000
-    ; graphic_strip_1_pixels 2100 / 2100 / 0010 / 0011 / 0011 / 0001 / 0001 / 0000
-    ; graphic_strip_2_pixels 2200 / 0001 / 0001 / 0001 / 0001 / 0001 / 0011 / 0011
+    ; graphic_role player_direction_frame_family
+    ; graphic_usage status=structural role=player_direction_frame_family sources=family-aligned fourth record; no active selector proved
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&01,&03,&02,&00,&04,&04,&00
     EQUB &12,&12,&04,&0C,&0C,&08,&08,&00
     EQUB &30,&08,&08,&08,&08,&08,&0C,&0C
@@ -4494,10 +4398,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits; $1CAB fixed status blank/space and $2319 trailing glyph
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 3311 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 3311
-    ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 0000 / 3010 / 3010 / 3010 / 3311
-    ; graphic_strip_2_pixels 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &3F,&2A,&2A,&2A,&2A,&2A,&2A,&3F
     EQUB &3F,&00,&00,&00,&15,&15,&15,&3F
     EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A
@@ -4506,10 +4407,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
-    ; graphic_strip_1_pixels 3010 / 3010 / 3010 / 3010 / 3311 / 3311 / 3311 / 3311
-    ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&00,&00,&00,&00,&00,&00,&00
     EQUB &15,&15,&15,&15,&3F,&3F,&3F,&3F
     EQUB &00,&00,&00,&00,&00,&00,&00,&00
@@ -4518,10 +4416,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 3311 / 0000 / 0000 / 3311 / 3311 / 3311 / 3311 / 3311
-    ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 3311 / 0000 / 0000 / 3311 / 3311
-    ; graphic_strip_2_pixels 0301 / 0301 / 0301 / 0301 / 0000 / 0000 / 0301 / 0301
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &3F,&00,&00,&3F,&3F,&3F,&3F,&3F
     EQUB &3F,&00,&00,&3F,&00,&00,&3F,&3F
     EQUB &2A,&2A,&2A,&2A,&00,&00,&2A,&2A
@@ -4530,10 +4425,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 3311 / 0000 / 0000 / 3311 / 0000 / 0000 / 3311 / 3311
-    ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 3311 / 3010 / 3010 / 3311 / 3311
-    ; graphic_strip_2_pixels 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &3F,&00,&00,&3F,&00,&00,&3F,&3F
     EQUB &3F,&00,&00,&3F,&15,&15,&3F,&3F
     EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A
@@ -4542,10 +4434,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0301 / 0301 / 0301 / 0301 / 3311 / 0000 / 0000 / 0000
-    ; graphic_strip_1_pixels 0000 / 0000 / 3311 / 3311 / 3311 / 3311 / 3311 / 3311
-    ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0000 / 0301 / 0000 / 0000 / 0000
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &2A,&2A,&2A,&2A,&3F,&00,&00,&00
     EQUB &00,&00,&3F,&3F,&3F,&3F,&3F,&3F
     EQUB &00,&00,&00,&00,&2A,&00,&00,&00
@@ -4554,10 +4443,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits; $1CAB fixed status-panel glyph
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 3311 / 0301 / 0301 / 3311 / 0000 / 0000 / 3311 / 3311
-    ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 3311 / 3010 / 3010 / 3311 / 3311
-    ; graphic_strip_2_pixels 0301 / 0000 / 0000 / 0301 / 0301 / 0301 / 0301 / 0301
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &3F,&2A,&2A,&3F,&00,&00,&3F,&3F
     EQUB &3F,&00,&00,&3F,&15,&15,&3F,&3F
     EQUB &2A,&00,&00,&2A,&2A,&2A,&2A,&2A
@@ -4566,10 +4452,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 3311 / 0301 / 0301 / 3311 / 3311 / 3311 / 3311 / 3311
-    ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 3311 / 0000 / 0000 / 3311 / 3311
-    ; graphic_strip_2_pixels 0301 / 0000 / 0000 / 0301 / 0301 / 0301 / 0301 / 0301
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &3F,&2A,&2A,&3F,&3F,&3F,&3F,&3F
     EQUB &3F,&00,&00,&3F,&00,&00,&3F,&3F
     EQUB &2A,&00,&00,&2A,&2A,&2A,&2A,&2A
@@ -4578,10 +4461,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 3311 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
-    ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 0000 / 3010 / 3010 / 3010 / 3010
-    ; graphic_strip_2_pixels 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &3F,&00,&00,&00,&00,&00,&00,&00
     EQUB &3F,&00,&00,&00,&15,&15,&15,&15
     EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A
@@ -4590,10 +4470,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 3010 / 3010 / 3010 / 3311 / 3311 / 3311 / 3311 / 3311
-    ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 3311 / 0000 / 0000 / 3311 / 3311
-    ; graphic_strip_2_pixels 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &15,&15,&15,&3F,&3F,&3F,&3F,&3F
     EQUB &3F,&00,&00,&3F,&00,&00,&3F,&3F
     EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A
@@ -4602,10 +4479,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role status_score_room_level_character_glyph
     ; graphic_usage status=assigned role=status_score_room_level_character_glyph sources=$22E6/$2319 score character range and $1D0A-$1D34 room/level digits
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 3311 / 0301 / 0301 / 3311 / 0000 / 0000 / 0000 / 0000
-    ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 3311 / 3010 / 3010 / 3010 / 3010
-    ; graphic_strip_2_pixels 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301 / 0301
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &3F,&2A,&2A,&3F,&00,&00,&00,&00
     EQUB &3F,&00,&00,&3F,&15,&15,&15,&15
     EQUB &2A,&2A,&2A,&2A,&2A,&2A,&2A,&2A
@@ -4614,10 +4488,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role SPINNER
     ; graphic_usage status=assigned role=legend_and_enemy_SPINNER sources=$2557 legend table and $1E3A spinner placement
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 3322 / 0303 / 3333 / 0203 / 2233 / 0302 / 3322 / 3333
-    ; graphic_strip_1_pixels 2233 / 0203 / 0011 / 0011 / 0011 / 0011 / 2030 / 2233
-    ; graphic_strip_2_pixels 3333 / 3322 / 3020 / 2233 / 2030 / 3333 / 3030 / 3322
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &F3,&AA,&FF,&A8,&FC,&A2,&F3,&FF
     EQUB &FC,&A8,&0C,&0C,&0C,&0C,&54,&FC
     EQUB &FF,&F3,&51,&FC,&54,&FF,&55,&F3
@@ -4626,10 +4497,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role CLONE
     ; graphic_usage status=assigned role=legend_and_enemy_CLONE sources=$2557 legend table and $1E3A clone placement
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 2000 / 2200 / 2332 / 2332 / 2200 / 2000 / 0000
-    ; graphic_strip_1_pixels 2200 / 2200 / 2200 / 3323 / 3323 / 2200 / 2200 / 2200
-    ; graphic_strip_2_pixels 0000 / 0200 / 2200 / 3233 / 3233 / 2200 / 0200 / 0000
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&10,&30,&F6,&F6,&30,&10,&00
     EQUB &30,&30,&30,&FB,&FB,&30,&30,&30
     EQUB &00,&20,&30,&FD,&FD,&30,&20,&00
@@ -4638,10 +4506,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role CYBERDROID
     ; graphic_usage status=assigned role=legend_and_enemy_CYBERDROID sources=$2557 legend table and $1E3A cyberdroid placement
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 1010 / 2302 / 2203 / 0303 / 3000 / 2300 / 3000
-    ; graphic_strip_1_pixels 0033 / 1111 / 1111 / 2200 / 1111 / 3300 / 2200 / 3300
-    ; graphic_strip_2_pixels 0000 / 0101 / 3220 / 2230 / 3030 / 0300 / 3200 / 0300
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&05,&B2,&B8,&AA,&11,&32,&11
     EQUB &CC,&0F,&0F,&30,&0F,&33,&30,&33
     EQUB &00,&0A,&71,&74,&55,&22,&31,&22
@@ -4650,10 +4515,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role bonus_target_status_and_room_fill_probe
     ; graphic_usage status=assigned role=bonus_target_status_and_room_fill_probe sources=$2F36 target/status slot 6 and $1EC8/$1F19 room fill probes
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 1133 / 1030 / 1030 / 0103 / 3123 / 0103 / 2133 / 1030
-    ; graphic_strip_1_pixels 0000 / 0000 / 0303 / 2030 / 0303 / 2030 / 3332 / 1133
-    ; graphic_strip_2_pixels 1133 / 0103 / 0103 / 1030 / 1030 / 1332 / 1030 / 0103
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &CF,&45,&45,&8A,&DB,&8A,&DE,&45
     EQUB &00,&00,&AA,&54,&AA,&54,&F7,&CF
     EQUB &CF,&8A,&8A,&45,&45,&E7,&45,&8A
@@ -4662,10 +4524,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role SPOOK_first_cell
     ; graphic_usage status=assigned role=legend_and_spook_pair sources=$1175 SPOOK immediate and $1E3A spook first cell
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 0000 / 2020 / 2020 / 2020 / 2222 / 2222 / 0202
-    ; graphic_strip_1_pixels 2020 / 2222 / 2222 / 2020 / 2020 / 2222 / 2222 / 2222
-    ; graphic_strip_2_pixels 0000 / 0202 / 2222 / 2020 / 2020 / 2222 / 2222 / 2222
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&00,&50,&50,&50,&F0,&F0,&A0
     EQUB &50,&F0,&F0,&50,&50,&F0,&F0,&F0
     EQUB &00,&A0,&F0,&50,&50,&F0,&F0,&F0
@@ -4674,10 +4533,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role SPOOK_second_cell
     ; graphic_usage status=assigned role=legend_and_spook_pair sources=$1175 SPOOK immediate and $1E3A spook second cell
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0202 / 0000 / 0000 / 2020 / 2020 / 2020 / 2222 / 0202
-    ; graphic_strip_1_pixels 2222 / 2222 / 2222 / 0202 / 0202 / 0000 / 0000 / 0000
-    ; graphic_strip_2_pixels 2020 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &A0,&00,&00,&50,&50,&50,&F0,&A0
     EQUB &F0,&F0,&F0,&A0,&A0,&00,&00,&00
     EQUB &50,&00,&00,&00,&00,&00,&00,&00
@@ -4686,10 +4542,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_collision_flash
     ; graphic_usage status=assigned role=player_collision_flash sources=$19F3 player collision flash first cell
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 3010 / 3010 / 3010 / 0000 / 3311 / 0000 / 0301
-    ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 3311 / 0000 / 3311 / 0000 / 3311
-    ; graphic_strip_2_pixels 0000 / 0301 / 0301 / 0301 / 0000 / 3311 / 0000 / 3010
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&15,&15,&15,&00,&3F,&00,&2A
     EQUB &3F,&00,&00,&3F,&00,&3F,&00,&3F
     EQUB &00,&2A,&2A,&2A,&00,&3F,&00,&15
@@ -4698,10 +4551,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_collision_flash
     ; graphic_usage status=assigned role=player_collision_flash sources=$19F3 player collision flash second cell
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0301 / 0000 / 0000 / 3010 / 0000 / 3010 / 3010 / 3311
-    ; graphic_strip_1_pixels 0000 / 3311 / 0000 / 3311 / 0000 / 0000 / 0000 / 0000
-    ; graphic_strip_2_pixels 3010 / 0000 / 0000 / 0301 / 0000 / 0301 / 0301 / 3311
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &2A,&00,&00,&15,&00,&15,&15,&3F
     EQUB &00,&3F,&00,&3F,&00,&00,&00,&00
     EQUB &15,&00,&00,&2A,&00,&2A,&2A,&3F
@@ -4710,10 +4560,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role POT_OF_GOLD
     ; graphic_usage status=assigned role=legend_and_required_target_POT_OF_GOLD sources=$2557 legend table, $2700 level intro, and $2F36 target/status table
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 1030 / 0000 / 1030 / 1133 / 1133 / 1030 / 0000
-    ; graphic_strip_1_pixels 0000 / 1133 / 1133 / 1133 / 1133 / 1133 / 1133 / 1133
-    ; graphic_strip_2_pixels 0000 / 0103 / 0000 / 0103 / 1133 / 1133 / 0103 / 0000
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&45,&00,&45,&CF,&CF,&45,&00
     EQUB &00,&CF,&CF,&CF,&CF,&CF,&CF,&CF
     EQUB &00,&8A,&00,&8A,&CF,&CF,&8A,&00
@@ -4722,10 +4569,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_life_loss_reset
     ; graphic_usage status=assigned role=player_life_loss_reset sources=$1A59 player life-loss reset first cell
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 0000 / 0000 / 0000 / 1010 / 1310 / 1310 / 3300
-    ; graphic_strip_1_pixels 0000 / 0000 / 0000 / 0000 / 0101 / 0101 / 2101 / 2101
-    ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0000 / 1000 / 1001 / 2200 / 2200
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&00,&00,&00,&05,&27,&27,&33
     EQUB &00,&00,&00,&00,&0A,&0A,&1A,&1A
     EQUB &00,&00,&00,&00,&01,&09,&30,&30
@@ -4734,10 +4578,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_life_loss_reset
     ; graphic_usage status=assigned role=player_life_loss_reset sources=$1A59 player life-loss reset second cell
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0001 / 0011 / 0011
-    ; graphic_strip_1_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0011 / 0011
-    ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0000 / 0010 / 0010 / 0011 / 0011
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&00,&00,&00,&00,&08,&0C,&0C
     EQUB &00,&00,&00,&00,&00,&00,&0C,&0C
     EQUB &00,&00,&00,&00,&04,&04,&0C,&0C
@@ -4746,10 +4587,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role static_status_panel_glyph
     ; graphic_usage status=assigned role=static_status_panel_glyph sources=$1CAB fixed status-panel glyph
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 3311 / 0301 / 0301 / 0301 / 3311 / 3311 / 3311 / 3311
-    ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 3311
-    ; graphic_strip_2_pixels 0301 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0301
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &3F,&2A,&2A,&2A,&3F,&3F,&3F,&3F
     EQUB &3F,&00,&00,&00,&00,&00,&00,&3F
     EQUB &2A,&00,&00,&00,&00,&00,&00,&2A
@@ -4758,10 +4596,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role static_status_panel_glyph
     ; graphic_usage status=assigned role=static_status_panel_glyph sources=$1CAB fixed status-panel glyph and $2F36 target table
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 3311 / 0301 / 0301 / 0301 / 3311 / 3311 / 3311 / 3311
-    ; graphic_strip_1_pixels 3311 / 3010 / 3010 / 3010 / 3311 / 0000 / 0000 / 0000
-    ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0301 / 0301 / 0301 / 0301 / 0301
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &3F,&2A,&2A,&2A,&3F,&3F,&3F,&3F
     EQUB &3F,&15,&15,&15,&3F,&00,&00,&00
     EQUB &00,&00,&00,&2A,&2A,&2A,&2A,&2A
@@ -4770,10 +4605,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role static_status_panel_glyph
     ; graphic_usage status=assigned role=static_status_panel_glyph sources=$1CAB fixed status-panel glyph and $2F36 target table
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 3311 / 0301 / 0301 / 3311 / 3311 / 3311 / 3311 / 3311
-    ; graphic_strip_1_pixels 3311 / 0000 / 0000 / 3311 / 0000 / 0000 / 3311 / 3311
-    ; graphic_strip_2_pixels 0301 / 0000 / 0000 / 0301 / 0000 / 0000 / 0301 / 0301
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &3F,&2A,&2A,&3F,&3F,&3F,&3F,&3F
     EQUB &3F,&00,&00,&3F,&00,&00,&3F,&3F
     EQUB &2A,&00,&00,&2A,&00,&00,&2A,&2A
@@ -4782,10 +4614,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role static_status_panel_glyph
     ; graphic_usage status=assigned role=static_status_panel_glyph sources=$1CAB fixed status-panel glyph and $2F36 target table
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 3010 / 3010 / 3010 / 3010 / 3311 / 3311 / 3311 / 3311
-    ; graphic_strip_1_pixels 3311 / 3010 / 3010 / 0000 / 0000 / 0000 / 0000 / 0000
-    ; graphic_strip_2_pixels 3311 / 3010 / 3010 / 3010 / 3311 / 3311 / 3311 / 3311
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &15,&15,&15,&15,&3F,&3F,&3F,&3F
     EQUB &3F,&15,&15,&00,&00,&00,&00,&00
     EQUB &3F,&15,&15,&15,&3F,&3F,&3F,&3F
@@ -4794,10 +4623,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role lives_status_marker
     ; graphic_usage status=assigned role=lives_status_marker sources=$2345 lives/status marker
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 3000 / 1010 / 2000 / 2000 / 0010 / 0010 / 0010 / 0010
-    ; graphic_strip_1_pixels 0101 / 0101 / 0000 / 1200 / 0000 / 0000 / 0000 / 0001
-    ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &11,&05,&10,&10,&04,&04,&04,&04
     EQUB &0A,&0A,&00,&21,&00,&00,&00,&08
     EQUB &00,&00,&00,&00,&00,&00,&00,&00
@@ -4806,10 +4632,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role object_hit_animation_frame
     ; graphic_usage status=assigned role=object_hit_animation_frame sources=$1876 object hit animation state 2
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 1010 / 3010 / 1301 / 3010 / 1010 / 3010 / 0000
-    ; graphic_strip_1_pixels 0000 / 1010 / 0100 / 1110 / 1101 / 1010 / 0000 / 0000
-    ; graphic_strip_2_pixels 0000 / 0301 / 0000 / 0301 / 0000 / 0301 / 0000 / 0000
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&05,&15,&2B,&15,&05,&15,&00
     EQUB &00,&05,&02,&07,&0B,&05,&00,&00
     EQUB &00,&2A,&00,&2A,&00,&2A,&00,&00
@@ -4818,10 +4641,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role object_hit_animation_frame
     ; graphic_usage status=assigned role=object_hit_animation_frame sources=$1876 object hit animation state 3
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 1311 / 1010 / 1100 / 1311 / 1010 / 1000 / 1010 / 0101
-    ; graphic_strip_1_pixels 1010 / 0100 / 1100 / 1100 / 1100 / 1111 / 1010 / 0301
-    ; graphic_strip_2_pixels 3111 / 0301 / 0000 / 3111 / 0101 / 0100 / 0000 / 3111
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &2F,&05,&03,&2F,&05,&01,&05,&0A
     EQUB &05,&02,&03,&03,&03,&0F,&05,&2A
     EQUB &1F,&2A,&00,&1F,&0A,&02,&00,&1F
@@ -4830,10 +4650,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role object_hit_animation_frame
     ; graphic_usage status=assigned role=object_hit_animation_frame sources=$1876 object hit animation state 4
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 3010 / 3010 / 0301 / 0000 / 0301 / 3010 / 0000
-    ; graphic_strip_1_pixels 3010 / 0000 / 0000 / 0000 / 0000 / 0000 / 3010 / 0301
-    ; graphic_strip_2_pixels 0000 / 0301 / 3010 / 0000 / 0301 / 3010 / 0301 / 0000
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&15,&15,&2A,&00,&2A,&15,&00
     EQUB &15,&00,&00,&00,&00,&00,&15,&2A
     EQUB &00,&2A,&15,&00,&2A,&15,&2A,&00
@@ -4842,10 +4659,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role SAFE
     ; graphic_usage status=assigned role=legend_and_target_SAFE sources=$2557 legend table and $2F36 target/status slot 0
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 1133 / 0103 / 0103 / 0103 / 0103 / 0103 / 0103 / 1133
-    ; graphic_strip_1_pixels 1133 / 0000 / 0000 / 1030 / 0000 / 0000 / 0000 / 1133
-    ; graphic_strip_2_pixels 1133 / 1030 / 1030 / 1030 / 1030 / 1030 / 1030 / 1133
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &CF,&8A,&8A,&8A,&8A,&8A,&8A,&CF
     EQUB &CF,&00,&00,&45,&00,&00,&00,&CF
     EQUB &CF,&45,&45,&45,&45,&45,&45,&CF
@@ -4854,10 +4668,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role RING
     ; graphic_usage status=assigned role=legend_and_required_target_RING sources=$2557 legend table, $2700 level intro, and $2F36 target/status table
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 0000 / 0000 / 1030 / 0103 / 0103 / 0103 / 1030 / 0000
-    ; graphic_strip_1_pixels 1133 / 1133 / 0000 / 0000 / 0000 / 0000 / 1133 / 0000
-    ; graphic_strip_2_pixels 0000 / 0000 / 0103 / 1030 / 1030 / 1030 / 0103 / 0000
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&00,&45,&8A,&8A,&8A,&45,&00
     EQUB &CF,&CF,&00,&00,&00,&00,&CF,&00
     EQUB &00,&00,&8A,&45,&45,&45,&8A,&00
@@ -4866,10 +4677,7 @@ org runtime_start
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role KEY
     ; graphic_usage status=assigned role=legend_and_required_target_KEY sources=$2557 legend table, $2700 level intro, and $2F36 target/status table
-    ; graphic_record layout: three 8-byte strips used by the Mode 5 renderer
-    ; graphic_strip_0_pixels 1030 / 1030 / 1030 / 0000 / 0000 / 0000 / 0000 / 0000
-    ; graphic_strip_1_pixels 1133 / 1030 / 1133 / 0103 / 0103 / 1133 / 0103 / 1133
-    ; graphic_strip_2_pixels 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000 / 0000
+    ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &45,&45,&45,&00,&00,&00,&00,&00
     EQUB &CF,&45,&CF,&8A,&8A,&CF,&8A,&CF
     EQUB &00,&00,&00,&00,&00,&00,&00,&00

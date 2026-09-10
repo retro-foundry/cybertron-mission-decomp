@@ -31,6 +31,9 @@ Build and validate from the repository root with `./build.ps1` and
 `build/reconstruction/`.
 
 Run `python tools/reconstruction/render_graphic_sheet.py` to regenerate the
-labelled sheet at `analysis/reconstruction/all_graphic_records.png`. The sheet
-uses each record's source annotation and leaves unproved artwork numerically
-named rather than inferring gameplay identity from appearance alone.
+labelled sheet at `analysis/reconstruction/composed_sprite_sheet.png`. Player
+and spook graphics are composed from the record pairs selected and positioned
+by the runtime. Bytes are decoded as two four-bit Mode 2 pixels, proved by the
+80-byte raster pitch and 20 KB screen range used by the address calculations.
+The sheet assigns distinct review colours to all 16 logical indices because
+the game dynamically remaps the upper logical colours during play.
