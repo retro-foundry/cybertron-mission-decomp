@@ -1421,6 +1421,141 @@ def main() -> None:
                 )
             enemy_decision_cpu_replays += 1
 
+    # Replay SPINNER's diagonal, X-only, and Y-only fallback policy. The
+    # movement validator is a controlled collision oracle; every branch and
+    # retry instruction remains the assembled $1FF7 routine.
+    enemy_policy_cpu_replays = 0
+    for successful_attempt in (0, 1, 2, None):
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        render_slot = 0x14
+        memory[0x0039] = render_slot
+        memory[0x0A10] = 0x25
+        memory[0x0A50] = 0x25
+        memory[0x0A00 + render_slot] = 0x20
+        memory[0x0A40 + render_slot] = 0x20
+        attempts = []
+        restores = []
+
+        def spinner_policy_handler(cpu: Replay6502, target: int) -> bool:
+            if target == 0x205D:
+                attempt = len(attempts)
+                attempts.append((memory[0x0033], memory[0x0034]))
+                memory[0x0C99] = int(attempt == successful_attempt)
+                return True
+            if target == 0x1FA1:
+                restores.append((memory[0x0033], memory[0x0034]))
+                return True
+            return False
+
+        cpu = Replay6502(memory, spinner_policy_handler, spinner_policy_handler)
+        cpu.run_subroutine(0x1FF7)
+        all_attempts = [(1, 1), (1, 0), (0, 1)]
+        attempt_count = 3 if successful_attempt is None else successful_attempt + 1
+        expected_attempts = all_attempts[:attempt_count]
+        expected_restores = expected_attempts if successful_attempt is None else expected_attempts[:-1]
+        if attempts != expected_attempts or restores != expected_restores:
+            fail(
+                f"spinner success={successful_attempt}: attempts/restores "
+                f"{attempts}/{restores}, expected {expected_attempts}/{expected_restores}"
+            )
+        enemy_policy_cpu_replays += 1
+
+    # Replay CLONE's stored-delta fast path and random fallback. The scripted
+    # RNG stream includes the gate byte followed by four axis bits when the
+    # original code reaches $20B3.
+    clone_cases = (
+        ("stored_success", [1], [True], [(1, 0)], 0),
+        ("stored_fail_random_success", [1, 0, 1, 1, 0], [False, True], [(1, 0), (1, 0xFF)], 1),
+        ("random_direct_success", [0, 0, 1, 1, 0], [True], [(1, 0xFF)], 0),
+        ("random_direct_fail", [0, 0, 1, 1, 0], [False], [(1, 0xFF)], 1),
+    )
+    for name, scripted_rng, outcomes, expected_attempts, expected_restores in clone_cases:
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        render_slot = 0x14
+        memory[0x0039] = render_slot
+        memory[0x0C86 + render_slot] = 1
+        memory[0x0C9E + render_slot] = 0
+        rng_values = list(scripted_rng)
+        move_outcomes = list(outcomes)
+        attempts = []
+        restores = []
+
+        def clone_policy_handler(cpu: Replay6502, target: int) -> bool:
+            if target == 0x1D61:
+                cpu.a = rng_values.pop(0)
+                return True
+            if target == 0x205D:
+                attempts.append((memory[0x0033], memory[0x0034]))
+                memory[0x0C99] = int(move_outcomes.pop(0))
+                return True
+            if target == 0x1FA1:
+                restores.append((memory[0x0033], memory[0x0034]))
+                return True
+            return False
+
+        cpu = Replay6502(memory, clone_policy_handler)
+        cpu.run_subroutine(0x2080)
+        actual = (attempts, len(restores), rng_values, move_outcomes)
+        expected = (expected_attempts, expected_restores, [], [])
+        if actual != expected:
+            fail(f"clone policy {name}: {actual}, expected {expected}")
+        enemy_policy_cpu_replays += 1
+
+    # Replay CYBERDROID initialization, persistent movement, both alignment
+    # retarget branches, and blocked-move delta reset.
+    cyberdroid_cases = (
+        ("random_success", (0, 0), (0x20, 0x20), [0, 1, 1, 0], True, (1, 0xFF), 0),
+        ("random_blocked", (0, 0), (0x20, 0x20), [0, 1, 1, 0], False, (1, 0xFF), 1),
+        ("persist_success", (1, 1), (0x25, 0x25), [], True, (1, 1), 0),
+        ("persist_blocked", (1, 1), (0x25, 0x25), [], False, (1, 1), 1),
+        ("x_aligned_retarget_y", (1, 0), (0x20, 0x25), [], True, (0, 1), 0),
+        ("y_aligned_retarget_x", (0, 1), (0x25, 0x1F), [], True, (1, 0), 0),
+    )
+    for name, stored_delta, player_position, scripted_rng, succeeds, expected_attempt, expected_restores in cyberdroid_cases:
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        render_slot = 0x14
+        memory[0x0039] = render_slot
+        memory[0x0C86 + render_slot] = stored_delta[0]
+        memory[0x0C9E + render_slot] = stored_delta[1]
+        memory[0x0A00 + render_slot] = 0x20
+        memory[0x0A40 + render_slot] = 0x20
+        memory[0x0A10] = player_position[0]
+        memory[0x0A50] = player_position[1]
+        rng_values = list(scripted_rng)
+        attempts = []
+        restores = []
+
+        def cyberdroid_policy_handler(cpu: Replay6502, target: int) -> bool:
+            if target == 0x1D61:
+                cpu.a = rng_values.pop(0)
+                return True
+            if target == 0x205D:
+                attempts.append((memory[0x0033], memory[0x0034]))
+                memory[0x0C99] = int(succeeds)
+                return True
+            if target == 0x1FA1:
+                restores.append((memory[0x0033], memory[0x0034]))
+                return True
+            return False
+
+        cpu = Replay6502(memory, cyberdroid_policy_handler)
+        cpu.x = render_slot
+        cpu.run_subroutine(0x20E0)
+        expected_stored = expected_attempt if succeeds else (0, 0)
+        actual = (
+            attempts,
+            len(restores),
+            (memory[0x0C86 + render_slot], memory[0x0C9E + render_slot]),
+            rng_values,
+        )
+        expected = ([expected_attempt], expected_restores, expected_stored, [])
+        if actual != expected:
+            fail(f"cyberdroid policy {name}: {actual}, expected {expected}")
+        enemy_policy_cpu_replays += 1
+
     # $1B41 recognizes four masked screen-byte classes. Exhaust all byte
     # values so ports cannot accidentally compare unmasked pixels or merge the
     # special $A0 spook-pause outcome with ordinary expiry.
@@ -2068,6 +2203,7 @@ def main() -> None:
         f"{lifecycle_cpu_replays} lifecycle CPU replays, "
         f"{enemy_scheduler_cpu_replays} enemy-scheduler CPU replays, "
         f"{enemy_decision_cpu_replays} enemy-decision CPU replays, "
+        f"{enemy_policy_cpu_replays} enemy-policy CPU replays, "
         f"{expiry_rows} projectile expiry bytes, "
         f"{projectile_expiry_cpu_replays} projectile expiry CPU replays, "
         f"{target_outcome_cpu_replays} target-outcome CPU replays, "

@@ -33,4 +33,5 @@ the source delta selects one of eight directions; allocation and lifecycle detai
 replay_coverage
 Scheduler replay covers every slot $14-$1F, frame phase 0-15, each recognized graphic, inactive state, and an unrecognized graphic.
 Shared decision replay covers all sixteen four-bit RNG inputs to $20B3 and all nine relative X/Y outcomes from $23A3.
-Movement-policy promotion still requires actual-code replay of each enemy's success and collision-restoration branches.
+Policy replay covers SPINNER success at each retry stage and total failure, CLONE stored/random success and failure, and CYBERDROID random initialization, persistence, both alignment retargets, and blocked-delta reset.
+The shared $205D renderer-collision and bounds validator remains to be replayed with integrated movement/render leaves.
