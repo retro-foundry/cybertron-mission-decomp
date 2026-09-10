@@ -64,6 +64,9 @@ Seven seeded setup scenarios additionally validate target-code generation,
 enemy/target placement, collision rejection, and the composed entry frame.
 The input preflight exhausts all 16 keyboard movement masks, joystick threshold
 edges, and every previous/current fire-latch transition.
+Object validation covers every setup-count row, all 41 render slots in the
+overlapping lifecycle windows, all six hit-animation states, and all 256
+projectile expiry input bytes.
 
 ## Layout and provenance
 
@@ -95,6 +98,11 @@ The [control-flow reference](analysis/reconstruction/runtime_control_input_refer
 and [movement reference](analysis/reconstruction/runtime_player_movement.txt)
 document key codes, input selection, pause/menu behavior, direction mapping,
 room exits, and projectile movement tables.
+The [object-slot contract](analysis/reconstruction/runtime_object_slot_contract.txt),
+[object lifecycle reference](analysis/reconstruction/runtime_object_lifecycle_reference.txt),
+and [projectile lifecycle reference](analysis/reconstruction/runtime_projectile_lifecycle.txt)
+preserve the deliberately different scheduler, collision, animation, target,
+and shot/hazard ownership windows.
 
 The decoded 24-byte artwork can be reviewed in the
 [composed sprite and graphic sheet](analysis/reconstruction/composed_sprite_sheet.png).

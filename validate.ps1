@@ -26,6 +26,9 @@ $requiredFiles = @(
     'analysis/reconstruction/runtime_setup_frame_reference.txt'
     'analysis/reconstruction/runtime_control_input_reference.txt'
     'analysis/reconstruction/runtime_player_movement.txt'
+    'analysis/reconstruction/runtime_object_lifecycle_reference.txt'
+    'analysis/reconstruction/runtime_object_slot_contract.txt'
+    'analysis/reconstruction/runtime_projectile_lifecycle.txt'
     'tools/reconstruction/render_graphic_sheet.py'
     'tools/reconstruction/validate_port_contracts.py'
     'analysis/reconstruction/composed_sprite_sheet.png'
@@ -53,6 +56,9 @@ $maintainedFiles = @(
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_setup_frame_reference.txt')
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_control_input_reference.txt')
     (Join-Path $repoRoot 'analysis\reconstruction\runtime_player_movement.txt')
+    (Join-Path $repoRoot 'analysis\reconstruction\runtime_object_lifecycle_reference.txt')
+    (Join-Path $repoRoot 'analysis\reconstruction\runtime_object_slot_contract.txt')
+    (Join-Path $repoRoot 'analysis\reconstruction\runtime_projectile_lifecycle.txt')
     (Join-Path $repoRoot 'tools\reconstruction\render_graphic_sheet.py')
     (Join-Path $repoRoot 'tools\reconstruction\validate_port_contracts.py')
 )

@@ -1,0 +1,229 @@
+runtime_object_lifecycle_reference
+Purpose: port-facing object lifecycle and slot-window oracle for hit states, hit animation, scheduler eligibility, and hazard recycle targets.
+Original authority: $1812, $1876, $198C, $2163, $22C5/$22D0, and the logical/render alias arrays rooted at $0C53/$0C67.
+Scope: object lifecycle state and slot-window behavior only. Movement AI remains in runtime_enemy_movement.txt; projectile slot lifecycle remains in runtime_projectile_lifecycle.txt.
+
+object_window_matrix
+Authority: $198C, $1812, $1876, $2163, and $22D0 use overlapping but different object/logical slot windows.
+render_range logical_range scheduler_198c hit_scan_2163 hit_anim_1812_1876 hazard_recycle_target_22d0 owner_note
+$14-$1F $00-$0B yes yes yes yes active_enemy_scheduler_and_hit_animation_window
+$20-$2B $0C-$17 no yes no no extra_hit_scan_window_only_in_current_evidence
+$2C-$35 $18-$21 no no no no logical_gap_cleared_by_$1E3A
+$36-$3C $22-$28 no no no no room_target_projection_$243E/$244A_outside_$2163_scan
+port_rule: preserve the exact routine windows. Do not assume every slot scanned by $2163 is advanced by the hit-animation passes.
+
+phase0_hit_state_projection_1812_1876
+Authority: on frames where $0036&3 == 0, $1812 runs before $198C and $1876 runs later before projectile draw/test.
+state_before erase_retire_1812 state_after_1812 graphic_written_by_1876 state_after_1876 draw_by_1876 scheduler_eligible_after hit_scan_eligible_after
+$00 none $00 none $00 no no no
+$01 none $01 none $01 no yes yes
+$02 erase_current_graphic $02 $3A $03 yes no no
+$03 erase_current_graphic $03 $3B $04 yes no no
+$04 erase_current_graphic $04 $3C $05 yes no no
+$05 set_state_0_then_erase_current_graphic $00 none $00 no no no
+port_rule: states $02-$05 are not active enemies while animating. Only state $01 is scheduled by $198C and accepted by $2163.
+
+post_hit_timeline_2163_to_1812_1876
+Authority: $2163 sets $0C53,Y=2 on a shot/hazard object hit; $1812/$1876 consume that state only for render slots $14-$1F.
+phase0_tick state_at_tick_start erase_retire_1812 draw_1876 state_after_tick
+1 $02 erase_pre_hit_or_current_graphic draw_$3A_and_increment_to_$03 $03
+2 $03 erase_$3A draw_$3B_and_increment_to_$04 $04
+3 $04 erase_$3B draw_$3C_and_increment_to_$05 $05
+4 $05 set_state_$00_then_erase_$3C no_draw $00
+slot_scope: this timeline is proven for render slots $14-$1F. $2163 also scans $20-$2B, but current $1812/$1876 code does not advance that higher window.
+
+logical_alias_projection
+Authority: logical slot s aliases render slot s+$14 for the state/graphic/position/delta arrays used by $1E3A/$1DD1/$198C/$2163.
+logical render state_addr graphic_addr x_addr y_addr dx_addr dy_addr scheduled hit_scanned hit_animated recycle_target
+$00 $14 $0C67 $2F14 $0A14 $0A54 $0C86 $0C9E yes yes yes yes
+$01 $15 $0C68 $2F15 $0A15 $0A55 $0C87 $0C9F yes yes yes yes
+$02 $16 $0C69 $2F16 $0A16 $0A56 $0C88 $0CA0 yes yes yes yes
+$03 $17 $0C6A $2F17 $0A17 $0A57 $0C89 $0CA1 yes yes yes yes
+$04 $18 $0C6B $2F18 $0A18 $0A58 $0C8A $0CA2 yes yes yes yes
+$05 $19 $0C6C $2F19 $0A19 $0A59 $0C8B $0CA3 yes yes yes yes
+$06 $1A $0C6D $2F1A $0A1A $0A5A $0C8C $0CA4 yes yes yes yes
+$07 $1B $0C6E $2F1B $0A1B $0A5B $0C8D $0CA5 yes yes yes yes
+$08 $1C $0C6F $2F1C $0A1C $0A5C $0C8E $0CA6 yes yes yes yes
+$09 $1D $0C70 $2F1D $0A1D $0A5D $0C8F $0CA7 yes yes yes yes
+$0A $1E $0C71 $2F1E $0A1E $0A5E $0C90 $0CA8 yes yes yes yes
+$0B $1F $0C72 $2F1F $0A1F $0A5F $0C91 $0CA9 yes yes yes yes
+$0C $20 $0C73 $2F20 $0A20 $0A60 $0C92 $0CAA no yes no no
+$0D $21 $0C74 $2F21 $0A21 $0A61 $0C93 $0CAB no yes no no
+$0E $22 $0C75 $2F22 $0A22 $0A62 $0C94 $0CAC no yes no no
+$0F $23 $0C76 $2F23 $0A23 $0A63 $0C95 $0CAD no yes no no
+$10 $24 $0C77 $2F24 $0A24 $0A64 $0C96 $0CAE no yes no no
+$11 $25 $0C78 $2F25 $0A25 $0A65 $0C97 $0CAF no yes no no
+$12 $26 $0C79 $2F26 $0A26 $0A66 $0C98 $0CB0 no yes no no
+$13 $27 $0C7A $2F27 $0A27 $0A67 $0C99 $0CB1 no yes no no
+$14 $28 $0C7B $2F28 $0A28 $0A68 $0C9A $0CB2 no yes no no
+$15 $29 $0C7C $2F29 $0A29 $0A69 $0C9B $0CB3 no yes no no
+$16 $2A $0C7D $2F2A $0A2A $0A6A $0C9C $0CB4 no yes no no
+$17 $2B $0C7E $2F2B $0A2B $0A6B $0C9D $0CB5 no yes no no
+
+projectile_hit_outcome_bridge_2163_22d0
+Authority: $2163 bridges projectile slots to object lifecycle, score, and hazard recycle behavior.
+projectile_slot_class condition object_state_change extra_effect
+player_shot_$00-$03 hit_render_$14-$2B_with_state_$01 set_$0C53[Y]=$02 score_(graphic-$29)*2_through_$22E6_and_DEC_$0080
+spawned_hazard_$04-$07 hit_render_$14-$2B_with_state_$01 set_$0C53[Y]=$02 copy_hit_graphic_to_first_free_logical_$00-$0B_via_$22D0/$1DD1
+all_hit_slots after_bridge deactivate_projectile_via_$21D8/$1B77_and_play_sound_id_2
+port_rule: object state change happens before shot/hazard deactivation; hazard recycle refuses logical slots >=$0C.
+
+hit_state_erase_retire_1812 1812-1835
+1812  LDX      #0x14
+1814  LDA      #0x0
+1816  STA      0x0031
+1818  STX      0x0039
+181a  LDA      0xc53,X
+181d  CMP      #0x2
+181f  BMI      0x1830
+1821  LDA      0xc53,X
+1824  CMP      #0x5
+1826  BNE      0x182d
+1828  LDA      #0x0
+182a  STA      0xc53,X
+182d  JSR      0x13fb
+1830  LDX      0x0039
+1832  INX      
+1833  CPX      #0x20
+1835  BNE      0x1818
+
+active_enemy_scheduler_198c 198c-19f2
+198c  LDX      #0x14
+198e  STX      0x0039
+1990  LDA      0xc53,X
+1993  CMP      #0x1
+1995  BNE      0x19eb
+1997  LDA      0x2f00,X
+199a  CMP      #0x2a
+199c  BNE      0x19b1
+199e  TXA      
+199f  AND      #0xf
+19a1  CMP      0x0036
+19a3  BNE      0x19b1
+19a5  JSR      0x1fdb
+19a8  JSR      0x1ff7
+19ab  JSR      0x1fed
+19ae  JMP      0x19eb
+19b1  LDA      0x2f00,X
+19b4  CMP      #0x2b
+19b6  BNE      0x19d1
+19b8  TXA      
+19b9  AND      #0x7
+19bb  STA      0x0074
+19bd  LDA      0x0036
+19bf  AND      #0x7
+19c1  CMP      0x0074
+19c3  BNE      0x19d1
+19c5  JSR      0x1fdb
+19c8  JSR      0x2080
+19cb  JSR      0x1fed
+19ce  JMP      0x19eb
+19d1  LDA      0x2f00,X
+19d4  CMP      #0x2c
+19d6  BNE      0x19eb
+19d8  TXA      
+19d9  AND      #0xf
+19db  CMP      0x0036
+19dd  BNE      0x19eb
+19df  JSR      0x1fdb
+19e2  JSR      0x20e0
+19e5  JSR      0x1fed
+19e8  JMP      0x19eb
+19eb  LDX      0x0039
+19ed  INX      
+19ee  CPX      #0x20
+19f0  BNE      0x198e
+19f2  RTS      
+
+hit_state_draw_advance_1876 1876-189a
+1876  LDX      #0x14
+1878  LDA      #0x0
+187a  STA      0x0031
+187c  STX      0x0039
+187e  LDA      0xc53,X
+1881  CMP      #0x2
+1883  BMI      0x1895
+1885  CMP      #0x5
+1887  BPL      0x1895
+1889  CLC      
+188a  ADC      #0x38
+188c  STA      0x2f00,X
+188f  INC      0xc53,X
+1892  JSR      0x13fb
+1895  LDX      0x0039
+1897  INX      
+1898  CPX      #0x20
+189a  BNE      0x187c
+
+projectile_object_hit_2163 2163-21d7
+2163  LDA      0x0082
+2165  BNE      0x2187
+2167  LDA      0xc3e,X
+216a  SEC      
+216b  SBC      0x0a10
+216e  BMI      0x2187
+2170  CMP      #0x3
+2172  BPL      0x2187
+2174  LDA      0xc46,X
+2177  SEC      
+2178  SBC      0x0a50
+217b  BMI      0x2187
+217d  CMP      #0x4
+217f  BPL      0x2187
+2181  JSR      0x21d8
+2184  JMP      0x1964
+2187  LDY      #0x14
+2189  LDA      0xc53,Y
+218c  CMP      #0x1
+218e  BNE      0x21d2
+2190  LDA      0xc3e,X
+2193  SEC      
+2194  SBC      0xa00,Y
+2197  BMI      0x21d2
+2199  CMP      #0x3
+219b  BPL      0x21d2
+219d  LDA      0xc46,X
+21a0  SEC      
+21a1  SBC      0xa40,Y
+21a4  BMI      0x21d2
+21a6  CMP      #0x2
+21a8  BPL      0x21d2
+21aa  LDA      #0x2
+21ac  STA      0xc53,Y
+21af  CPX      #0x4
+21b1  BPL      0x21c2
+21b3  LDA      0x2f00,Y
+21b6  SEC      
+21b7  SBC      #0x29
+21b9  ASL      A
+21ba  JSR      0x22e6
+21bd  DEC      0x0080
+21bf  JMP      0x21c8
+21c2  LDA      0x2f00,Y
+21c5  JSR      0x22d0
+21c8  LDX      0x0039
+21ca  JSR      0x21d8
+21cd  LDA      #0x2
+21cf  JMP      0x21ea
+21d2  INY      
+21d3  CPY      #0x2c
+21d5  BNE      0x2189
+21d7  RTS      
+
+free_slot_and_hazard_recycle_22c5_22e3 22c5-22e3
+22c5  LDX      #0xff
+22c7  INX      
+22c8  LDA      0xc67,X
+22cb  BNE      0x22c7
+22cd  STX      0x003a
+22cf  RTS      
+22d0  TAY      
+22d1  JSR      0x22c5
+22d4  CPX      #0xc
+22d6  BPL      0x22cf
+22d8  TYA      
+22d9  STA      0x2f14,X
+22dc  LDA      #0x1
+22de  STA      0xc67,X
+22e1  STX      0x003a
+22e3  JMP      0x1dd1

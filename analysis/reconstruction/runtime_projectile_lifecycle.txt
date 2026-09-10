@@ -1,0 +1,395 @@
+runtime_projectile_lifecycle
+Purpose: port-facing shot/hazard slot lifecycle, collision ordering, expiry masks, and object-hit recycle rules.
+Port rule: preserve scan order, masked screen-byte classes, counter ownership, and shared shot/hazard slot semantics.
+
+draw_collision_order_189c_195b
+Frame phase before player input: $189C scans slots 7..0, calls $1AE9 to erase/toggle the previous visible two bytes, then $1B0E to draw/test current bytes.
+$1AE9 only runs when $0C56[X] != 0; it toggles previous pointer bytes Y=1 and Y=0 with EOR #$2A, and clears $0C56 if direction $0C4E[X] is now inactive.
+$1B0E returns immediately for inactive $0C4E[X]<0; otherwise it sets $0C56=1, ORs the masked current screen bytes into $0030, toggles the same two bytes with EOR #$2A, and jumps to $2163 if $0030 != 0.
+Frame phase after player input: $1937 scans slots 7..0 through $1B87 movement, optionally spawns player shots and hazards, then $194E scans slots 7..0 through $1B41 expiry.
+
+shot_hazard_direction_tables_1b87
+Authority: $1B87 applies these deltas to both player shots (slots 0-3) and spawned hazards (slots 4-7).
+dir x_delta y_delta ptr_lo_delta ptr_hi_delta vertical_wrap_rule
+0 +0 +1 +4 +0 if new_y is even add $0278 to screen pointer
+1 +0 -1 -4 -1 if new_y is odd subtract $0278 from screen pointer
+2 +1 +0 +8 +0 none
+3 -1 +0 -8 -1 none
+4 +1 -1 +4 +0 if new_y is odd subtract $0278 from screen pointer
+5 +1 +1 +12 +0 if new_y is even add $0278 to screen pointer
+6 -1 -1 -12 -1 if new_y is odd subtract $0278 from screen pointer
+7 -1 +1 -4 -1 if new_y is even add $0278 to screen pointer
+
+shot_spawn_1c4d
+Authority: $1C4D consumes $003E fire edge, refuses when $0042 == 4, finds first inactive slot with $0C4E < 0, then stores $0035 as direction.
+On spawn it clears $0C56, offsets player position by $2790/$2788, computes pointer through $1BFC, plays sound id 0, and increments $0042.
+dir x_offset y_offset
+0 +1 +4
+1 +1 -1
+2 +3 +2
+3 -1 +2
+4 +3 +1
+5 +4 +3
+6 -1 +1
+7 -2 +3
+
+hazard_spawn_slot_summary_2235
+Authority: $2235 finds a free shot/hazard slot but only accepts slots >=4; it increments $0BB8 after seeding direction/position/pointer.
+Hazard offset tables are listed in runtime_enemy_movement.txt and runtime_player_movement.txt; lifecycle after spawn is identical to $1B87/$1B41 slot handling.
+
+slot_allocation_projection_1c4d_2235
+Authority: $1C4D and $2235 allocate from the shared $0C4E/$0C56 shot/hazard slot arrays but rely on separate counters and invariants.
+allocator eligible_slots precheck scan_rule visibility_rule counter_change failure_rule
+player_shot_$1C4D 0-3_by_invariant $003E!=0_and_$0042<4 X=$FF_then_INX_until_$0C4E[X]<0 clears_$0C56[X]_without_testing_old_visibility INC_$0042 Returns_without_spawn_if_no_fire_or_$0042==4
+spawned_hazard_$2235 4-7_explicit $0BB8<4_rng_gate_source_active_and_source_delta_nonzero Y=$03_then_INY_until_$0C4E[Y]<0 requires_$0C56[Y]==0_before_use INC_$0BB8 Returns_without_spawn_if_no_free_inactive_and_invisible_slot
+port_rule: preserve the original split invariants. Player shots rely on $0042 to keep the first-free scan inside slots 0-3; spawned hazards explicitly begin at slot 4 and reject stale-visible inactive slots.
+
+expiry_mask_classes_1b41
+Authority: $1B41 reads current pointer bytes Y=1 then Y=0, masks each with $AA, and expires the slot for only these classes or for out-of-bounds $1C8D.
+masked_value action
+$A0 set $0043 then deactivate slot via $1B77; $18AB consumes $0043 next frame to pause/stun spook pair
+$80 deactivate slot via $1B77
+$82 deactivate slot via $1B77
+$8A deactivate slot via $1B77
+none of those: run $1C8D bounds check; if $0041 != 0 deactivate, else keep active
+Counter ownership: $1B77 sets $0C4E[X]=$FF; slots X<4 decrement $0042, slots X>=4 decrement $0BB8.
+
+object_hit_and_recycle_2163_22d0
+Authority: $2163 first checks direct player overlap only when $0082 == 0. Hit width is X delta 0..2 and Y delta 0..3; on hit it calls $21D8 and jumps to $1964.
+If no player hit, $2163 scans object indices $14-$2B with $0C53[Y] == 1. Object hit width is X delta 0..2 and Y delta 0..1.
+On object hit it sets $0C53[Y]=2. Player shot slots X<4 score (graphic_id-$29)*2 through $22E6 and decrement $0080. Hazard slots X>=4 copy hit graphic id through $22D0 into the first free logical item slot below $0C.
+$21D8 saves current pointer to previous pointer, then calls $1B77 and jumps to $1AE9, so counter decrement and visible-byte erase use the same deactivate path.
+$22D0 preserves the hit graphic id in Y, finds a free $0C67 slot via $22C5, refuses slots >=$0C, writes $2F14[X]=graphic id, marks $0C67[X]=1, stores $003A=X, then jumps to $1DD1 for random placement.
+
+frame_draw_test_loop_189c 189c-18c1
+  189c  LDX #0x7
+  189e  STX 0x0039
+  18a0  JSR 0x1ae9
+  18a3  JSR 0x1b0e
+  18a6  LDX 0x0039
+  18a8  DEX
+  18a9  BPL 0x189e
+  18ab  LDA 0x0043
+  18ad  BEQ 0x18c4
+  18af  LDA #0x32
+  18b1  STA 0x0bbc
+  18b4  LDX #0xc
+  18b6  LDA #0x4
+  18b8  JSR 0x24c0
+  18bb  LDA #0x0
+  18bd  STA 0x0043
+  18bf  LDA #0x14
+  18c1  JSR 0x21ea
+
+frame_move_spawn_expire_loop_1937 1937-195b
+  1937  LDA #0x7
+  1939  STA 0x0039
+  193b  LDX 0x0039
+  193d  JSR 0x1b87
+  1940  DEC 0x0039
+  1942  BPL 0x193b
+  1944  LDA 0x0082
+  1946  BNE 0x194e
+  1948  JSR 0x1c4d
+  194b  JSR 0x2235
+  194e  LDA #0x7
+  1950  STA 0x0039
+  1952  LDX 0x0039
+  1954  JSR 0x1b41
+  1957  DEC 0x0039
+  1959  BPL 0x1952
+  195b  JMP 0x17bf
+
+erase_previous_visible_slot_1ae9 1ae9-1b0d
+  1ae9  LDA 0xc56,X
+  1aec  BEQ 0x1ada
+  1aee  LDA 0xc2e,X
+  1af1  STA 0x0070
+  1af3  LDA 0xc36,X
+  1af6  STA 0x0071
+  1af8  LDY #0x1
+  1afa  LDA (0x70),Y
+  1afc  EOR #0x2a
+  1afe  STA (0x70),Y
+  1b00  DEY
+  1b01  BPL 0x1afa
+  1b03  LDA 0xc4e,X
+  1b06  BPL 0x1b0d
+  1b08  LDA #0x0
+  1b0a  STA 0xc56,X
+  1b0d  RTS
+
+draw_current_and_dispatch_collision_1b0e 1b0e-1b3e
+  1b0e  LDA #0x0
+  1b10  STA 0x0030
+  1b12  LDA 0xc4e,X
+  1b15  BMI 0x1ada
+  1b17  LDA #0x1
+  1b19  STA 0xc56,X
+  1b1c  LDA 0xc1e,X
+  1b1f  STA 0x0070
+  1b21  LDA 0xc26,X
+  1b24  STA 0x0071
+  1b26  LDY #0x1
+  1b28  LDA (0x70),Y
+  1b2a  AND #0xaa
+  1b2c  ORA 0x0030
+  1b2e  STA 0x0030
+  1b30  LDA (0x70),Y
+  1b32  EOR #0x2a
+  1b34  STA (0x70),Y
+  1b36  DEY
+  1b37  BPL 0x1b28
+  1b39  LDA 0x0030
+  1b3b  BNE 0x1b3e
+  1b3d  RTS
+  1b3e  JMP 0x2163
+
+expire_current_slot_1b41 1b41-1b86
+  1b41  LDA 0xc4e,X
+  1b44  BMI 0x1ada
+  1b46  LDA #0x0
+  1b48  STA 0x0043
+  1b4a  LDA 0xc1e,X
+  1b4d  STA 0x0070
+  1b4f  LDA 0xc26,X
+  1b52  STA 0x0071
+  1b54  LDY #0x1
+  1b56  LDA (0x70),Y
+  1b58  AND #0xaa
+  1b5a  CMP #0xa0
+  1b5c  BEQ 0x1b75
+  1b5e  CMP #0x80
+  1b60  BEQ 0x1b77
+  1b62  CMP #0x82
+  1b64  BEQ 0x1b77
+  1b66  CMP #0x8a
+  1b68  BEQ 0x1b77
+  1b6a  DEY
+  1b6b  BPL 0x1b56
+  1b6d  JSR 0x1c8d
+  1b70  LDA 0x0041
+  1b72  BNE 0x1b77
+  1b74  RTS
+  1b75  INC 0x0043
+  1b77  LDA #0xff
+  1b79  STA 0xc4e,X
+  1b7c  CPX #0x4
+  1b7e  BPL 0x1b83
+  1b80  DEC 0x0042
+  1b82  RTS
+  1b83  DEC 0x0bb8
+  1b86  RTS
+
+move_slot_1b87 1b87-1bfb
+  1b87  LDY 0xc4e,X
+  1b8a  BMI 0x1be2
+  1b8c  LDA 0xc1e,X
+  1b8f  STA 0xc2e,X
+  1b92  STA 0x0070
+  1b94  LDA 0xc26,X
+  1b97  STA 0xc36,X
+  1b9a  STA 0x0071
+  1b9c  LDA 0xc3e,X
+  1b9f  CLC
+  1ba0  ADC 0x27a0,Y
+  1ba3  STA 0xc3e,X
+  1ba6  LDA 0xc46,X
+  1ba9  CLC
+  1baa  ADC 0x2798,Y
+  1bad  STA 0xc46,X
+  1bb0  CLC
+  1bb1  LDA 0xc1e,X
+  1bb4  ADC 0x27b0,Y
+  1bb7  STA 0xc1e,X
+  1bba  LDA 0xc26,X
+  1bbd  ADC 0x27a8,Y
+  1bc0  STA 0xc26,X
+  1bc3  LDA 0x2798,Y
+  1bc6  BEQ 0x1be2
+  1bc8  BPL 0x1be3
+  1bca  LDA 0xc46,X
+  1bcd  AND #0x1
+  1bcf  BEQ 0x1be2
+  1bd1  LDA 0xc1e,X
+  1bd4  SEC
+  1bd5  SBC #0x78
+  1bd7  STA 0xc1e,X
+  1bda  LDA 0xc26,X
+  1bdd  SBC #0x2
+  1bdf  STA 0xc26,X
+  1be2  RTS
+  1be3  LDA 0xc46,X
+  1be6  AND #0x1
+  1be8  BNE 0x1be2
+  1bea  LDA 0xc1e,X
+  1bed  CLC
+  1bee  ADC #0x78
+  1bf0  STA 0xc1e,X
+  1bf3  LDA 0xc26,X
+  1bf6  ADC #0x2
+  1bf8  STA 0xc26,X
+  1bfb  RTS
+
+compute_slot_screen_pointer_1bfc 1bfc-1c4c
+  1bfc  STX 0x0074
+  1bfe  LDA 0xc46,X
+  1c01  AND #0xfe
+  1c03  ASL A
+  1c04  ASL A
+  1c05  STA 0x0070
+  1c07  LDA #0x0
+  1c09  STA 0x0071
+  1c0b  LDA 0xc46,X
+  1c0e  AND #0xfe
+  1c10  JSR 0x13c0
+  1c13  LDX #0x6
+  1c15  JSR 0x13d8
+  1c18  LDX 0x0074
+  1c1a  LDA 0xc46,X
+  1c1d  AND #0x1
+  1c1f  BEQ 0x1c26
+  1c21  LDA #0x4
+  1c23  JSR 0x13c0
+  1c26  LDA 0xc3e,X
+  1c29  STA 0x0072
+  1c2b  LDA #0x0
+  1c2d  STA 0x0073
+  1c2f  LDX #0x3
+  1c31  JSR 0x13e0
+  1c34  LDA #0x30
+  1c36  CLC
+  1c37  ADC 0x0071
+  1c39  STA 0x0071
+  1c3b  LDX 0x0074
+  1c3d  LDA 0x0070
+  1c3f  CLC
+  1c40  ADC 0x0072
+  1c42  STA 0xc1e,X
+  1c45  LDA 0x0071
+  1c47  ADC 0x0073
+  1c49  STA 0xc26,X
+  1c4c  RTS
+
+spawn_player_shot_1c4d 1c4d-1c8c
+  1c4d  LDA 0x003e
+  1c4f  BEQ 0x1c8c
+  1c51  LDA #0x0
+  1c53  STA 0x003e
+  1c55  LDA 0x0042
+  1c57  CMP #0x4
+  1c59  BEQ 0x1c8c
+  1c5b  INC 0x0042
+  1c5d  LDX #0xff
+  1c5f  INX
+  1c60  LDA 0xc4e,X
+  1c63  BPL 0x1c5f
+  1c65  LDA 0x0035
+  1c67  STA 0xc4e,X
+  1c6a  TAY
+  1c6b  LDA #0x0
+  1c6d  STA 0xc56,X
+  1c70  LDA 0x0a10
+  1c73  CLC
+  1c74  ADC 0x2790,Y
+  1c77  STA 0xc3e,X
+  1c7a  LDA 0x0a50
+  1c7d  CLC
+  1c7e  ADC 0x2788,Y
+  1c81  STA 0xc46,X
+  1c84  JSR 0x1bfc
+  1c87  LDA #0x0
+  1c89  JSR 0x21ea
+  1c8c  RTS
+
+shot_bounds_1c8d 1c8d-1caa
+  1c8d  LDA #0x0
+  1c8f  STA 0x0041
+  1c91  LDA 0xc3e,X
+  1c94  CMP #0x2
+  1c96  BMI 0x1ca8
+  1c98  CMP #0x4e
+  1c9a  BPL 0x1ca8
+  1c9c  LDA 0xc46,X
+  1c9f  CMP #0x7
+  1ca1  BMI 0x1ca8
+  1ca3  CMP #0x39
+  1ca5  BPL 0x1ca8
+  1ca7  RTS
+  1ca8  INC 0x0041
+  1caa  RTS
+
+object_or_player_hit_2163 2163-21d7
+  2163  LDA 0x0082
+  2165  BNE 0x2187
+  2167  LDA 0xc3e,X
+  216a  SEC
+  216b  SBC 0x0a10
+  216e  BMI 0x2187
+  2170  CMP #0x3
+  2172  BPL 0x2187
+  2174  LDA 0xc46,X
+  2177  SEC
+  2178  SBC 0x0a50
+  217b  BMI 0x2187
+  217d  CMP #0x4
+  217f  BPL 0x2187
+  2181  JSR 0x21d8
+  2184  JMP 0x1964
+  2187  LDY #0x14
+  2189  LDA 0xc53,Y
+  218c  CMP #0x1
+  218e  BNE 0x21d2
+  2190  LDA 0xc3e,X
+  2193  SEC
+  2194  SBC 0xa00,Y
+  2197  BMI 0x21d2
+  2199  CMP #0x3
+  219b  BPL 0x21d2
+  219d  LDA 0xc46,X
+  21a0  SEC
+  21a1  SBC 0xa40,Y
+  21a4  BMI 0x21d2
+  21a6  CMP #0x2
+  21a8  BPL 0x21d2
+  21aa  LDA #0x2
+  21ac  STA 0xc53,Y
+  21af  CPX #0x4
+  21b1  BPL 0x21c2
+  21b3  LDA 0x2f00,Y
+  21b6  SEC
+  21b7  SBC #0x29
+  21b9  ASL A
+  21ba  JSR 0x22e6
+  21bd  DEC 0x0080
+  21bf  JMP 0x21c8
+  21c2  LDA 0x2f00,Y
+  21c5  JSR 0x22d0
+  21c8  LDX 0x0039
+  21ca  JSR 0x21d8
+  21cd  LDA #0x2
+  21cf  JMP 0x21ea
+  21d2  INY
+  21d3  CPY #0x2c
+  21d5  BNE 0x2189
+  21d7  RTS
+
+deactivate_and_erase_slot_21d8 21d8-21e7
+  21d8  LDA 0xc1e,X
+  21db  STA 0xc2e,X
+  21de  LDA 0xc26,X
+  21e1  STA 0xc36,X
+  21e4  JSR 0x1b77
+  21e7  JMP 0x1ae9
+
+place_hit_graphic_in_free_item_slot_22d0 22d0-22e3
+  22d0  TAY
+  22d1  JSR 0x22c5
+  22d4  CPX #0xc
+  22d6  BPL 0x22cf
+  22d8  TYA
+  22d9  STA 0x2f14,X
+  22dc  LDA #0x1
+  22de  STA 0xc67,X
+  22e1  STX 0x003a
+  22e3  JMP 0x1dd1

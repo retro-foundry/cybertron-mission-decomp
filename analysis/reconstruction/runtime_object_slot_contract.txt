@@ -1,0 +1,340 @@
+runtime_object_slot_contract
+Purpose: port-facing ownership contract for Cybertron render-object slots, logical item/enemy slots, target-code slots, and shot/hazard slots.
+Port rule: preserve the original overlapping array views. Do not collapse render objects, logical slots, target codes, and shot/hazard slots into one generic entity pool.
+
+render_slot_map
+Authority: renderer and movement routines index object arrays directly as render index i.
+slot_range storage role ownership
+$00-$0D $0A00+i/$0A40+i/$0A80+i/$0AC0+i/$2F00+i utility/status/text/transient renderer users; do not model as gameplay enemies without call-site proof
+$0E-$0F same_arrays SPOOK_pair seeded_by_$1E3A_moved_by_$23CF/$2410_not_logical_item_slots
+$10-$11 same_arrays player_pair seeded_by_$1735_moved_by_$1718/$16BE_drawn_by_$1849-$1863
+$12-$13 same_arrays reserved_or_transient_in_current_evidence no gameplay slot ownership proven
+$14-$1F same_arrays active_enemy_scheduler_window logical_slots_$00-$0B_seeded_by_$1E3A_moved_by_$198C
+$20-$2B same_arrays placed_item_or_extra_enemy_window logical_slots_$0C-$17_hits_scanned_by_$2163_hazard_source_candidate_overlap
+$36-$3C same_arrays room_target_render_window logical_slots_$22-$28_from_target_slots_0-6_via_$243E/$244A
+
+logical_slot_aliases
+Authority: logical slot s is rendered as object index s+$14; $0C67+s aliases $0C53+(s+$14).
+logical_range render_range state graphic x y stored_dx stored_dy owner
+$00-$0B $14-$1F $0C67+s/$0C53+(s+$14) $2F14+s $0A14+s $0A54+s $0C86+s $0C9E+s enemy_scheduler_window_$198C
+$0C-$17 $20-$2B same_aliases same same same same same object_hit_scan_and_hazard_recycle_window_$2163/$22D0
+$18-$21 $2C-$35 same_aliases same same same same same logical_gap_not_currently_target_placement_or_scheduler_window
+$22-$28 $36-$3C same_aliases $2F36+t $0A36+t $0A76+t $0CA8+t $0CC0+t room_target_slots_t=0..6_$243E/$244A
+$29-$2B $3D-$3F same_aliases same same same same same cleared_by_$1E3A_but_no_current_placement_owner_proven
+
+object_lifecycle_state_contract
+Authority: $0C53 indexed by render object; logical state $0C67+s is the same byte as $0C53+(s+$14).
+state meaning owner_transition port_rule
+$00 inactive_or_free $1812_resets_state_5_to_0_and_$1E3A_clears_slots free_for_$22C5/$1DD1_reuse
+$01 active_object $1E3A/$1DD1/$244A_seed_active_objects_and_targets only_state_scanned_by_$198C_and_$2163_object_hits
+$02 hit_anim_frame_3A $2163_sets_from_active_hit drawn_by_$1876_then_incremented
+$03 hit_anim_frame_3B $1876_advances_from_2 drawn_by_$1876_then_incremented
+$04 hit_anim_frame_3C $1876_advances_from_3 drawn_by_$1876_then_incremented
+$05 pending_retire_after_final_hit_frame $1876_advances_from_4 erased_and_cleared_to_0_by_next_$1812_pass
+
+target_slot_to_object_projection
+Authority: $12BF/$12DD create target-code slots; $243E/$244A place matching room targets through logical slot t+$22/render slot t+$36.
+target_slot status_addr room_code_addr graphic_addr graphic role logical_slot render_slot placement_order
+0 $0C0D $0C14 $2F36 $3D completion_gate_SAFE $22 $36 descending_required_loop_when_slot<=006F
+1 $0C0E $0C15 $2F37 $3F required_KEY $23 $37 descending_required_loop_when_slot<=006F
+2 $0C0F $0C16 $2F38 $3E required_RING $24 $38 descending_required_loop_when_slot<=006F
+3 $0C10 $0C17 $2F39 $32 required_POT_OF_GOLD $25 $39 descending_required_loop_when_slot<=006F
+4 $0C11 $0C18 $2F3A $3E required_RING $26 $3A descending_required_loop_when_slot<=006F
+5 $0C12 $0C19 $2F3B $32 required_POT_OF_GOLD $27 $3B descending_required_loop_when_slot<=006F
+6 $0C13 $0C1A $2F3C $2D bonus_status_probe_id_$2D $28 $3C after_required_loop
+
+enemy_setup_counts_and_slot_pressure
+Authority: $1E3A reads $2770/$2782/$277C/$2776, clears logical slots $00-$2B, marks the first total entries active, then places ids in spinner/clone/cyberdroid order.
+level_index spook_timer spinner clone cyberdroid total logical_range render_range placement_graphics
+0 60 6 0 0 6 $00-$05 $14-$19 2A,2A,2A,2A,2A,2A
+1 80 3 3 0 6 $00-$05 $14-$19 2A,2A,2A,2B,2B,2B
+2 100 3 3 2 8 $00-$07 $14-$1B 2A,2A,2A,2B,2B,2B,2C,2C
+3 100 2 3 3 8 $00-$07 $14-$1B 2A,2A,2B,2B,2B,2C,2C,2C
+4 120 2 4 4 10 $00-$09 $14-$1D 2A,2A,2B,2B,2B,2B,2C,2C,2C,2C
+5 120 2 5 5 12 $00-$0B $14-$1F 2A,2A,2B,2B,2B,2B,2B,2C,2C,2C,2C,2C
+
+shot_hazard_slot_contract
+Authority: projectile arrays are not render-object slots; they use $0C1E/$0C26/$0C2E/$0C36/$0C3E/$0C46/$0C4E/$0C56 and draw through $1AE9/$1B0E.
+slot_range role allocator counter expiry_owner
+$00-$03 player_shots $1C4D_first_free_by_$0042_invariant $0042 $1B41/$1B77/$21D8
+$04-$07 spawned_hazards $2235_first_free_from_Y=$03_plus_stale_visible_reject $0BB8 $1B41/$1B77/$21D8
+port_rule: do not merge these with render object slots or logical item slots; only collision/recycle routines bridge them.
+
+port_summary
+Render slot i owns visible object position/pointer/graphic arrays; logical slot s aliases render slot s+$14 for item/enemy/target placement.
+Only lifecycle state $01 participates in active enemy scheduling and shot/object hit scanning; states $02-$05 are hit-animation/retire states.
+Room target slots 0-6 are not generic logical slots: they project to logical $22-$28/render $36-$3C only when $243E/$244A place them for the current room.
+Shot/hazard slots are a separate 8-entry projectile array with different allocation/counter rules from render-object slots.
+
+setup_enemy_slots_1e3a 1e3a-1eb1
+1e3a  LDA      #0x2e
+1e3c  STA      0x2f0e
+1e3f  LDA      #0x2f
+1e41  STA      0x2f0f
+1e44  LDX      0x00b8
+1e46  LDA      0x2770,X
+1e49  STA      0x0c66
+1e4c  LDA      0x2782,X
+1e4f  STA      0x0c62
+1e52  LDA      0x277c,X
+1e55  STA      0x0c63
+1e58  LDA      0x2776,X
+1e5b  STA      0x0c64
+1e5e  LDX      #0x2b
+1e60  LDA      #0x0
+1e62  STA      0xc67,X
+1e65  STA      0xc86,X
+1e68  STA      0xc9e,X
+1e6b  DEX      
+1e6c  BPL      0x1e62
+1e6e  LDA      0x0c62
+1e71  CLC      
+1e72  ADC      0x0c63
+1e75  ADC      0x0c64
+1e78  STA      0x003a
+1e7a  STA      0x0080
+1e7c  TAX      
+1e7d  DEX      
+1e7e  LDA      #0x1
+1e80  STA      0xc67,X
+1e83  DEX      
+1e84  BPL      0x1e80
+1e86  LDA      #0x0
+1e88  STA      0x003a
+1e8a  DEC      0x0c62
+1e8d  BMI      0x1e97
+1e8f  LDA      #0x2a
+1e91  JSR      0x1dcc
+1e94  JMP      0x1e8a
+1e97  DEC      0x0c63
+1e9a  BMI      0x1ea4
+1e9c  LDA      #0x2b
+1e9e  JSR      0x1dcc
+1ea1  JMP      0x1e97
+1ea4  DEC      0x0c64
+1ea7  BMI      0x1eb1
+1ea9  LDA      #0x2c
+1eab  JSR      0x1dcc
+1eae  JMP      0x1ea4
+1eb1  RTS      
+
+random_place_logical_slot_1dcc 1dcc-1e37
+1dcc  LDX      0x003a
+1dce  STA      0x2f14,X
+1dd1  JSR      0x1d61
+1dd4  LDX      0x003a
+1dd6  AND      #0x1f
+1dd8  STA      0xa14,X
+1ddb  JSR      0x1d61
+1dde  LDX      0x003a
+1de0  AND      #0xf
+1de2  CLC      
+1de3  ADC      0xa14,X
+1de6  ADC      #0xf
+1de8  STA      0xa14,X
+1deb  JSR      0x1d61
+1dee  LDX      0x003a
+1df0  AND      #0x1f
+1df2  CLC      
+1df3  ADC      #0xf
+1df5  STA      0xa54,X
+1df8  LDA      0x0a10
+1dfb  SBC      0xa14,X
+1dfe  BPL      0x1e02
+1e00  EOR      #0xff
+1e02  CMP      #0x8
+1e04  BPL      0x1e15
+1e06  LDA      0x0a50
+1e09  SEC      
+1e0a  SBC      0xa54,X
+1e0d  BPL      0x1e11
+1e0f  EOR      #0xff
+1e11  CMP      #0x5
+1e13  BMI      0x1dd1
+1e15  TXA      
+1e16  CLC      
+1e17  ADC      #0x14
+1e19  TAX      
+1e1a  STX      0x0077
+1e1c  JSR      0x1d85
+1e1f  LDA      #0x0
+1e21  STA      0x0030
+1e23  LDA      #0x5
+1e25  STA      0x0031
+1e27  JSR      0x13fb
+1e2a  LDA      0x0030
+1e2c  BNE      0x1dd1
+1e2e  LDA      #0x0
+1e30  STA      0x0031
+1e32  LDX      0x0077
+1e34  JSR      0x13fb
+1e37  INC      0x003a
+
+active_enemy_scheduler_198c 198c-19f2
+198c  LDX      #0x14
+198e  STX      0x0039
+1990  LDA      0xc53,X
+1993  CMP      #0x1
+1995  BNE      0x19eb
+1997  LDA      0x2f00,X
+199a  CMP      #0x2a
+199c  BNE      0x19b1
+199e  TXA      
+199f  AND      #0xf
+19a1  CMP      0x0036
+19a3  BNE      0x19b1
+19a5  JSR      0x1fdb
+19a8  JSR      0x1ff7
+19ab  JSR      0x1fed
+19ae  JMP      0x19eb
+19b1  LDA      0x2f00,X
+19b4  CMP      #0x2b
+19b6  BNE      0x19d1
+19b8  TXA      
+19b9  AND      #0x7
+19bb  STA      0x0074
+19bd  LDA      0x0036
+19bf  AND      #0x7
+19c1  CMP      0x0074
+19c3  BNE      0x19d1
+19c5  JSR      0x1fdb
+19c8  JSR      0x2080
+19cb  JSR      0x1fed
+19ce  JMP      0x19eb
+19d1  LDA      0x2f00,X
+19d4  CMP      #0x2c
+19d6  BNE      0x19eb
+19d8  TXA      
+19d9  AND      #0xf
+19db  CMP      0x0036
+19dd  BNE      0x19eb
+19df  JSR      0x1fdb
+19e2  JSR      0x20e0
+19e5  JSR      0x1fed
+19e8  JMP      0x19eb
+19eb  LDX      0x0039
+19ed  INX      
+19ee  CPX      #0x20
+19f0  BNE      0x198e
+19f2  RTS      
+
+hit_state_erase_retire_1812 1812-1835
+1812  LDX      #0x14
+1814  LDA      #0x0
+1816  STA      0x0031
+1818  STX      0x0039
+181a  LDA      0xc53,X
+181d  CMP      #0x2
+181f  BMI      0x1830
+1821  LDA      0xc53,X
+1824  CMP      #0x5
+1826  BNE      0x182d
+1828  LDA      #0x0
+182a  STA      0xc53,X
+182d  JSR      0x13fb
+1830  LDX      0x0039
+1832  INX      
+1833  CPX      #0x20
+1835  BNE      0x1818
+
+hit_state_draw_1876 1876-189a
+1876  LDX      #0x14
+1878  LDA      #0x0
+187a  STA      0x0031
+187c  STX      0x0039
+187e  LDA      0xc53,X
+1881  CMP      #0x2
+1883  BMI      0x1895
+1885  CMP      #0x5
+1887  BPL      0x1895
+1889  CLC      
+188a  ADC      #0x38
+188c  STA      0x2f00,X
+188f  INC      0xc53,X
+1892  JSR      0x13fb
+1895  LDX      0x0039
+1897  INX      
+1898  CPX      #0x20
+189a  BNE      0x187c
+
+shot_or_hazard_object_hit_2163 2163-21c8
+2163  LDA      0x0082
+2165  BNE      0x2187
+2167  LDA      0xc3e,X
+216a  SEC      
+216b  SBC      0x0a10
+216e  BMI      0x2187
+2170  CMP      #0x3
+2172  BPL      0x2187
+2174  LDA      0xc46,X
+2177  SEC      
+2178  SBC      0x0a50
+217b  BMI      0x2187
+217d  CMP      #0x4
+217f  BPL      0x2187
+2181  JSR      0x21d8
+2184  JMP      0x1964
+2187  LDY      #0x14
+2189  LDA      0xc53,Y
+218c  CMP      #0x1
+218e  BNE      0x21d2
+2190  LDA      0xc3e,X
+2193  SEC      
+2194  SBC      0xa00,Y
+2197  BMI      0x21d2
+2199  CMP      #0x3
+219b  BPL      0x21d2
+219d  LDA      0xc46,X
+21a0  SEC      
+21a1  SBC      0xa40,Y
+21a4  BMI      0x21d2
+21a6  CMP      #0x2
+21a8  BPL      0x21d2
+21aa  LDA      #0x2
+21ac  STA      0xc53,Y
+21af  CPX      #0x4
+21b1  BPL      0x21c2
+21b3  LDA      0x2f00,Y
+21b6  SEC      
+21b7  SBC      #0x29
+21b9  ASL      A
+21ba  JSR      0x22e6
+21bd  DEC      0x0080
+21bf  JMP      0x21c8
+21c2  LDA      0x2f00,Y
+21c5  JSR      0x22d0
+21c8  LDX      0x0039
+
+free_item_slot_recycle_22c5 22c5-22de
+22c5  LDX      #0xff
+22c7  INX      
+22c8  LDA      0xc67,X
+22cb  BNE      0x22c7
+22cd  STX      0x003a
+22cf  RTS      
+22d0  TAY      
+22d1  JSR      0x22c5
+22d4  CPX      #0xc
+22d6  BPL      0x22cf
+22d8  TYA      
+22d9  STA      0x2f14,X
+22dc  LDA      #0x1
+22de  STA      0xc67,X
+
+target_room_placement_243e 243e-245c
+243e  LDX      0x006f
+2440  JSR      0x244a
+2443  LDX      0x0039
+2445  DEX      
+2446  BPL      0x2440
+2448  LDX      #0x6
+244a  STX      0x0039
+244c  LDA      0x0032
+244e  AND      #0xf
+2450  CMP      0xc14,X
+2453  BNE      0x2463
+2455  LDA      0xc0d,X
+2458  BNE      0x2463
+245a  TXA      
+245b  CLC      
+245c  ADC      #0x22

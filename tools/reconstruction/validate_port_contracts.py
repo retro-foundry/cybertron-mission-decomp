@@ -14,6 +14,9 @@ STATUS_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_status_panel_
 SPRITE_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_sprite_renderer_reference.txt"
 SETUP_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_setup_frame_reference.txt"
 MOVEMENT_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_player_movement.txt"
+OBJECT_LIFECYCLE_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_object_lifecycle_reference.txt"
+OBJECT_SLOT_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_object_slot_contract.txt"
+PROJECTILE_LIFECYCLE_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_projectile_lifecycle.txt"
 LOAD_ADDRESS = 0x0D80
 
 
@@ -604,6 +607,33 @@ def main() -> None:
         (cyberdroid_counts, 0x2C),
     )
 
+    # Cross-check every difficulty row against the preserved object-slot
+    # contract, not just the level indices exercised by setup scenarios.
+    object_slot_reference = OBJECT_SLOT_REFERENCE.read_text(encoding="ascii")
+    count_table = object_slot_reference.split("enemy_setup_counts_and_slot_pressure\n", 1)[1].split(
+        "\nshot_hazard_slot_contract\n", 1
+    )[0]
+    count_pattern = re.compile(
+        r"^(?P<level>[0-5]) (?P<timer>[0-9]+) (?P<spinner>[0-9]+) "
+        r"(?P<clone>[0-9]+) (?P<cyberdroid>[0-9]+) (?P<total>[0-9]+) ",
+        re.MULTILINE,
+    )
+    expected_counts = {
+        int(match["level"]): tuple(int(match[name]) for name in ("spinner", "clone", "cyberdroid", "total"))
+        for match in count_pattern.finditer(count_table)
+    }
+    if len(expected_counts) != 6:
+        fail(f"object-slot contract has {len(expected_counts)} level rows; expected 6")
+    for level_index in range(6):
+        actual = (
+            spinner_counts[level_index],
+            clone_counts[level_index],
+            cyberdroid_counts[level_index],
+            spinner_counts[level_index] + clone_counts[level_index] + cyberdroid_counts[level_index],
+        )
+        if actual != expected_counts[level_index]:
+            fail(f"level index {level_index}: enemy setup counts {actual}, expected {expected_counts[level_index]}")
+
     def adc8(a: int, value: int, carry: bool) -> tuple[int, bool]:
         total = a + value + int(carry)
         return total & 0xFF, total > 0xFF
@@ -727,6 +757,89 @@ def main() -> None:
             fail(f"{expected['name']}: final RNG state differs")
         setup_rows += 1
 
+    # Object lifecycle windows overlap intentionally. Parse the original
+    # matrix and prove each render slot's scheduler/hit/animation/recycle role.
+    lifecycle_reference = OBJECT_LIFECYCLE_REFERENCE.read_text(encoding="ascii")
+    window_text = lifecycle_reference.split("object_window_matrix\n", 1)[1].split(
+        "\nphase0_hit_state_projection_1812_1876\n", 1
+    )[0]
+    window_pattern = re.compile(
+        r"^\$(?P<first>[0-9A-F]{2})-\$(?P<last>[0-9A-F]{2}) "
+        r"\$[0-9A-F]{2}-\$[0-9A-F]{2} (?P<scheduler>yes|no) (?P<hit>yes|no) "
+        r"(?P<animation>yes|no) (?P<recycle>yes|no) ",
+        re.MULTILINE,
+    )
+    window_roles = {}
+    for match in window_pattern.finditer(window_text):
+        roles = tuple(match[name] == "yes" for name in ("scheduler", "hit", "animation", "recycle"))
+        for render_slot in range(int(match["first"], 16), int(match["last"], 16) + 1):
+            window_roles[render_slot] = roles
+    if len(window_roles) != 41 or set(window_roles) != set(range(0x14, 0x3D)):
+        fail("object lifecycle matrix does not cover render slots $14-$3C exactly")
+    for render_slot, roles in window_roles.items():
+        expected_roles = (
+            0x14 <= render_slot <= 0x1F,
+            0x14 <= render_slot <= 0x2B,
+            0x14 <= render_slot <= 0x1F,
+            0x14 <= render_slot <= 0x1F,
+        )
+        if roles != expected_roles:
+            fail(f"render slot ${render_slot:02X}: lifecycle roles {roles}, expected {expected_roles}")
+
+    state_text = lifecycle_reference.split("phase0_hit_state_projection_1812_1876\n", 1)[1].split(
+        "\npost_hit_timeline_2163_to_1812_1876\n", 1
+    )[0]
+    state_pattern = re.compile(
+        r"^\$(?P<before>[0-5][0-5]) .* \$(?P<after_first>[0-5][0-5]) "
+        r"(?P<graphic>none|\$[0-9A-F]{2}) \$(?P<after_second>[0-5][0-5]) ",
+        re.MULTILINE,
+    )
+    expected_states = {
+        int(match["before"], 16): (
+            int(match["after_first"], 16),
+            None if match["graphic"] == "none" else int(match["graphic"][1:], 16),
+            int(match["after_second"], 16),
+        )
+        for match in state_pattern.finditer(state_text)
+    }
+    if len(expected_states) != 6:
+        fail(f"object lifecycle contract has {len(expected_states)} state rows; expected 6")
+    lifecycle_rows = 0
+    for state_before in range(6):
+        state_after_erase = 0 if state_before == 5 else state_before
+        if 2 <= state_after_erase < 5:
+            graphic = state_after_erase + 0x38
+            state_after_draw = state_after_erase + 1
+        else:
+            graphic = None
+            state_after_draw = state_after_erase
+        actual = (state_after_erase, graphic, state_after_draw)
+        if actual != expected_states[state_before]:
+            fail(f"lifecycle state ${state_before:02X}: {actual}, expected {expected_states[state_before]}")
+        lifecycle_rows += 1
+
+    # $1B41 recognizes four masked screen-byte classes. Exhaust all byte
+    # values so ports cannot accidentally compare unmasked pixels or merge the
+    # special $A0 spook-pause outcome with ordinary expiry.
+    projectile_reference = PROJECTILE_LIFECYCLE_REFERENCE.read_text(encoding="ascii")
+    expiry_text = projectile_reference.split("expiry_mask_classes_1b41\n", 1)[1].split(
+        "\nobject_hit_and_recycle_2163_22d0\n", 1
+    )[0]
+    expiry_classes = {
+        int(value, 16)
+        for value in re.findall(r"^\$(A0|80|82|8A) ", expiry_text, re.MULTILINE)
+    }
+    if expiry_classes != {0x80, 0x82, 0x8A, 0xA0}:
+        fail(f"projectile expiry classes differ: {sorted(expiry_classes)}")
+    expiry_rows = 0
+    for screen_byte in range(256):
+        masked = screen_byte & 0xAA
+        expires = masked in expiry_classes
+        sets_spook_pause = masked == 0xA0
+        if sets_spook_pause and not expires:
+            fail(f"screen byte ${screen_byte:02X}: spook pause without expiry")
+        expiry_rows += 1
+
     print(
         "Validated port preflight: "
         "64 graphic pointers, "
@@ -740,7 +853,10 @@ def main() -> None:
         f"{room_rows} room-render digests, "
         f"{status_rows} status-render digests, "
         f"{player_layer_rows} player sprite layers, "
-        f"{setup_rows} deterministic setup frames"
+        f"{setup_rows} deterministic setup frames, "
+        f"{len(window_roles)} object-slot roles, "
+        f"{lifecycle_rows} lifecycle states, "
+        f"{expiry_rows} projectile expiry bytes"
     )
 
 
