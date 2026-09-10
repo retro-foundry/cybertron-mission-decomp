@@ -3,12 +3,14 @@
 from pathlib import Path
 import hashlib
 import json
+import re
 import sys
 
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_RUNTIME = ROOT / "build" / "reconstruction" / "CYBRUN"
 ROOM_FIXTURE = ROOT / "analysis" / "reconstruction" / "room_render_fixture.json"
+STATUS_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_status_panel_reference.txt"
 LOAD_ADDRESS = 0x0D80
 
 
@@ -184,6 +186,7 @@ def main() -> None:
         fail(f"room fixture has {len(expected_variants)} unique variants; expected 256")
 
     room_rows = 0
+    room_screens = {}
     for room_id in range(64):
         packed_room = room_data[room_id * 0x12 : (room_id + 1) * 0x12]
 
@@ -287,7 +290,99 @@ def main() -> None:
                     f"room ${room_id:02X} variant {variant}: "
                     f"actual {actual_fields}, expected {expected_fields}"
                 )
+            room_screens[(room_id, variant)] = bytes(screen)
             room_rows += 1
+
+    # G2: reproduce $1CAB/$1D3C/$2319/$2345 over every validated clean
+    # room. The original helper clears a 24-byte cell, copies one graphic
+    # record, and falls through to the pointer advance at $1D4F.
+    reference_text = STATUS_REFERENCE.read_text(encoding="ascii")
+    table_text = reference_text.split(
+        "room_status_composite_digests_lives4_score_spaces_no_collected\n", 1
+    )[1].split("\nlife_status_reference\n", 1)[0]
+    status_pattern = re.compile(
+        r"^(?P<room>[0-9a-f]{2}) (?P<level>[0-9]) (?P<variant>[0-3]) "
+        r"(?P<nonzero>[0-9]+) (?P<digest>[0-9a-f]{64})$",
+        re.MULTILINE,
+    )
+    expected_status = {
+        (int(match["room"], 16), int(match["level"])): match.groupdict()
+        for match in status_pattern.finditer(table_text)
+    }
+    if len(expected_status) != 640:
+        fail(f"status reference has {len(expected_status)} digest rows; expected 640")
+
+    graphic_records = tuple(block(0x2900 + graphic_id * 24, 24) for graphic_id in range(64))
+
+    def render_status(room_id: int, level_ones: int) -> bytes:
+        screen = bytearray(room_screens[(room_id, level_ones & 3)])
+
+        def clear_cell(address: int) -> None:
+            offset = screen_offset(address)
+            screen[offset : offset + 24] = bytes(24)
+
+        def draw_glyph(address: int, graphic_id: int) -> int:
+            clear_cell(address)
+            offset = screen_offset(address)
+            screen[offset : offset + 24] = graphic_records[graphic_id]
+            return address + 0x18
+
+        pointer = 0x3288
+        for graphic_id in (0x25, 0x35, 0x20, 0x36, 0x37):
+            pointer = draw_glyph(pointer, graphic_id)
+
+        pointer = 0x3318
+        for graphic_id in (0x20, 0x20, 0x20, 0x20, 0x20):
+            pointer = draw_glyph(pointer, graphic_id)
+
+        pointer = 0x7B08
+        for _ in range(4):
+            pointer = draw_glyph(pointer, 0x39)
+        clear_cell(pointer)
+
+        # No target is collected in the 640-row composite table. Validate the
+        # five slot-to-graphic mappings used by the omitted conditional draws.
+        if tuple(block(0x2F37, 5)) != (0x3F, 0x3E, 0x32, 0x3E, 0x32):
+            fail("target status slot graphic mapping changed")
+
+        screen[0x34BA - 0x3000] = 0x2A
+        screen[0x34BD - 0x3000] = 0x2A
+
+        pointer = 0x3408
+        for graphic_id in (0x36, 0x20, 0x20, 0x38):
+            pointer = draw_glyph(pointer, graphic_id)
+        pointer += 0x18
+        room_low = room_id & 0x0F
+        if room_low >= 9:
+            pointer = draw_glyph(pointer, 0x21)
+            pointer = draw_glyph(pointer, room_low + 0x17)
+        else:
+            pointer += 0x18
+            pointer = draw_glyph(pointer, room_low + 0x21)
+        pointer += 0x18
+        pointer = draw_glyph(pointer, 0x20)
+        draw_glyph(pointer, level_ones + 0x20)
+        return bytes(screen)
+
+    status_rows = 0
+    for room_id in range(64):
+        for level_ones in range(10):
+            expected = expected_status[(room_id, level_ones)]
+            if int(expected["variant"]) != level_ones & 3:
+                fail(f"status room ${room_id:02X} level {level_ones}: bad fixture variant")
+            screen = render_status(room_id, level_ones)
+            actual_nonzero = sum(value != 0 for value in screen)
+            actual_digest = hashlib.sha256(screen).hexdigest()
+            if (actual_nonzero, actual_digest) != (
+                int(expected["nonzero"]),
+                expected["digest"],
+            ):
+                fail(
+                    f"status room ${room_id:02X} level {level_ones}: "
+                    f"actual {(actual_nonzero, actual_digest)}, "
+                    f"expected {(expected['nonzero'], expected['digest'])}"
+                )
+            status_rows += 1
 
     print(
         "Validated port preflight: "
@@ -296,7 +391,8 @@ def main() -> None:
         "4 player starts, "
         f"{projectile_rows} shot projections, "
         f"{movement_rows} movement projections, "
-        f"{room_rows} room-render digests"
+        f"{room_rows} room-render digests, "
+        f"{status_rows} status-render digests"
     )
 
 

@@ -57,8 +57,8 @@ to be exactly `$2280` bytes with SHA-256
 That digest is the byte-exact authority established by the reverse-engineering
 project, so validation requires no copyrighted original media. It also runs
 standalone port preflight contracts for graphic pointers, player animation
-selection, player starts, projectile address updates, and all 256 clean room
-render variants.
+selection, player starts, projectile address updates, all 256 clean room
+render variants, and all 640 room/level status-panel composites.
 
 ## Layout and provenance
 
@@ -77,6 +77,9 @@ records what is proved and the remaining Quest-level runtime validation gaps.
 The original-output [room renderer oracle](analysis/reconstruction/runtime_room_render_reference.txt)
 provides 256 clean-screen digests covering all 64 rooms and four fill-pattern
 variants.
+The [status-panel oracle](analysis/reconstruction/runtime_status_panel_reference.txt)
+adds every room with every displayed level digit, plus explicit life and target
+slot placement references.
 
 The decoded 24-byte artwork can be reviewed in the
 [composed sprite and graphic sheet](analysis/reconstruction/composed_sprite_sheet.png).

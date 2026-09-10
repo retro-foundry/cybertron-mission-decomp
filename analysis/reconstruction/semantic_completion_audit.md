@@ -28,6 +28,7 @@ accepted as evidence for gameplay identity.
 | Static gameplay semantics | Input, player movement, collision, projectile, object, status, score, sound, room, and screen-flow code is source-owned and behaviorally named | Behavioral, static |
 | Port address preflight | `validate_port_contracts.py` checks 64 graphic pointers, 32 player animation selections, four player starts, 32 shot projections, and 32 movement projections against the source-built runtime | Port-contract |
 | Room-render parity | `validate_port_contracts.py` independently reconstructs `$14B9/$1516/$0EFE/$1EC8/$1F19` and matches all 256 original-output `$3000-$7FFF` digests, draw/fill counts, and nonzero-byte totals | Port-contract |
+| Status-render parity | `validate_port_contracts.py` independently reconstructs `$1CAB/$1D3C/$2319/$2345` and matches all 640 original-output room/level composite digests; the bundled oracle also records life and target-slot placement | Port-contract |
 | Full active-frame parity | No deterministic full-frame replay oracle is bundled in this standalone repository | Not proved |
 
 ## Source quality metrics
@@ -51,8 +52,8 @@ The source reconstruction itself is complete and byte-exact, but the dynamic
 validation depth is not yet equivalent to the Quest repository. Completion of
 that broader standard requires:
 
-1. Add executable status- and sprite-render fixtures equivalent to the room
-   renderer contract.
+1. Add an executable sprite-render fixture equivalent to the room and status
+   renderer contracts.
 2. Add replay-backed input, movement, collision, projectile, object lifecycle,
    score, sound, and screen-flow contracts.
 3. Add an active-loop/full-frame comparison that records RAM and display
