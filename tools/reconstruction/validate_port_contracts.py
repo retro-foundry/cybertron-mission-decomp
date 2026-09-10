@@ -13,6 +13,7 @@ ROOM_FIXTURE = ROOT / "analysis" / "reconstruction" / "room_render_fixture.json"
 STATUS_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_status_panel_reference.txt"
 SPRITE_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_sprite_renderer_reference.txt"
 SETUP_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_setup_frame_reference.txt"
+MOVEMENT_REFERENCE = ROOT / "analysis" / "reconstruction" / "runtime_player_movement.txt"
 LOAD_ADDRESS = 0x0D80
 
 
@@ -125,6 +126,83 @@ def main() -> None:
                     f"pointer ${after:04X}, expected ${expected:04X}"
                 )
             movement_rows += 1
+
+    # Exhaust the $1609 keyboard key-mask space and the $2207 direction map.
+    # The expected rows are retained separately from the source-built tables.
+    movement_reference = MOVEMENT_REFERENCE.read_text(encoding="ascii")
+    keyboard_y_delta = tuple(
+        value if value < 0x80 else value - 0x100 for value in block(0x27D4, 4)
+    )
+    keyboard_x_delta = tuple(
+        value if value < 0x80 else value - 0x100 for value in block(0x27D8, 4)
+    )
+    if block(0x27DC, 4) != bytes((0xBE, 0x9E, 0x99, 0x98)):
+        fail("keyboard INKEY table differs from the control reference")
+
+    def direction_for_delta(x_delta: int, y_delta: int):
+        return {
+            (0, 1): 0,
+            (0, -1): 1,
+            (1, 0): 2,
+            (-1, 0): 3,
+            (1, -1): 4,
+            (1, 1): 5,
+            (-1, -1): 6,
+            (-1, 1): 7,
+        }.get((x_delta, y_delta))
+
+    keyboard_projection = movement_reference.split(
+        "keyboard_combination_projection_1609_16e1\n", 1
+    )[1].split("\njoystick_input_1287\n", 1)[0]
+    keyboard_pattern = re.compile(
+        r"^mask=\$(?P<mask>[0-9a-f]{2}) keys=.* net_x=(?P<x>[+-][0-9]+) "
+        r"net_y=(?P<y>[+-][0-9]+) direction=(?P<direction>[0-7]|idle_preserve_0035)$",
+        re.MULTILINE,
+    )
+    expected_keyboard = {
+        int(match["mask"], 16): match.groupdict()
+        for match in keyboard_pattern.finditer(keyboard_projection)
+    }
+    if len(expected_keyboard) != 16:
+        fail(f"movement reference has {len(expected_keyboard)} keyboard masks; expected 16")
+    keyboard_rows = 0
+    for mask in range(16):
+        x_delta = sum(keyboard_x_delta[index] for index in range(4) if mask & (1 << index))
+        y_delta = sum(keyboard_y_delta[index] for index in range(4) if mask & (1 << index))
+        direction = direction_for_delta(x_delta, y_delta)
+        expected = expected_keyboard[mask]
+        expected_direction = (
+            None if expected["direction"] == "idle_preserve_0035" else int(expected["direction"])
+        )
+        if (x_delta, y_delta, direction) != (
+            int(expected["x"]),
+            int(expected["y"]),
+            expected_direction,
+        ):
+            fail(f"keyboard mask ${mask:02X}: direction projection differs")
+        keyboard_rows += 1
+
+    # Boundary values exercise both branches of each joystick threshold, and
+    # all previous/current pairs exercise the rising-edge fire latch at $15DD.
+    def joystick_axis(sample: int) -> int:
+        if sample < 0x40:
+            return 1
+        if sample >= 0xC0:
+            return -1
+        return 0
+
+    joystick_cases = ((0x00, 1), (0x3F, 1), (0x40, 0), (0xBF, 0), (0xC0, -1), (0xFF, -1))
+    for sample, expected_delta in joystick_cases:
+        if joystick_axis(sample) != expected_delta:
+            fail(f"joystick sample ${sample:02X}: threshold projection differs")
+    fire_edge_rows = 0
+    for previous in (0, 1):
+        for current in (0, 1):
+            fire_edge = previous == 0 and current != 0
+            expected_edge = (previous, current) == (0, 1)
+            if fire_edge != expected_edge:
+                fail(f"fire latch {previous}->{current}: edge projection differs")
+            fire_edge_rows += 1
 
     # G1: independently reproduce $1516/$0EFE and the two room-fill scans,
     # then compare every clean-screen result with the preserved original-output
@@ -656,6 +734,9 @@ def main() -> None:
         "4 player starts, "
         f"{projectile_rows} shot projections, "
         f"{movement_rows} movement projections, "
+        f"{keyboard_rows} keyboard masks, "
+        f"{len(joystick_cases)} joystick thresholds, "
+        f"{fire_edge_rows} fire-latch transitions, "
         f"{room_rows} room-render digests, "
         f"{status_rows} status-render digests, "
         f"{player_layer_rows} player sprite layers, "

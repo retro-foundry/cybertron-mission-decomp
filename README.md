@@ -62,6 +62,8 @@ render variants, all 640 room/level status-panel composites, both sprite
 destination walks, and all four isolated player-start layers.
 Seven seeded setup scenarios additionally validate target-code generation,
 enemy/target placement, collision rejection, and the composed entry frame.
+The input preflight exhausts all 16 keyboard movement masks, joystick threshold
+edges, and every previous/current fire-latch transition.
 
 ## Layout and provenance
 
@@ -89,6 +91,10 @@ digests.
 The [setup-frame oracle](analysis/reconstruction/runtime_setup_frame_reference.txt)
 records the seeded RNG state, placed objects, setup-screen digest, and immediate
 player-entry digest for each scenario.
+The [control-flow reference](analysis/reconstruction/runtime_control_input_reference.txt)
+and [movement reference](analysis/reconstruction/runtime_player_movement.txt)
+document key codes, input selection, pause/menu behavior, direction mapping,
+room exits, and projectile movement tables.
 
 The decoded 24-byte artwork can be reviewed in the
 [composed sprite and graphic sheet](analysis/reconstruction/composed_sprite_sheet.png).

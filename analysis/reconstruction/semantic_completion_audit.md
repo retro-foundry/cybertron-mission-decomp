@@ -27,6 +27,7 @@ accepted as evidence for gameplay identity.
 | Room data | Sixteen 18-byte packed room records are bounded by the room selector and tile renderer | Behavioral |
 | Static gameplay semantics | Input, player movement, collision, projectile, object, status, score, sound, room, and screen-flow code is source-owned and behaviorally named | Behavioral, static |
 | Port address preflight | `validate_port_contracts.py` checks 64 graphic pointers, 32 player animation selections, four player starts, 32 shot projections, and 32 movement projections against the source-built runtime | Port-contract |
+| Input projection | All 16 keyboard masks, six joystick threshold boundaries, and four fire-latch transitions are checked against the preserved control/movement contract | Port-contract |
 | Room-render parity | `validate_port_contracts.py` independently reconstructs `$14B9/$1516/$0EFE/$1EC8/$1F19` and matches all 256 original-output `$3000-$7FFF` digests, draw/fill counts, and nonzero-byte totals | Port-contract |
 | Status-render parity | `validate_port_contracts.py` independently reconstructs `$1CAB/$1D3C/$2319/$2345` and matches all 640 original-output room/level composite digests; the bundled oracle also records life and target-slot placement | Port-contract |
 | Sprite-render parity | `validate_port_contracts.py` independently reconstructs the even and split odd-Y `$1426-$1464` destination walks and matches all four original-output `$1735` player-start XOR-layer digests | Port-contract |

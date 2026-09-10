@@ -1,0 +1,237 @@
+runtime_control_input_reference
+scope=$0E05-$0E84 attract/input wait, $13AA/$2466 INKEY helpers, $15C3-$1634 active input, $1287 joystick, $2470 sound toggles
+purpose=port-facing control flow reference; use runtime_player_movement.txt for the wider movement/shot/hazard tables
+
+inkey_helper_semantics
+$13AA and $2466 both call OSBYTE $81 with Y=$FF and X set to the negative INKEY code, then CPX #$00; BEQ means not pressed, nonzero X means pressed.
+$2464 is the Escape wrapper: X=$8F then falls through to $2466.
+
+control_key_codes
+Space/start        inkey_x=$9d signed_x=-99 effect=$0E2E sets $0CEB=0 and returns carry set
+Escape/menu        inkey_x=$8f signed_x=-113 effect=$0E2E returns carry clear; active $15C3 unwinds stack and jumps $0E05
+M/fire             inkey_x=$9a signed_x=-102 effect=$1609 returns current fire state in X for $15C3 edge latch
+P/pause            inkey_x=$c8 signed_x=-56 effect=$15C3 enters pause loop
+R/resume           inkey_x=$cc signed_x=-52 effect=$15C3 exits pause loop
+S/sound on         inkey_x=$ae signed_x=-82 effect=$2470 stores $0CEA=0
+Q/sound off        inkey_x=$ef signed_x=-17 effect=$2470 tries sound ids $0C/$10 then stores $0CEA=1
+
+keyboard_movement_codes_from_27dc
+source_y_delta=$27D4 source_x_delta=$27D8 source_inkey=$27DC; multiple pressed movement keys accumulate deltas before $16E1 resolves direction.
+entry 0 name=A/up inkey_x=$be signed_x=-66 x_delta=+0 y_delta=-1
+entry 1 name=Z/down inkey_x=$9e signed_x=-98 x_delta=+0 y_delta=+1
+entry 2 name=</left inkey_x=$99 signed_x=-103 x_delta=-1 y_delta=+0
+entry 3 name=>/right inkey_x=$98 signed_x=-104 x_delta=+1 y_delta=+0
+
+attract_wait_flow_0e2e
+$0E2E sets $2706=4, clears $0076-$0079, sets $0075=2, and disables IRQs with SEI only when $0C03 is nonzero.
+Each loop calls $1307 with A=2, then $1341, then scans Space, Escape, joystick fire, and timeout counters.
+Space pressed: stores $0CEB=0, executes CLI, returns SEC.
+Joystick fire pressed through OSBYTE $80 X=0: stores $0CEB=1, executes CLI, returns SEC.
+Escape pressed: returns CLC without the Space/fire CLI path.
+Timeout after $0076/$0075 counters expire: returns CLC.
+
+active_input_flow_15c3
+$15C3 calls $2470 before clearing input deltas, so S/Q are polled once per active input frame.
+It clears $003F/$0040/$0C01, then selects keyboard $1609 when $0CEB=0 or joystick $1287 when $0CEB!=0.
+Fire edge: if previous $0C98 is zero and current returned X is nonzero, $003E is set to 1; then current X is stored to $0C98.
+Escape: $2464 nonzero triggers four PLA instructions and JMP $0E05, so a port should leave the active frame path immediately.
+Pause: P through $2466 enters a tight wait loop that repeatedly scans R through $2466; only R returns to active play.
+
+joystick_flow_1287
+OSBYTE $80 channel X=1 adjusts $003F with Y<$40 => +1 and Y>=$C0 => -1.
+OSBYTE $80 channel X=2 adjusts $0040 with Y<$40 => +1 and Y>=$C0 => -1.
+OSBYTE $80 channel X=0 returns fire in X&1 to the same $15C3 edge latch used by keyboard fire.
+
+sound_toggle_flow_2470
+S key pressed: $0CEA=0, enabling later sound dispatch in $21EA.
+Q key pressed: calls $21EA with sound ids $0C and $10 before storing $0CEA=1; those feedback sounds are therefore suppressed if sound was already disabled.
+$21EA returns immediately when $0CEA is nonzero, so ports should preserve $0CEA as the global sound-off gate.
+
+port_rules
+1. Preserve $0CEB as the selected input mode set by attract start: Space=keyboard, joystick fire=joystick.
+2. Preserve INKEY helper polarity: zero means not pressed, nonzero means pressed.
+3. Preserve $0C98/$003E as a rising-edge fire latch; do not spawn repeated shots from a held fire input.
+4. Preserve Escape as an immediate return-to-menu transfer from active input, not a normal pause or death transition.
+5. Preserve the pause loop's P-to-enter/R-to-exit behavior and its lack of normal frame progress while paused.
+6. Preserve Q sound-off feedback gating: it only plays while sound was enabled before Q is stored.
+
+menu_attract_entry_context_0e05 0e05-0e2d
+  0e05  LDA #0xc
+  0e07  JSR 0x21ea
+  0e0a  LDA #0x10
+  0e0c  JSR 0x21ea
+  0e0f  JSR 0x0db7
+  0e12  JSR 0x1145
+  0e15  JSR 0x1f71
+  0e18  JSR 0x0e2e
+  0e1b  BCS 0x0e85
+  0e1d  JSR 0x0db7
+  0e20  JSR 0x1175
+  0e23  JSR 0x1f71
+  0e26  JSR 0x0e2e
+  0e29  BCS 0x0e85
+  0e2b  JMP 0x0e05
+
+attract_wait_context_0e2e 0e2e-0e84
+  0e2e  LDA #0x4
+  0e30  STA 0x2706
+  0e33  LDA #0x0
+  0e35  STA 0x0076
+  0e37  STA 0x0079
+  0e39  STA 0x0078
+  0e3b  STA 0x0077
+  0e3d  LDA #0x2
+  0e3f  STA 0x0075
+  0e41  LDA 0x0c03
+  0e44  BEQ 0x0e47
+  0e46  SEI
+  0e47  LDA #0x2
+  0e49  JSR 0x1307
+  0e4c  JSR 0x1341
+  0e4f  LDX #0x9d
+  0e51  JSR 0x13aa
+  0e54  BEQ 0x0e5e
+  0e56  LDA #0x0
+  0e58  STA 0x0ceb
+  0e5b  CLI
+  0e5c  SEC
+  0e5d  RTS
+  0e5e  LDX #0x8f
+  0e60  JSR 0x13aa
+  0e63  BEQ 0x0e67
+  0e65  CLC
+  0e66  RTS
+  0e67  LDA #0x80
+  0e69  LDX #0x0
+  0e6b  JSR 0xfff4
+  0e6e  TXA
+  0e6f  AND #0x1
+  0e71  BEQ 0x0e7b
+  0e73  LDA #0x1
+  0e75  STA 0x0ceb
+  0e78  CLI
+  0e79  SEC
+  0e7a  RTS
+  0e7b  DEC 0x0076
+  0e7d  BNE 0x0e47
+  0e7f  DEC 0x0075
+  0e81  BNE 0x0e47
+  0e83  CLC
+  0e84  RTS
+
+inkey_helper_context_13aa 13aa-13b3
+  13aa  LDA #0x81
+  13ac  LDY #0xff
+  13ae  JSR 0xfff4
+  13b1  CPX #0x0
+  13b3  RTS
+
+active_input_context_15c3 15c3-1608
+  15c3  JSR 0x2470
+  15c6  LDA #0x0
+  15c8  STA 0x003f
+  15ca  STA 0x0040
+  15cc  STA 0x0c01
+  15cf  LDA 0x0ceb
+  15d2  BNE 0x15da
+  15d4  JSR 0x1609
+  15d7  JMP 0x15dd
+  15da  JSR 0x1287
+  15dd  LDA 0x0c98
+  15e0  BNE 0x15ea
+  15e2  CPX #0x0
+  15e4  BEQ 0x15ea
+  15e6  LDA #0x1
+  15e8  STA 0x003e
+  15ea  STX 0x0c98
+  15ed  JSR 0x2464
+  15f0  BEQ 0x15f9
+  15f2  PLA
+  15f3  PLA
+  15f4  PLA
+  15f5  PLA
+  15f6  JMP 0x0e05
+  15f9  LDX #0xc8
+  15fb  JSR 0x2466
+  15fe  BNE 0x1601
+  1600  RTS
+  1601  LDX #0xcc
+  1603  JSR 0x2466
+  1606  BEQ 0x1601
+  1608  RTS
+
+keyboard_scan_context_1609 1609-1634
+  1609  LDY 0x0c01
+  160c  LDA 0x27dc,Y
+  160f  TAX
+  1610  JSR 0x2466
+  1613  BEQ 0x1628
+  1615  LDY 0x0c01
+  1618  LDA 0x003f
+  161a  CLC
+  161b  ADC 0x27d8,Y
+  161e  STA 0x003f
+  1620  LDA 0x0040
+  1622  CLC
+  1623  ADC 0x27d4,Y
+  1626  STA 0x0040
+  1628  INC 0x0c01
+  162b  LDA 0x0c01
+  162e  CMP #0x4
+  1630  BNE 0x1609
+  1632  LDX #0x9a
+  1634  JMP 0x2466
+
+joystick_scan_context_1287 1287-12be
+  1287  LDA #0x80
+  1289  LDX #0x1
+  128b  JSR 0xfff4
+  128e  CPY #0x40
+  1290  BCC 0x129b
+  1292  CPY #0xc0
+  1294  BCC 0x129d
+  1296  DEC 0x003f
+  1298  JMP 0x129d
+  129b  INC 0x003f
+  129d  LDA #0x80
+  129f  LDX #0x2
+  12a1  JSR 0xfff4
+  12a4  CPY #0x40
+  12a6  BCC 0x12b1
+  12a8  CPY #0xc0
+  12aa  BCC 0x12b3
+  12ac  DEC 0x0040
+  12ae  JMP 0x12b3
+  12b1  INC 0x0040
+  12b3  LDA #0x80
+  12b5  LDX #0x0
+  12b7  JSR 0xfff4
+  12ba  TXA
+  12bb  AND #0x1
+  12bd  TAX
+  12be  RTS
+
+escape_and_inkey_helper_context_2464 2464-246f
+  2464  LDX #0x8f
+  2466  LDA #0x81
+  2468  LDY #0xff
+  246a  JSR 0xfff4
+  246d  CPX #0x0
+  246f  RTS
+
+sound_toggle_context_2470 2470-2492
+  2470  LDX #0xae
+  2472  JSR 0x2466
+  2475  BEQ 0x247c
+  2477  LDA #0x0
+  2479  STA 0x0cea
+  247c  LDX #0xef
+  247e  JSR 0x2466
+  2481  BEQ 0x2492
+  2483  LDA #0xc
+  2485  JSR 0x21ea
+  2488  LDA #0x10
+  248a  JSR 0x21ea
+  248d  LDA #0x1
+  248f  STA 0x0cea
+  2492  RTS

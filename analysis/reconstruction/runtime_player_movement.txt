@@ -1,0 +1,286 @@
+runtime_player_movement
+input_authority=$15C3 active input, $1609 keyboard scan, $1287 OSBYTE joystick scan
+movement_authority=$16E1 direction/graphics, $1718 player pair move, $16BE object move
+direction_authority=$2207 maps signed x/y deltas to ids 0-7
+
+keyboard_movement_table_1609
+source_y_delta=$27D4 source_x_delta=$27D8 source_inkey=$27DC; $2466 scans negative INKEY code in X
+entry 0 name=A/up inkey_x=$be x_delta=+0 y_delta=-1 direction_if_alone=1
+entry 1 name=Z/down inkey_x=$9e x_delta=+0 y_delta=+1 direction_if_alone=0
+entry 2 name=</left inkey_x=$99 x_delta=-1 y_delta=+0 direction_if_alone=3
+entry 3 name=>/right inkey_x=$98 x_delta=+1 y_delta=+0 direction_if_alone=2
+
+keyboard_combination_projection_1609_16e1
+$1609 accumulates all pressed movement-key deltas in table order A,Z,<,>; opposite keys cancel by arithmetic, not by priority.
+$16E1 treats net dx=0/dy=0 as idle: it preserves $0035 and sets second player graphic to ($0035*4)+2.
+mask bits: bit0=A/up bit1=Z/down bit2=</left bit3=>/right
+mask=$00 keys=none net_x=+0 net_y=+0 direction=idle_preserve_0035
+mask=$01 keys=A/up net_x=+0 net_y=-1 direction=1
+mask=$02 keys=Z/down net_x=+0 net_y=+1 direction=0
+mask=$03 keys=A/up+Z/down net_x=+0 net_y=+0 direction=idle_preserve_0035
+mask=$04 keys=</left net_x=-1 net_y=+0 direction=3
+mask=$05 keys=A/up+</left net_x=-1 net_y=-1 direction=6
+mask=$06 keys=Z/down+</left net_x=-1 net_y=+1 direction=7
+mask=$07 keys=A/up+Z/down+</left net_x=-1 net_y=+0 direction=3
+mask=$08 keys=>/right net_x=+1 net_y=+0 direction=2
+mask=$09 keys=A/up+>/right net_x=+1 net_y=-1 direction=4
+mask=$0a keys=Z/down+>/right net_x=+1 net_y=+1 direction=5
+mask=$0b keys=A/up+Z/down+>/right net_x=+1 net_y=+0 direction=2
+mask=$0c keys=</left+>/right net_x=+0 net_y=+0 direction=idle_preserve_0035
+mask=$0d keys=A/up+</left+>/right net_x=+0 net_y=-1 direction=1
+mask=$0e keys=Z/down+</left+>/right net_x=+0 net_y=+1 direction=0
+mask=$0f keys=A/up+Z/down+</left+>/right net_x=+0 net_y=+0 direction=idle_preserve_0035
+
+joystick_input_1287
+OSBYTE $80 channel X=1 adjusts $003F with thresholds Y<$40 => +1 and Y>=$C0 => -1
+OSBYTE $80 channel X=2 adjusts $0040 with thresholds Y<$40 => +1 and Y>=$C0 => -1
+OSBYTE $80 channel X=0 returns fire in X&1
+
+direction_id_map_2207
+x_delta=-1 y_delta=-1 direction=6
+x_delta=+0 y_delta=-1 direction=1
+x_delta=+1 y_delta=-1 direction=4
+x_delta=-1 y_delta=+0 direction=3
+x_delta=+1 y_delta=+0 direction=2
+x_delta=-1 y_delta=+1 direction=7
+x_delta=+0 y_delta=+1 direction=0
+x_delta=+1 y_delta=+1 direction=5
+idle/no input: $16E1 keeps $0035 and sets second player graphic to ($0035*4)+2 before $1718
+
+player_start_and_exit_tables
+room_exit_delta_27d0 used by $172A to update $0032:
+exit 0 x>=right edge delta=+1 raw=$01
+exit 1 x<left edge delta=-1 raw=$ff
+exit 2 y<top edge delta=-4 raw=$fc
+exit 3 y>=bottom edge delta=+4 raw=$04
+start index comes from $1AAC boundary test via X, then $1735 seeds player state:
+start 0 player_x=$07 player_y=$1e direction=2 graphic0=$08 graphic1=$0a screen_lo0=$b8 screen_hi0=$55 screen_lo1=$38 screen_hi1=$58
+start 1 player_x=$45 player_y=$1e direction=3 graphic0=$0c graphic1=$0e screen_lo0=$a8 screen_hi0=$57 screen_lo1=$28 screen_hi1=$5a
+start 2 player_x=$27 player_y=$32 direction=1 graphic0=$04 graphic1=$06 screen_lo0=$b8 screen_hi0=$6f screen_lo1=$38 screen_hi1=$72
+start 3 player_x=$27 player_y=$0a direction=0 graphic0=$00 graphic1=$02 screen_lo0=$b8 screen_hi0=$3d screen_lo1=$38 screen_hi1=$40
+
+room_exit_transition_projection_1aac_172a_1735
+$1AAC tests boundaries in branch order left(index 1), right(index 0), top(index 2), bottom(index 3); the selected X index is reused by $172A and $1735.
+$172A adds signed $27D0[index] to $0032, clears palette via $1F66, emits OSWRCH $0C, then jumps to $1735.
+exit_index=0 test="player_x >= $4C" room_delta=+1 start_x=$07 start_y=$1e start_direction=2 start_graphic0=$08 start_graphic1=$0a start_ptr0=$55b8 start_ptr1=$5838
+exit_index=1 test="player_x < $02" room_delta=-1 start_x=$45 start_y=$1e start_direction=3 start_graphic0=$0c start_graphic1=$0e start_ptr0=$57a8 start_ptr1=$5a28
+exit_index=2 test="player_y < $07" room_delta=-4 start_x=$27 start_y=$32 start_direction=1 start_graphic0=$04 start_graphic1=$06 start_ptr0=$6fb8 start_ptr1=$7238
+exit_index=3 test="player_y >= $36" room_delta=+4 start_x=$27 start_y=$0a start_direction=0 start_graphic0=$00 start_graphic1=$02 start_ptr0=$3db8 start_ptr1=$4038
+
+player_shot_spawn_offsets_1c4d
+source_x_offset=$2790 source_y_offset=$2788 by direction id $0035
+direction 0 shot_x_offset=+1 shot_y_offset=+4
+direction 1 shot_x_offset=+1 shot_y_offset=-1
+direction 2 shot_x_offset=+3 shot_y_offset=+2
+direction 3 shot_x_offset=-1 shot_y_offset=+2
+direction 4 shot_x_offset=+3 shot_y_offset=+1
+direction 5 shot_x_offset=+4 shot_y_offset=+3
+direction 6 shot_x_offset=-1 shot_y_offset=+1
+direction 7 shot_x_offset=-2 shot_y_offset=+3
+
+shot_hazard_movement_tables_1b87
+source_x_delta=$27A0 source_y_delta=$2798 source_screen_lo_delta=$27B0 source_screen_hi_delta=$27A8
+direction 0 x_delta=+0 y_delta=+1 screen_lo_delta=+4 screen_hi_delta=+0
+direction 1 x_delta=+0 y_delta=-1 screen_lo_delta=-4 screen_hi_delta=-1
+direction 2 x_delta=+1 y_delta=+0 screen_lo_delta=+8 screen_hi_delta=+0
+direction 3 x_delta=-1 y_delta=+0 screen_lo_delta=-8 screen_hi_delta=-1
+direction 4 x_delta=+1 y_delta=-1 screen_lo_delta=+4 screen_hi_delta=+0
+direction 5 x_delta=+1 y_delta=+1 screen_lo_delta=+12 screen_hi_delta=+0
+direction 6 x_delta=-1 y_delta=-1 screen_lo_delta=-12 screen_hi_delta=-1
+direction 7 x_delta=-1 y_delta=+1 screen_lo_delta=-4 screen_hi_delta=-1
+
+hazard_spawn_offsets_2235
+source_x_offset=$26E6 source_y_offset=$26DE by direction id from $2207
+direction 0 hazard_x_offset=+1 hazard_y_offset=+3
+direction 1 hazard_x_offset=+1 hazard_y_offset=-2
+direction 2 hazard_x_offset=+4 hazard_y_offset=+1
+direction 3 hazard_x_offset=-2 hazard_y_offset=+1
+direction 4 hazard_x_offset=+4 hazard_y_offset=-2
+direction 5 hazard_x_offset=+4 hazard_y_offset=+3
+direction 6 hazard_x_offset=-2 hazard_y_offset=-2
+direction 7 hazard_x_offset=-2 hazard_y_offset=+3
+
+active_input_context_15c3 15c3-1608
+  15c3  JSR 0x2470
+  15c6  LDA #0x0
+  15c8  STA 0x003f
+  15ca  STA 0x0040
+  15cc  STA 0x0c01
+  15cf  LDA 0x0ceb
+  15d2  BNE 0x15da
+  15d4  JSR 0x1609
+  15d7  JMP 0x15dd
+  15da  JSR 0x1287
+  15dd  LDA 0x0c98
+  15e0  BNE 0x15ea
+  15e2  CPX #0x0
+  15e4  BEQ 0x15ea
+  15e6  LDA #0x1
+  15e8  STA 0x003e
+  15ea  STX 0x0c98
+  15ed  JSR 0x2464
+  15f0  BEQ 0x15f9
+  15f2  PLA
+  15f3  PLA
+  15f4  PLA
+  15f5  PLA
+  15f6  JMP 0x0e05
+  15f9  LDX #0xc8
+  15fb  JSR 0x2466
+  15fe  BNE 0x1601
+  1600  RTS
+  1601  LDX #0xcc
+  1603  JSR 0x2466
+  1606  BEQ 0x1601
+  1608  RTS
+
+keyboard_scan_context_1609 1609-1634
+  1609  LDY 0x0c01
+  160c  LDA 0x27dc,Y
+  160f  TAX
+  1610  JSR 0x2466
+  1613  BEQ 0x1628
+  1615  LDY 0x0c01
+  1618  LDA 0x003f
+  161a  CLC
+  161b  ADC 0x27d8,Y
+  161e  STA 0x003f
+  1620  LDA 0x0040
+  1622  CLC
+  1623  ADC 0x27d4,Y
+  1626  STA 0x0040
+  1628  INC 0x0c01
+  162b  LDA 0x0c01
+  162e  CMP #0x4
+  1630  BNE 0x1609
+  1632  LDX #0x9a
+  1634  JMP 0x2466
+
+joystick_scan_context_1287 1287-12be
+  1287  LDA #0x80
+  1289  LDX #0x1
+  128b  JSR 0xfff4
+  128e  CPY #0x40
+  1290  BCC 0x129b
+  1292  CPY #0xc0
+  1294  BCC 0x129d
+  1296  DEC 0x003f
+  1298  JMP 0x129d
+  129b  INC 0x003f
+  129d  LDA #0x80
+  129f  LDX #0x2
+  12a1  JSR 0xfff4
+  12a4  CPY #0x40
+  12a6  BCC 0x12b1
+  12a8  CPY #0xc0
+  12aa  BCC 0x12b3
+  12ac  DEC 0x0040
+  12ae  JMP 0x12b3
+  12b1  INC 0x0040
+  12b3  LDA #0x80
+  12b5  LDX #0x0
+  12b7  JSR 0xfff4
+  12ba  TXA
+  12bb  AND #0x1
+  12bd  TAX
+  12be  RTS
+
+direction_and_player_pair_context_16e1 16e1-1727
+  16e1  LDA 0x003f
+  16e3  BNE 0x16f6
+  16e5  LDA 0x0040
+  16e7  BNE 0x16f6
+  16e9  LDA 0x0035
+  16eb  ASL A
+  16ec  ASL A
+  16ed  CLC
+  16ee  ADC #0x2
+  16f0  STA 0x2f11
+  16f3  JMP 0x1718
+  16f6  LDX 0x003f
+  16f8  LDY 0x0040
+  16fa  JSR 0x2207
+  16fd  STA 0x0035
+  16ff  ASL A
+  1700  ASL A
+  1701  STA 0x2f10
+  1704  STA 0x003d
+  1706  LDA 0x0036
+  1708  LSR A
+  1709  LSR A
+  170a  CMP #0x3
+  170c  BNE 0x1710
+  170e  LDA #0x1
+  1710  CLC
+  1711  INC 0x003d
+  1713  ADC 0x003d
+  1715  STA 0x2f11
+  1718  LDA 0x003f
+  171a  STA 0x0033
+  171c  LDA 0x0040
+  171e  STA 0x0034
+  1720  LDX #0x10
+  1722  JSR 0x16be
+  1725  LDX #0x11
+  1727  JMP 0x16be
+
+room_exit_context_1aac 1aac-1adb
+  1aac  LDA #0x0
+  1aae  STA 0x0041
+  1ab0  LDA 0x0a10
+  1ab3  CMP #0x2
+  1ab5  BPL 0x1abc
+  1ab7  LDX #0x1
+  1ab9  JMP 0x1adb
+  1abc  CMP #0x4c
+  1abe  BMI 0x1ac5
+  1ac0  LDX #0x0
+  1ac2  JMP 0x1adb
+  1ac5  LDA 0x0a50
+  1ac8  CMP #0x7
+  1aca  BPL 0x1ad1
+  1acc  LDX #0x2
+  1ace  JMP 0x1adb
+  1ad1  CMP #0x36
+  1ad3  BMI 0x1ada
+  1ad5  LDX #0x3
+  1ad7  JMP 0x1adb
+  1ada  RTS
+  1adb  JSR 0x172a
+
+room_index_update_context_172a 172a-1734
+  172a  STX 0x0037
+  172c  LDA 0x27d0,X
+  172f  CLC
+  1730  ADC 0x0032
+  1732  STA 0x0032
+  1734  RTS
+
+direction_map_context_2207 2207-2234
+  2207  CPX #0x0
+  2209  BEQ 0x222b
+  220b  BPL 0x221c
+  220d  CPY #0x0
+  220f  BNE 0x2214
+  2211  LDA #0x3
+  2213  RTS
+  2214  BPL 0x2219
+  2216  LDA #0x6
+  2218  RTS
+  2219  LDA #0x7
+  221b  RTS
+  221c  CPY #0x0
+  221e  BNE 0x2223
+  2220  LDA #0x2
+  2222  RTS
+  2223  BPL 0x2228
+  2225  LDA #0x4
+  2227  RTS
+  2228  LDA #0x5
+  222a  RTS
+  222b  CPY #0x0
+  222d  BPL 0x2232
+  222f  LDA #0x1
+  2231  RTS
+  2232  LDA #0x0
+  2234  RTS
