@@ -9,6 +9,8 @@ org runtime_start
 ; This is reconstructed source, not original author source.
 ; Reconstructed routines are validated against the known CYBRUN length and SHA-256 digest.
 
+; SCORE, STARTUP AND LEVEL CONTROL
+; ================================
 
 .copy_current_score_to_best_if_not_lower
     LDX      #&4
@@ -245,6 +247,9 @@ org runtime_start
 .unused_return_before_tile_generator
     ; Unreferenced one-byte routine retained from the original runtime.
     RTS
+
+; TILE, TEXT AND OBJECT RENDERING
+; ===============================
 
 .draw_24byte_tile_or_sprite
     LDA      #&0
@@ -1300,6 +1305,9 @@ org runtime_start
     INC      room_tile_x_index
     JMP      draw_playfield_major_column_setup_1516
 
+; INPUT AND PLAYER MOVEMENT
+; =========================
+
 .read_game_input_and_pause
     JSR      handle_sound_on_off_keys
     LDA      #&0
@@ -1521,6 +1529,9 @@ org runtime_start
     ADC      room_area
     STA      room_area
     RTS
+
+; FRAME SCHEDULER AND GAMEPLAY STATE
+; ==================================
 
 .start_or_reset_player_and_level_objects
     JSR      apply_level_palette
@@ -2039,6 +2050,9 @@ org runtime_start
     JSR      MOS_OSWRCH
     JMP      start_or_reset_player_and_level_objects
 
+; SHOTS AND MOVING HAZARDS
+; ========================
+
 .erase_visible_shot_or_hazard_previous_bytes
     LDA      shot_visible_flag_by_slot,X
     BEQ      return_from_bounds_or_invisible_shot
@@ -2285,6 +2299,9 @@ org runtime_start
 .mark_projectile_outside_playfield
     INC      bounds_or_outside_flag
     RTS
+
+; STATUS, RANDOM PLACEMENT AND ROOM TRANSITIONS
+; =============================================
 
 .draw_static_status_panel
     LDA      #&32
@@ -2654,6 +2671,9 @@ org runtime_start
     CMP      #&3a
     BMI      scan_next_offset_room_gap_position
     RTS
+
+; PALETTE AND MOVING ENTITY BEHAVIOUR
+; ===================================
 
 .clear_all_palette_entries
     LDX      #&f
@@ -3480,6 +3500,9 @@ org runtime_start
     JSR      MOS_OSWRCH
     JMP      MOS_OSWRCH
 
+; STATIC TEXT AND GAMEPLAY TABLES
+; ===============================
+
 .runtime_data_padding_24d9
     ; zero padding/workspace tail between runtime code and resident data tables
     EQUB &00,&00,&00,&00,&00,&00,&00,&00
@@ -3882,6 +3905,9 @@ org runtime_start
     ; keyboard direction table used by the $1609 input scanner
     EQUB &BE,&9E,&99,&98
 
+; ROOM LAYOUT RECORDS
+; ===================
+
 .room_layout_bank0_runtime
     ; 18-byte packed room record decoded by $14B9 as a 6x6 nibble grid
     ; room_row_0 a c c c c 6
@@ -4073,6 +4099,12 @@ org runtime_start
     EQUB &CA,&A6,&6C,&03,&33,&30,&C9,&35
     EQUB &30,&CA,&5C,&30,&03,&00,&30,&C9
     EQUB &CC,&5C
+
+; 24-BYTE OBJECT GRAPHIC RECORDS
+; ==============================
+; Records remain numerically named unless decoded artwork or a consumer proves
+; a stronger identity. Graphic IDs select these records through the tables at
+; graphic_record_high_pointer_table_1404 and graphic_record_low_pointer_table_1404.
 
 .graphic_record_00
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
@@ -4842,6 +4874,9 @@ org runtime_start
     EQUB &CF,&45,&CF,&8A,&8A,&CF,&8A,&CF
     EQUB &00,&00,&00,&00,&00,&00,&00,&00
 
+; INITIAL OBJECT GRAPHIC IDS AND STATUS IDS
+; =========================================
+
 .object_graphic_id_by_index
     ; render-object graphic ids for object indices $00-$0D; indices $0E+ are split below by slot role
     ; slot_map $00-$0D utility/status/text/transient renderer slots; these are outside the logical item window
@@ -4897,6 +4932,9 @@ org runtime_start
 .unused_pointer_table_alignment_2f3d
     ; Three unreferenced bytes aligning the pointer tables at $2F40.
     EQUB &4C,&44,&41
+
+; GRAPHIC POINTER AND TILE GENERATOR TABLES
+; =========================================
 
 .graphic_record_high_pointer_table_1404
     ; 64-entry graphic pointer table; graphic id Y maps to source address high[$2F40+Y]:low[$2F80+Y]
