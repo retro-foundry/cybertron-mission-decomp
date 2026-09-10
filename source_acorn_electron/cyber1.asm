@@ -2741,10 +2741,10 @@ org runtime_start
     JSR      delta_towards_player_for_object_x
     JSR      try_move_object_with_collision
     LDA      object_movement_success_flag
-    BEQ      addr_2003
+    BEQ      retry_spinner_move_on_horizontal_axis
     RTS
 
-.addr_2003
+.retry_spinner_move_on_horizontal_axis
     LDX      active_object_index
     JSR      restore_object_position_and_ptr
     LDA      #&0
@@ -2752,23 +2752,23 @@ org runtime_start
     STA      movement_delta_y
     LDA      player_x_first_cell
     CMP      object_x_by_index,X
-    BEQ      addr_2023
-    BMI      addr_201F
+    BEQ      try_spinner_horizontal_move
+    BMI      set_spinner_horizontal_delta_negative
     LDA      #&1
     STA      movement_delta_x
-    JMP      addr_2023
+    JMP      try_spinner_horizontal_move
 
-.addr_201F
+.set_spinner_horizontal_delta_negative
     LDA      #&ff
     STA      movement_delta_x
 
-.addr_2023
+.try_spinner_horizontal_move
     JSR      try_move_object_with_collision
     LDA      object_movement_success_flag
-    BEQ      addr_202C
+    BEQ      retry_spinner_move_on_vertical_axis
     RTS
 
-.addr_202C
+.retry_spinner_move_on_vertical_axis
     LDX      active_object_index
     JSR      restore_object_position_and_ptr
     LDA      #&0
@@ -2778,23 +2778,23 @@ org runtime_start
     CLC
     ADC      #&1
     CMP      object_y_by_index,X
-    BEQ      addr_204F
-    BMI      addr_204B
+    BEQ      try_spinner_vertical_move
+    BMI      set_spinner_vertical_delta_negative
     LDA      #&1
     STA      movement_delta_y
-    JMP      addr_204F
+    JMP      try_spinner_vertical_move
 
-.addr_204B
+.set_spinner_vertical_delta_negative
     LDA      #&ff
     STA      movement_delta_y
 
-.addr_204F
+.try_spinner_vertical_move
     JSR      try_move_object_with_collision
     LDA      object_movement_success_flag
-    BEQ      addr_2058
+    BEQ      restore_spinner_after_failed_move
     RTS
 
-.addr_2058
+.restore_spinner_after_failed_move
     LDX      active_object_index
     JMP      restore_object_position_and_ptr
 
@@ -2806,22 +2806,22 @@ org runtime_start
     LDX      active_object_index
     JSR      draw_object_by_index
     LDA      renderer_collision_accumulator
-    BNE      addr_207F
+    BNE      return_from_object_move_collision_test
     LDX      active_object_index
     JSR      test_object_inside_playfield
     LDA      bounds_or_outside_flag
-    BNE      addr_207F
+    BNE      return_from_object_move_collision_test
     LDA      #&1
     STA      object_movement_success_flag
     RTS
 
-.addr_207F
+.return_from_object_move_collision_test
     RTS
 
 .move_clone_continue_or_random
     JSR      rng_next_byte
     AND      #&7
-    BEQ      addr_20A1
+    BEQ      try_clone_random_direction
     LDX      active_object_index
     LDA      item_delta_x_by_slot,X
     STA      movement_delta_x
@@ -2829,21 +2829,21 @@ org runtime_start
     STA      movement_delta_y
     JSR      try_move_object_with_collision
     LDA      object_movement_success_flag
-    BEQ      addr_209C
+    BEQ      restore_clone_before_random_move
     RTS
 
-.addr_209C
+.restore_clone_before_random_move
     LDX      active_object_index
     JSR      restore_object_position_and_ptr
 
-.addr_20A1
+.try_clone_random_direction
     JSR      random_direction_delta
     JSR      try_move_object_with_collision
     LDA      object_movement_success_flag
-    BEQ      addr_20AD
+    BEQ      restore_clone_after_failed_random_move
     RTS
 
-.addr_20AD
+.restore_clone_after_failed_random_move
     LDX      active_object_index
     JSR      restore_object_position_and_ptr
     RTS
@@ -2873,16 +2873,16 @@ org runtime_start
 
 .move_cyberdroid_persistent
     LDA      item_delta_x_by_slot,X
-    BNE      addr_2104
+    BNE      select_cyberdroid_axis_towards_player
     LDA      item_delta_y_by_slot,X
-    BNE      addr_2104
+    BNE      select_cyberdroid_axis_towards_player
     JSR      random_direction_delta
     JSR      try_move_object_with_collision
     LDA      object_movement_success_flag
-    BEQ      addr_20F6
+    BEQ      reset_cyberdroid_direction_after_block
     RTS
 
-.addr_20F6
+.reset_cyberdroid_direction_after_block
     LDX      active_object_index
     JSR      restore_object_position_and_ptr
     LDA      #&0
@@ -2890,123 +2890,123 @@ org runtime_start
     STA      item_delta_y_by_slot,X
     RTS
 
-.addr_2104
+.select_cyberdroid_axis_towards_player
     LDA      player_x_first_cell
     CMP      object_x_by_index,X
-    BEQ      addr_211A
+    BEQ      set_cyberdroid_vertical_direction
     LDA      player_y_first_cell
     CLC
     ADC      #&1
     CMP      object_y_by_index,X
-    BEQ      addr_2133
-    JMP      addr_2150
+    BEQ      set_cyberdroid_horizontal_direction
+    JMP      try_cyberdroid_persistent_move
 
-.addr_211A
+.set_cyberdroid_vertical_direction
     LDA      player_y_first_cell
     CLC
     ADC      #&1
     CMP      object_y_by_index,X
-    BMI      addr_212C
+    BMI      set_cyberdroid_vertical_delta_negative
     LDA      #&1
     STA      movement_delta_y
-    JMP      addr_2146
+    JMP      store_cyberdroid_direction
 
-.addr_212C
+.set_cyberdroid_vertical_delta_negative
     LDA      #&ff
     STA      movement_delta_y
-    JMP      addr_2146
+    JMP      store_cyberdroid_direction
 
-.addr_2133
+.set_cyberdroid_horizontal_direction
     LDA      player_x_first_cell
     CMP      object_x_by_index,X
-    BMI      addr_2142
+    BMI      set_cyberdroid_horizontal_delta_negative
     LDA      #&1
     STA      movement_delta_x
-    JMP      addr_2146
+    JMP      store_cyberdroid_direction
 
-.addr_2142
+.set_cyberdroid_horizontal_delta_negative
     LDA      #&ff
     STA      movement_delta_x
 
-.addr_2146
+.store_cyberdroid_direction
     LDA      movement_delta_x
     STA      item_delta_x_by_slot,X
     LDA      movement_delta_y
     STA      item_delta_y_by_slot,X
 
-.addr_2150
+.try_cyberdroid_persistent_move
     LDA      item_delta_x_by_slot,X
     STA      movement_delta_x
     LDA      item_delta_y_by_slot,X
     STA      movement_delta_y
     JSR      try_move_object_with_collision
     LDA      object_movement_success_flag
-    BEQ      addr_20F6
+    BEQ      reset_cyberdroid_direction_after_block
     RTS
 
 .handle_shot_or_hazard_overlap_collisions
     LDA      transition_delay
-    BNE      addr_2187
+    BNE      scan_shot_or_hazard_object_overlaps
     LDA      shot_x_by_slot,X
     SEC
     SBC      player_x_first_cell
-    BMI      addr_2187
+    BMI      scan_shot_or_hazard_object_overlaps
     CMP      #&3
-    BPL      addr_2187
+    BPL      scan_shot_or_hazard_object_overlaps
     LDA      shot_y_by_slot,X
     SEC
     SBC      player_y_first_cell
-    BMI      addr_2187
+    BMI      scan_shot_or_hazard_object_overlaps
     CMP      #&4
-    BPL      addr_2187
+    BPL      scan_shot_or_hazard_object_overlaps
     JSR      deactivate_and_erase_shot_or_hazard
     JMP      handle_player_hit_from_active_object
 
-.addr_2187
+.scan_shot_or_hazard_object_overlaps
     LDY      #&14
 
-.addr_2189
+.test_next_object_for_shot_or_hazard_overlap
     LDA      object_lifecycle_base_for_indexed_refs,Y
     CMP      #&1
-    BNE      addr_21D2
+    BNE      advance_shot_or_hazard_object_scan
     LDA      shot_x_by_slot,X
     SEC
     SBC      object_x_by_index,Y
-    BMI      addr_21D2
+    BMI      advance_shot_or_hazard_object_scan
     CMP      #&3
-    BPL      addr_21D2
+    BPL      advance_shot_or_hazard_object_scan
     LDA      shot_y_by_slot,X
     SEC
     SBC      object_y_by_index,Y
-    BMI      addr_21D2
+    BMI      advance_shot_or_hazard_object_scan
     CMP      #&2
-    BPL      addr_21D2
+    BPL      advance_shot_or_hazard_object_scan
     LDA      #&2
     STA      object_lifecycle_base_for_indexed_refs,Y
     CPX      #&4
-    BPL      addr_21C2
+    BPL      convert_hazard_hit_object_to_item
     LDA      object_graphic_id_by_index,Y
     SEC
     SBC      #&29
     ASL      A
     JSR      increment_four_char_score_or_counter
     DEC      remaining_active_object_count
-    JMP      addr_21C8
+    JMP      finish_shot_or_hazard_object_hit
 
-.addr_21C2
+.convert_hazard_hit_object_to_item
     LDA      object_graphic_id_by_index,Y
     JSR      place_graphic_in_free_item_slot
 
-.addr_21C8
+.finish_shot_or_hazard_object_hit
     LDX      active_object_index
     JSR      deactivate_and_erase_shot_or_hazard
     LDA      #&2
     JMP      play_sound_id_if_enabled
 
-.addr_21D2
+.advance_shot_or_hazard_object_scan
     INY
     CPY      #&2c
-    BNE      addr_2189
+    BNE      test_next_object_for_shot_or_hazard_overlap
     RTS
 
 .deactivate_and_erase_shot_or_hazard
@@ -3020,10 +3020,10 @@ org runtime_start
 .play_sound_id_if_enabled
     STA      zp_screen_ptr_70_low
     LDA      sound_disabled_flag
-    BEQ      addr_21F2
+    BEQ      issue_sound_osword
     RTS
 
-.addr_21F2
+.issue_sound_osword
     LDA      #&0
     STA      zp_screen_ptr_70_high
     LDX      #&3
@@ -3037,55 +3037,55 @@ org runtime_start
 
 .direction_from_delta_xy
     CPX      #&0
-    BEQ      addr_222B
-    BPL      addr_221C
+    BEQ      return_vertical_direction_from_delta
+    BPL      return_rightward_direction_from_delta
     CPY      #&0
-    BNE      addr_2214
+    BNE      return_left_diagonal_direction_from_delta
     LDA      #&3
     RTS
 
-.addr_2214
-    BPL      addr_2219
+.return_left_diagonal_direction_from_delta
+    BPL      return_down_left_direction
     LDA      #&6
     RTS
 
-.addr_2219
+.return_down_left_direction
     LDA      #&7
     RTS
 
-.addr_221C
+.return_rightward_direction_from_delta
     CPY      #&0
-    BNE      addr_2223
+    BNE      return_right_diagonal_direction_from_delta
     LDA      #&2
     RTS
 
-.addr_2223
-    BPL      addr_2228
+.return_right_diagonal_direction_from_delta
+    BPL      return_down_right_direction
     LDA      #&4
     RTS
 
-.addr_2228
+.return_down_right_direction
     LDA      #&5
     RTS
 
-.addr_222B
+.return_vertical_direction_from_delta
     CPY      #&0
-    BPL      addr_2232
+    BPL      return_down_direction
     LDA      #&1
     RTS
 
-.addr_2232
+.return_down_direction
     LDA      #&0
     RTS
 
 .maybe_spawn_hazard_from_moving_object
     LDA      active_spawned_hazard_count
     CMP      #&4
-    BPL      addr_2262
+    BPL      return_without_hazard_spawn
     JSR      rng_next_byte
     AND      #&7
     CMP      level_index_and_hazard_gate
-    BPL      addr_2262
+    BPL      return_without_hazard_spawn
     JSR      rng_next_byte
     AND      #&f
     CLC
@@ -3094,28 +3094,28 @@ org runtime_start
     TAX
     LDA      object_lifecycle_base_for_indexed_refs,X
     CMP      #&1
-    BNE      addr_2262
+    BNE      return_without_hazard_spawn
     LDA      item_delta_x_by_slot,X
-    BNE      addr_2263
+    BNE      spawn_hazard_from_object_delta
     LDY      item_delta_y_by_slot,X
-    BNE      addr_2263
+    BNE      spawn_hazard_from_object_delta
 
-.addr_2262
+.return_without_hazard_spawn
     RTS
 
-.addr_2263
+.spawn_hazard_from_object_delta
     LDY      item_delta_y_by_slot,X
     TAX
     JSR      direction_from_delta_xy
     STA      hazard_spawn_direction
     LDY      #&3
 
-.addr_226F
+.find_inactive_hazard_slot
     INY
     LDA      shot_direction_or_inactive_by_slot,Y
-    BPL      addr_226F
+    BPL      find_inactive_hazard_slot
     LDA      shot_visible_flag_by_slot,Y
-    BNE      addr_2262
+    BNE      return_without_hazard_spawn
     STY      hazard_spawn_slot_index
     LDA      #&0
     STA      shot_visible_flag_by_slot,Y

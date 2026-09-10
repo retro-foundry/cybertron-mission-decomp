@@ -64,6 +64,10 @@ if ($rawAbsoluteOperands.Count -ne 0) {
     throw "Raw absolute operand in cyber1.asm; use a memory-map symbol: $($rawAbsoluteOperands[0].Value.Trim())"
 }
 
+if ($assemblyText -match '(?im)^\s*\.addr_[0-9A-F]+\s*$') {
+    throw 'Generic address-only labels are not permitted in cyber1.asm; name the control-flow purpose.'
+}
+
 & (Join-Path $repoRoot 'build.ps1') -BeebAsm $BeebAsm
 
 $actualLength = (Get-Item -LiteralPath $payload).Length
