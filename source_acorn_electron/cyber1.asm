@@ -701,13 +701,13 @@ org runtime_start
     BEQ      write_level_units_digit
     CLC
     ADC      #&10
-    STA      &0CD6
+    STA      level_intro_tens_digit_character
 
 .write_level_units_digit
     LDA      level_units_digit
     CLC
     ADC      #&10
-    STA      &0CD7
+    STA      level_intro_units_digit_character
     LDA      #&0
     STA      zp_screen_ptr_70_low
     LDA      #&49
@@ -892,8 +892,8 @@ org runtime_start
 
 .clear_rotating_wait_text_edge_loop_1341
     LDA      #&0
-    STA      &7B90,X
-    STA      &7E10,X
+    STA      rotating_wait_text_top_edge,X
+    STA      rotating_wait_text_bottom_edge,X
     DEX
     BPL      clear_rotating_wait_text_edge_loop_1341
 
@@ -1034,7 +1034,7 @@ org runtime_start
     RTS
 
 .render_load_source_byte_and_jump_store_stub
-    LDA      &FFFF,X
+    LDA      render_source_address_placeholder,X
     JMP      (zp_indirect_74_low)
 
 .render_odd_y_split_setup_143a
@@ -1541,7 +1541,7 @@ org runtime_start
     STX      level_loop_seed_or_status
     LDA      player_start_x_by_exit_1735,X
     STA      player_x_first_cell
-    STA      &0A11
+    STA      player_x_second_cell
     LDA      player_start_direction_by_exit_1735,X
     STA      player_direction
     LDA      player_start_first_graphic_by_exit_1735,X
@@ -1974,7 +1974,7 @@ org runtime_start
     LDA      saved_player_second_screen_high
     SBC      #&0
     STA      player_screen_high_first_cell
-    LDA      &0BD1
+    LDA      saved_player_second_cell_y
     STA      player_y_first_cell
     STA      player_y_second_cell
     LDA      saved_player_second_screen_low
@@ -2301,8 +2301,8 @@ org runtime_start
     JSR      draw_score_counter_digits
     JSR      draw_lives_or_target_status
     LDA      #&2a
-    STA      &34BA
-    STA      &34BD
+    STA      status_panel_fixed_pixel_left
+    STA      status_panel_fixed_pixel_right
     LDA      #&34
     STA      object_screen_high_by_index
     LDA      #&8
@@ -2372,15 +2372,15 @@ org runtime_start
     STA      rng_output_byte
 
 .addr_1D67
-    LDA      &7A
+    LDA      rng_shift_register_low
     AND      #&48
     ADC      #&38
     ASL      A
     ASL      A
-    ROL      &7C
-    ROL      &7B
-    ROL      &7A
-    LDA      &7A
+    ROL      rng_shift_register_high
+    ROL      rng_shift_register_middle
+    ROL      rng_shift_register_low
+    LDA      rng_shift_register_low
     LSR      A
     LSR      A
     AND      #&1
@@ -2582,25 +2582,25 @@ org runtime_start
     LDA      #&6
     STA      object_y_by_index
     LDA      #&0
-    STA      &0C93
-    STA      &0C94
+    STA      room_gap_transition_pending
+    STA      room_gap_previous_screen_byte
 
 .addr_1EEE
     JSR      read_object0_screen_byte_at_temp_position
     BEQ      addr_1EFE
-    LDA      &0C93
+    LDA      room_gap_transition_pending
     EOR      #&1
-    STA      &0C93
+    STA      room_gap_transition_pending
     JMP      addr_1F06
 
 .addr_1EFE
-    LDA      &0C93
+    LDA      room_gap_transition_pending
     BEQ      addr_1F06
     JSR      copy_level_modulo_24byte_fill_pattern
 
 .addr_1F06
     LDA      renderer_collision_accumulator
-    STA      &0C94
+    STA      room_gap_previous_screen_byte
     INC      object_y_by_index
     INC      object_y_by_index
     LDA      object_y_by_index
@@ -3333,16 +3333,16 @@ org runtime_start
     STA      spook_pause_counter
     STA      spook_first_cell_x
     STA      spook_first_cell_y
-    STA      &0A8E
-    STA      &0A0F
+    STA      spook_first_cell_screen_low
+    STA      spook_second_cell_x
     LDA      #&30
-    STA      &0ACE
+    STA      spook_first_cell_screen_high
     LDA      #&32
-    STA      &0ACF
+    STA      spook_second_cell_screen_high
     LDA      #&80
-    STA      &0A8F
+    STA      spook_second_cell_screen_low
     LDA      #&2
-    STA      &0A4F
+    STA      spook_second_cell_y
     JSR      draw_spook_pair_if_released
 
 .return_from_spook_release_or_draw_23cf

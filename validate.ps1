@@ -58,6 +58,12 @@ if ($assemblyText -notmatch '(?im)^\s*SAVE\s+"build/reconstruction/CYBRUN",\s*ru
     throw 'cyber1.asm no longer saves the expected CYBRUN runtime payload.'
 }
 
+$rawAbsoluteOperandPattern = '(?im)^\s*(?:ADC|AND|BIT|CMP|CPX|CPY|DEC|EOR|INC|JMP|JSR|LDA|LDX|LDY|ORA|SBC|STA|STX|STY)\s+(?:&|\$)[0-9A-F]+(?:\s*,\s*[XY])?\s*(?:;.*)?$'
+$rawAbsoluteOperands = [regex]::Matches($assemblyText, $rawAbsoluteOperandPattern)
+if ($rawAbsoluteOperands.Count -ne 0) {
+    throw "Raw absolute operand in cyber1.asm; use a memory-map symbol: $($rawAbsoluteOperands[0].Value.Trim())"
+}
+
 & (Join-Path $repoRoot 'build.ps1') -BeebAsm $BeebAsm
 
 $actualLength = (Get-Item -LiteralPath $payload).Length
