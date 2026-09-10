@@ -63,7 +63,8 @@ destination walks, and all four isolated player-start layers.
 Seven seeded setup scenarios additionally validate target-code generation,
 enemy/target placement, collision rejection, and the composed entry frame.
 The input preflight exhausts all 16 keyboard movement masks, joystick threshold
-edges, and every previous/current fire-latch transition.
+edges, and every previous/current fire-latch transition. Each keyboard mask is
+also replayed through the actual assembled scanner with a bounded INKEY stub.
 Object validation covers every setup-count row, all 41 render slots in the
 overlapping lifecycle windows, all six hit-animation states, and all 256
 projectile expiry input bytes.

@@ -172,6 +172,7 @@ def main() -> None:
     if len(expected_keyboard) != 16:
         fail(f"movement reference has {len(expected_keyboard)} keyboard masks; expected 16")
     keyboard_rows = 0
+    keyboard_cpu_replays = 0
     for mask in range(16):
         x_delta = sum(keyboard_x_delta[index] for index in range(4) if mask & (1 << index))
         y_delta = sum(keyboard_y_delta[index] for index in range(4) if mask & (1 << index))
@@ -187,6 +188,41 @@ def main() -> None:
         ):
             fail(f"keyboard mask ${mask:02X}: direction projection differs")
         keyboard_rows += 1
+
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        memory[0x003F] = 0
+        memory[0x0040] = 0
+        memory[0x0C01] = 0
+        pressed_codes = {
+            keyboard_code
+            for index, keyboard_code in enumerate(block(0x27DC, 4))
+            if mask & (1 << index)
+        }
+
+        def inkey_handler(cpu: Replay6502, target: int) -> bool:
+            if target != 0x2466:
+                return False
+            pressed = cpu.x in pressed_codes
+            cpu.x = 1 if pressed else 0
+            cpu.zero = not pressed
+            cpu.negative = False
+            return True
+
+        cpu = Replay6502(memory, inkey_handler)
+        cpu.run_subroutine(0x1609)
+        actual_x = memory[0x003F]
+        actual_y = memory[0x0040]
+        if actual_x >= 0x80:
+            actual_x -= 0x100
+        if actual_y >= 0x80:
+            actual_y -= 0x100
+        if (actual_x, actual_y) != (x_delta, y_delta):
+            fail(
+                f"keyboard CPU replay mask ${mask:02X}: {(actual_x, actual_y)}, "
+                f"expected {(x_delta, y_delta)}"
+            )
+        keyboard_cpu_replays += 1
 
     # Boundary values exercise both branches of each joystick threshold, and
     # all previous/current pairs exercise the rising-edge fire latch at $15DD.
@@ -915,6 +951,7 @@ def main() -> None:
         f"{projectile_rows} shot projections, "
         f"{movement_rows} movement projections, "
         f"{keyboard_rows} keyboard masks, "
+        f"{keyboard_cpu_replays} keyboard CPU replays, "
         f"{len(joystick_cases)} joystick thresholds, "
         f"{fire_edge_rows} fire-latch transitions, "
         f"{room_rows} room-render digests, "

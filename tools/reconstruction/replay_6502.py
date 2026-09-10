@@ -61,6 +61,14 @@ class Replay6502:
                 self.memory[self._fetch()] = self.x
             elif opcode == 0xA2:  # LDX #imm
                 self.x = self._flags(self._fetch())
+            elif opcode == 0xA4:  # LDY zp
+                self.y = self._flags(self.memory[self._fetch()])
+            elif opcode == 0xAC:  # LDY abs
+                self.y = self._flags(self.memory[self._word()])
+            elif opcode == 0xA5:  # LDA zp
+                self.a = self._flags(self.memory[self._fetch()])
+            elif opcode == 0xAD:  # LDA abs
+                self.a = self._flags(self.memory[self._word()])
             elif opcode == 0xFE:  # INC abs,X
                 target = (self._word() + self.x) & 0xFFFF
                 self.memory[target] = self._flags(self.memory[target] + 1)
@@ -70,6 +78,8 @@ class Replay6502:
                 self.x = self._flags(self.memory[self._fetch()])
             elif opcode == 0xC9:  # CMP #imm
                 self._compare(self.a, self._fetch())
+            elif opcode == 0xF0:  # BEQ rel
+                self._branch(self.zero)
             elif opcode == 0xD0:  # BNE rel
                 self._branch(not self.zero)
             elif opcode == 0xA9:  # LDA #imm
@@ -78,12 +88,17 @@ class Replay6502:
                 self.memory[(self._word() + self.x) & 0xFFFF] = self.a
             elif opcode == 0xE8:  # INX
                 self.x = self._flags(self.x + 1)
+            elif opcode == 0xE6:  # INC zp
+                target = self._fetch()
+                self.memory[target] = self._flags(self.memory[target] + 1)
             elif opcode == 0xCA:  # DEX
                 self.x = self._flags(self.x - 1)
             elif opcode == 0xE0:  # CPX #imm
                 self._compare(self.x, self._fetch())
             elif opcode == 0xA0:  # LDY #imm
                 self.y = self._flags(self._fetch())
+            elif opcode == 0xAA:  # TAX
+                self.x = self._flags(self.a)
             elif opcode == 0xB9:  # LDA abs,Y
                 self.a = self._flags(self.memory[(self._word() + self.y) & 0xFFFF])
             elif opcode == 0x88:  # DEY
@@ -96,6 +111,13 @@ class Replay6502:
                     raise AssertionError(
                         f"unhandled JSR ${target:04X} at ${opcode_address:04X}"
                     )
+            elif opcode == 0x18:  # CLC
+                self.carry = False
+            elif opcode == 0x79:  # ADC abs,Y
+                value = self.memory[(self._word() + self.y) & 0xFFFF]
+                total = self.a + value + int(self.carry)
+                self.carry = total > 0xFF
+                self.a = self._flags(total)
             elif opcode == 0x4C:  # JMP abs (tail-call handler may end replay)
                 target = self._word()
                 if self.jsr_handler is not None and self.jsr_handler(self, target):
