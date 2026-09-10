@@ -2252,10 +2252,10 @@ org runtime_start
     LDA      #&0
     STA      fire_edge_request
     LDA      active_player_shot_count
-    CMP      #&4
+    CMP      #PLAYER_SHOT_LIMIT
     BEQ      return_from_player_shot_request
     INC      active_player_shot_count
-    LDX      #&ff
+    LDX      #PLAYER_SHOT_SLOT_BEFORE_FIRST
 
 .find_inactive_player_shot_slot
     INX
@@ -2264,7 +2264,7 @@ org runtime_start
     LDA      player_direction
     STA      shot_direction_or_inactive_by_slot,X
     TAY
-    LDA      #&0
+    LDA      #SOUND_ID_PLAYER_SHOT
     STA      shot_visible_flag_by_slot,X
     LDA      player_x_first_cell
     CLC
@@ -2285,14 +2285,14 @@ org runtime_start
     LDA      #&0
     STA      bounds_or_outside_flag
     LDA      shot_x_by_slot,X
-    CMP      #&2
+    CMP      #PROJECTILE_LEFT_BOUNDARY
     BMI      mark_projectile_outside_playfield
-    CMP      #&4e
+    CMP      #PROJECTILE_RIGHT_BOUNDARY
     BPL      mark_projectile_outside_playfield
     LDA      shot_y_by_slot,X
-    CMP      #&7
+    CMP      #PROJECTILE_TOP_BOUNDARY
     BMI      mark_projectile_outside_playfield
-    CMP      #&39
+    CMP      #PROJECTILE_BOTTOM_BOUNDARY
     BPL      mark_projectile_outside_playfield
     RTS
 
@@ -2304,84 +2304,84 @@ org runtime_start
 ; =============================================
 
 .draw_static_status_panel
-    LDA      #&32
+    LDA      #STATUS_PANEL_FIRST_SCREEN_HIGH
     STA      object_screen_high_by_index
-    LDA      #&88
+    LDA      #STATUS_PANEL_FIRST_SCREEN_LOW
     STA      object_screen_low_by_index
     LDA      #&0
     STA      object_y_by_index
-    LDA      #&25
+    LDA      #STATUS_LABEL_GRAPHIC_0
     JSR      draw_status_glyph_at_current_ptr
-    LDA      #&35
+    LDA      #STATUS_LABEL_GRAPHIC_1
     JSR      draw_status_glyph_at_current_ptr
-    LDA      #&20
+    LDA      #STATUS_LABEL_GRAPHIC_2
     JSR      draw_status_glyph_at_current_ptr
-    LDA      #&36
+    LDA      #STATUS_LABEL_GRAPHIC_3
     JSR      draw_status_glyph_at_current_ptr
-    LDA      #&37
+    LDA      #STATUS_LABEL_GRAPHIC_4
     JSR      draw_status_glyph_at_current_ptr
     JSR      draw_score_counter_digits
     JSR      draw_lives_or_target_status
-    LDA      #&2a
+    LDA      #STATUS_FIXED_PIXEL_PATTERN
     STA      status_panel_fixed_pixel_left
     STA      status_panel_fixed_pixel_right
-    LDA      #&34
+    LDA      #STATUS_PANEL_SECOND_SCREEN_HIGH
     STA      object_screen_high_by_index
-    LDA      #&8
+    LDA      #STATUS_PANEL_SECOND_SCREEN_LOW
     STA      object_screen_low_by_index
-    LDA      #&36
+    LDA      #STATUS_SECOND_LABEL_GRAPHIC_0
     JSR      draw_status_glyph_at_current_ptr
-    LDA      #&20
+    LDA      #STATUS_SECOND_LABEL_GRAPHIC_1
     JSR      draw_status_glyph_at_current_ptr
-    LDA      #&20
+    LDA      #STATUS_SECOND_LABEL_GRAPHIC_2
     JSR      draw_status_glyph_at_current_ptr
-    LDA      #&38
+    LDA      #STATUS_SECOND_LABEL_GRAPHIC_3
     JSR      draw_status_glyph_at_current_ptr
     JSR      advance_status_glyph_ptr
     LDA      room_area
-    AND      #&f
-    CMP      #&9
+    AND      #ROOM_AREA_LOW_NIBBLE_MASK
+    CMP      #ROOM_NUMBER_DOUBLE_DIGIT_THRESHOLD
     BMI      draw_single_digit_room_number
-    LDA      #&21
+    LDA      #ROOM_NUMBER_TENS_ONE_GRAPHIC
     JSR      draw_status_glyph_at_current_ptr
     LDA      room_area
-    AND      #&f
+    AND      #ROOM_AREA_LOW_NIBBLE_MASK
     CLC
-    ADC      #&17
+    ADC      #ROOM_NUMBER_DOUBLE_DIGIT_UNITS_OFFSET
     JSR      draw_status_glyph_at_current_ptr
     JMP      draw_status_level_number
 
 .draw_single_digit_room_number
     JSR      advance_status_glyph_ptr
     LDA      room_area
-    AND      #&f
+    AND      #ROOM_AREA_LOW_NIBBLE_MASK
     CLC
-    ADC      #&21
+    ADC      #ROOM_NUMBER_SINGLE_DIGIT_OFFSET
     JSR      draw_status_glyph_at_current_ptr
 
 .draw_status_level_number
     JSR      advance_status_glyph_ptr
     LDA      level_tens_digit
-    ADC      #&20
+    ADC      #LEVEL_NUMBER_DIGIT_GRAPHIC_OFFSET
     JSR      draw_status_glyph_at_current_ptr
     LDA      level_units_digit
-    ADC      #&20
+    ADC      #LEVEL_NUMBER_DIGIT_GRAPHIC_OFFSET
     JMP      draw_status_glyph_at_current_ptr
 
 .draw_status_glyph_at_current_ptr
     STA      object_graphic_id_by_index
-    LDA      #&2
+    LDA      #RENDER_MODE_STATUS_ERASE
     STA      render_mode_or_text_scratch
-    LDX      #&0
+    LDX      #STATUS_RENDER_OBJECT_INDEX
     JSR      draw_object_by_index
     DEC      render_mode_or_text_scratch
-    LDX      #&0
+    LDX      #STATUS_RENDER_OBJECT_INDEX
     JSR      draw_object_by_index
 
 .advance_status_glyph_ptr
     LDA      object_screen_low_by_index
     CLC
-    ADC      #&18
+    ADC      #STATUS_GLYPH_SCREEN_STEP
     STA      object_screen_low_by_index
     LDA      object_screen_high_by_index
     ADC      #&0
@@ -2389,14 +2389,14 @@ org runtime_start
     RTS
 
 .rng_next_byte
-    LDY      #&8
+    LDY      #RNG_OUTPUT_BIT_COUNT
     LDA      #&0
     STA      rng_output_byte
 
 .generate_next_rng_output_bit
     LDA      rng_shift_register_low
-    AND      #&48
-    ADC      #&38
+    AND      #RNG_FEEDBACK_TAP_MASK
+    ADC      #RNG_FEEDBACK_ADC_BIAS
     ASL      A
     ASL      A
     ROL      rng_shift_register_high
@@ -2405,7 +2405,7 @@ org runtime_start
     LDA      rng_shift_register_low
     LSR      A
     LSR      A
-    AND      #&1
+    AND      #RNG_OUTPUT_TAP_MASK
     ASL      rng_output_byte
     ORA      rng_output_byte
     STA      rng_output_byte
@@ -2416,25 +2416,25 @@ org runtime_start
 .compute_item_screen_ptr
     STX      zp_indirect_74_low
     LDA      object_y_by_index,X
-    AND      #&fe
+    AND      #ITEM_SCREEN_Y_MASK
     ASL      A
     ASL      A
     STA      zp_screen_ptr_70_low
     LDA      #&0
     STA      zp_screen_ptr_70_high
     LDA      object_y_by_index,X
-    AND      #&fe
+    AND      #ITEM_SCREEN_Y_MASK
     JSR      add_a_to_pointer_70
-    LDX      #&6
+    LDX      #ITEM_SCREEN_Y_SHIFT_COUNT
     JSR      shift_pointer_70_left_x_times
     LDX      zp_indirect_74_low
     LDA      object_x_by_index,X
     STA      zp_calc_ptr_72_low
     LDA      #&0
     STA      zp_calc_ptr_72_high
-    LDX      #&3
+    LDX      #ITEM_SCREEN_X_SHIFT_COUNT
     JSR      shift_pointer_72_left_x_times
-    LDA      #&30
+    LDA      #BITMAP_SCREEN_BASE_HIGH
     CLC
     ADC      zp_screen_ptr_70_high
     STA      zp_screen_ptr_70_high
@@ -2446,7 +2446,7 @@ org runtime_start
     LDA      zp_screen_ptr_70_high
     ADC      zp_calc_ptr_72_high
     STA      object_screen_high_by_index,X
-    LDA      #&7
+    LDA      #ITEM_SCREEN_POINTER_RETURN_A
     RTS
 
 .set_item_graphic_and_random_place
@@ -2456,20 +2456,20 @@ org runtime_start
 .random_place_item
     JSR      rng_next_byte
     LDX      logical_item_slot_index
-    AND      #&1f
+    AND      #RANDOM_ITEM_COORDINATE_MASK
     STA      item_x_alias_object_14,X
     JSR      rng_next_byte
     LDX      logical_item_slot_index
-    AND      #&f
+    AND      #RANDOM_ITEM_X_SECOND_MASK
     CLC
     ADC      item_x_alias_object_14,X
-    ADC      #&f
+    ADC      #RANDOM_ITEM_COORDINATE_BIAS
     STA      item_x_alias_object_14,X
     JSR      rng_next_byte
     LDX      logical_item_slot_index
-    AND      #&1f
+    AND      #RANDOM_ITEM_COORDINATE_MASK
     CLC
-    ADC      #&f
+    ADC      #RANDOM_ITEM_COORDINATE_BIAS
     STA      item_y_alias_object_14,X
     LDA      player_x_first_cell
     SBC      item_x_alias_object_14,X
@@ -2477,7 +2477,7 @@ org runtime_start
     EOR      #&ff
 
 .compare_item_horizontal_distance
-    CMP      #&8
+    CMP      #RANDOM_ITEM_MINIMUM_X_DISTANCE
     BPL      test_item_candidate_position
     LDA      player_y_first_cell
     SEC
@@ -2486,19 +2486,19 @@ org runtime_start
     EOR      #&ff
 
 .compare_item_vertical_distance
-    CMP      #&5
+    CMP      #RANDOM_ITEM_MINIMUM_Y_DISTANCE
     BMI      random_place_item
 
 .test_item_candidate_position
     TXA
     CLC
-    ADC      #&14
+    ADC      #LOGICAL_ITEM_TO_OBJECT_INDEX
     TAX
     STX      zp_scratch_77
     JSR      compute_item_screen_ptr
     LDA      #&0
     STA      renderer_collision_accumulator
-    LDA      #&5
+    LDA      #RENDER_MODE_PLACEMENT_COLLISION_TEST
     STA      render_mode_or_text_scratch
     JSR      draw_object_by_index
     LDA      renderer_collision_accumulator
@@ -2524,7 +2524,7 @@ org runtime_start
     STA      pending_clone_count
     LDA      cyberdroid_count_by_level_index_1e3a,X
     STA      pending_cyberdroid_count
-    LDX      #&2b
+    LDX      #ITEM_ENEMY_STATE_LAST_INDEX
     LDA      #&0
 
 .clear_item_and_enemy_state_loop
@@ -2541,7 +2541,7 @@ org runtime_start
     STA      remaining_active_object_count
     TAX
     DEX
-    LDA      #&1
+    LDA      #OBJECT_LIFECYCLE_ACTIVE
 
 .mark_initial_active_enemy_slots_loop
     STA      item_state_alias_object_14,X
@@ -2575,13 +2575,13 @@ org runtime_start
     RTS
 
 .read_object0_screen_byte_at_temp_position
-    LDX      #&0
+    LDX      #STATUS_RENDER_OBJECT_INDEX
     JSR      compute_item_screen_ptr
     LDA      object_screen_low_by_index
     STA      zp_screen_ptr_70_low
     LDA      object_screen_high_by_index
     STA      zp_screen_ptr_70_high
-    LDY      #&0
+    LDY      #GRAPHIC_RECORD_FIRST_BYTE_INDEX
     LDA      (zp_screen_ptr_70_low),Y
     STA      renderer_collision_accumulator
     RTS
@@ -2597,11 +2597,11 @@ org runtime_start
     CLC
     ADC      room_tile_column_or_fill_index
     ADC      room_tile_column_or_fill_index
-    ADC      #&1
+    ADC      #ROOM_GAP_FORWARD_X_BIAS
     STA      object_x_by_index
     LDA      #graphic_id_room_fill_probe
     STA      object_graphic_id_by_index
-    LDA      #&6
+    LDA      #ROOM_GAP_FIRST_SCREEN_Y
     STA      object_y_by_index
     LDA      #&0
     STA      room_gap_transition_pending
@@ -2611,7 +2611,7 @@ org runtime_start
     JSR      read_object0_screen_byte_at_temp_position
     BEQ      fill_forward_gap_after_transition
     LDA      room_gap_transition_pending
-    EOR      #&1
+    EOR      #ROOM_GAP_TRANSITION_TOGGLE_MASK
     STA      room_gap_transition_pending
     JMP      advance_forward_room_gap_scan
 
@@ -2626,7 +2626,7 @@ org runtime_start
     INC      object_y_by_index
     INC      object_y_by_index
     LDA      object_y_by_index
-    CMP      #&3a
+    CMP      #ROOM_GAP_END_Y
     BMI      scan_next_forward_room_gap_position
 
 .return_from_room_gap_fill
@@ -2643,23 +2643,23 @@ org runtime_start
     ADC      room_tile_column_or_fill_index
     ADC      room_tile_column_or_fill_index
     SEC
-    SBC      #&2
+    SBC      #ROOM_GAP_OFFSET_X_BIAS
     STA      object_x_by_index
     LDA      #graphic_id_room_fill_probe
     STA      object_graphic_id_by_index
-    LDA      #&6
+    LDA      #ROOM_GAP_FIRST_SCREEN_Y
     STA      object_y_by_index
 
 .scan_next_offset_room_gap_position
     JSR      read_object0_screen_byte_at_temp_position
     BEQ      advance_offset_room_gap_scan
-    LDA      #&18
+    LDA      #ROOM_GAP_ADJACENT_SCREEN_STEP
     JSR      add_a_to_pointer_70
     LDA      zp_screen_ptr_70_low
     STA      object_screen_low_by_index
     LDA      zp_screen_ptr_70_high
     STA      object_screen_high_by_index
-    LDY      #&0
+    LDY      #GRAPHIC_RECORD_FIRST_BYTE_INDEX
     LDA      (zp_screen_ptr_70_low),Y
     BNE      advance_offset_room_gap_scan
     JSR      copy_level_modulo_24byte_fill_pattern
@@ -2668,7 +2668,7 @@ org runtime_start
     INC      object_y_by_index
     INC      object_y_by_index
     LDA      object_y_by_index
-    CMP      #&3a
+    CMP      #ROOM_GAP_END_Y
     BMI      scan_next_offset_room_gap_position
     RTS
 
@@ -2676,8 +2676,8 @@ org runtime_start
 ; ===================================
 
 .clear_all_palette_entries
-    LDX      #&f
-    LDA      #&0
+    LDX      #PALETTE_LAST_LOGICAL_COLOUR
+    LDA      #PALETTE_CLEAR_VALUE
 
 .clear_palette_entry_loop_1f66
     JSR      vdu19_set_palette_or_colour
@@ -2686,7 +2686,7 @@ org runtime_start
     RTS
 
 .apply_level_palette
-    LDX      #&f
+    LDX      #PALETTE_LAST_LOGICAL_COLOUR
 
 .apply_base_palette_entry_loop_1f71
     LDA      base_palette_table_1f71,X
@@ -2694,14 +2694,14 @@ org runtime_start
     DEX
     BPL      apply_base_palette_entry_loop_1f71
     LDA      level_units_digit
-    AND      #&7
-    LDX      #&9
+    AND      #LEVEL_PALETTE_INDEX_MASK
+    LDX      #LEVEL_PALETTE_LOGICAL_COLOUR_9
     JSR      vdu19_set_palette_or_colour
     LDA      level_units_digit
-    AND      #&7
+    AND      #LEVEL_PALETTE_INDEX_MASK
     TAX
     LDA      level_palette_logical8_by_level_units_mod8,X
-    LDX      #&8
+    LDX      #LEVEL_PALETTE_LOGICAL_COLOUR_8
     JMP      vdu19_set_palette_or_colour
 
 .unused_erase_object_then_restore_entry
