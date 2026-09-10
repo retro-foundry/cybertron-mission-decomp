@@ -66,12 +66,15 @@ The source reconstruction itself is complete and byte-exact, but the dynamic
 validation depth is not yet equivalent to the Quest repository. Completion of
 that broader standard requires:
 
-1. Add replay-backed input, movement, collision, projectile, object lifecycle,
-   score, sound, and screen-flow contracts.
-2. Add an active-loop/full-frame comparison that records RAM and display
+1. Add actual-code replay coverage for player collision outcomes, enemy AI
+   movement decisions, hazard spawning/recycling, target collection, life loss,
+   and level completion. Current contracts for these areas are static or cover
+   only their setup/lifecycle edges.
+2. Add an active-loop/full-frame comparison that records complete RAM and display
    effects for fixed initial state and input sequences.
-3. Promote routines from static behavioral meaning to `port-contract` only
-   when those fixtures or replays provide exact accept/reject evidence.
+3. Replace the active-frame spine's leaf probes with integrated subsystem
+   execution as replay coverage grows, then promote the full frame only when
+   complete state/display fixtures provide exact accept/reject evidence.
 
 Until those gates exist and pass, this audit must not describe the runtime as
 fully scenario-validated or port-contract complete.
