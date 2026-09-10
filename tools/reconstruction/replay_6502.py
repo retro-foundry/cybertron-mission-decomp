@@ -123,6 +123,10 @@ class Replay6502:
                 self.a = self._flags(self.a & self._fetch())
             elif opcode == 0xB9:  # LDA abs,Y
                 self.a = self._flags(self.memory[(self._word() + self.y) & 0xFFFF])
+            elif opcode == 0xB1:  # LDA (zp),Y
+                pointer = self._fetch()
+                address = self.memory[pointer] | self.memory[(pointer + 1) & 0xFF] << 8
+                self.a = self._flags(self.memory[(address + self.y) & 0xFFFF])
             elif opcode == 0x88:  # DEY
                 self.y = self._flags(self.y - 1)
             elif opcode == 0x10:  # BPL rel
@@ -181,6 +185,9 @@ class Replay6502:
                 self.memory[target] = self._flags(self.memory[target] + 1)
             elif opcode == 0xC6:  # DEC zp
                 target = self._fetch()
+                self.memory[target] = self._flags(self.memory[target] - 1)
+            elif opcode == 0xCE:  # DEC abs
+                target = self._word()
                 self.memory[target] = self._flags(self.memory[target] - 1)
             else:
                 raise AssertionError(

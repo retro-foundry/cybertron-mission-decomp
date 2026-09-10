@@ -79,6 +79,9 @@ the fire edge is consumed before the four-shot limit returns.
 Object validation covers every setup-count row, all 41 render slots in the
 overlapping lifecycle windows, all six hit-animation states, and all 256
 projectile expiry input bytes.
+The assembled `$1B41` expiry routine is also replayed for all 256 pixel bytes
+in both a player-shot and a spawned-hazard slot, checking separate counters,
+deactivation, and the special spook-pause flag.
 The actual assembled score routine is CPU-replayed across all 10,000 valid
 four-character score states, including every carry and extra-life boundary.
 

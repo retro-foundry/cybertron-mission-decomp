@@ -36,6 +36,7 @@ accepted as evidence for gameplay identity.
 | Sprite-render parity | `validate_port_contracts.py` independently reconstructs the even and split odd-Y `$1426-$1464` destination walks and matches all four original-output `$1735` player-start XOR-layer digests | Port-contract |
 | Setup-frame parity | Seven deterministic scenarios reproduce target-code generation, enemy/target placement with rejection, RNG end state, setup-screen digest, and the immediate `$1849-$1863` player-entry digest | Port-contract |
 | Object/projectile lifecycle projection | All six enemy-count rows, 41 overlapping render-slot roles, six hit-animation states, and 256 masked projectile-expiry bytes are checked against bundled contracts | Port-contract |
+| Projectile expiry replay | The actual source-built `$1B41` routine is CPU-replayed for all 256 screen-byte values in both player-shot and hazard slots, including counter ownership and the `$A0` spook-pause class | Port-contract, exhaustive |
 | Score CPU replay | The actual source-built `$22E6` routine is executed for all 10,000 valid four-character score states and compared with an independent carry/extra-life model | Port-contract, exhaustive |
 | Full active-frame parity | No deterministic full-frame replay oracle is bundled in this standalone repository | Not proved |
 

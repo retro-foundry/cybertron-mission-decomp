@@ -1052,6 +1052,44 @@ def main() -> None:
             fail(f"screen byte ${screen_byte:02X}: spook pause without expiry")
         expiry_rows += 1
 
+    projectile_expiry_cpu_replays = 0
+    for projectile_slot, counter_address in ((0, 0x0042), (4, 0x0BB8)):
+        for screen_byte in range(256):
+            memory = bytearray(0x10000)
+            memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+            memory[0x0C4E + projectile_slot] = 0
+            memory[0x0C1E + projectile_slot] = 0x00
+            memory[0x0C26 + projectile_slot] = 0x40
+            memory[counter_address] = 1
+            memory[0x4001] = screen_byte
+
+            def inside_bounds_handler(cpu: Replay6502, target: int) -> bool:
+                if target == 0x1C8D:
+                    cpu.memory[0x0041] = 0
+                    return True
+                return False
+
+            cpu = Replay6502(memory, inside_bounds_handler)
+            cpu.x = projectile_slot
+            cpu.run_subroutine(0x1B41)
+            masked = screen_byte & 0xAA
+            expected_expiry = masked in expiry_classes
+            expected_direction = 0xFF if expected_expiry else 0
+            expected_count = 0 if expected_expiry else 1
+            expected_pause = 1 if masked == 0xA0 else 0
+            actual = (
+                memory[0x0C4E + projectile_slot],
+                memory[counter_address],
+                memory[0x0043],
+            )
+            expected = (expected_direction, expected_count, expected_pause)
+            if actual != expected:
+                fail(
+                    f"expiry CPU replay slot {projectile_slot} byte ${screen_byte:02X}: "
+                    f"{actual}, expected {expected}"
+                )
+            projectile_expiry_cpu_replays += 1
+
     # Replay the actual assembled $22E6 score routine for every valid four-
     # character state. Calls to sound/status are bounded side-effect probes;
     # all score carry and life-award instructions execute from CYBRUN itself.
@@ -1139,6 +1177,7 @@ def main() -> None:
         f"{len(window_roles)} object-slot roles, "
         f"{lifecycle_rows} lifecycle states, "
         f"{expiry_rows} projectile expiry bytes, "
+        f"{projectile_expiry_cpu_replays} projectile expiry CPU replays, "
         f"{score_replays} score CPU replays"
     )
 
