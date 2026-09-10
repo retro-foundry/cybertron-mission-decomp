@@ -1,125 +1,9 @@
 ; Cybertron Acorn Electron runtime reconstruction
 
 cpu 1
-runtime_start = &0D80
-runtime_entry = &0E02
-renderer_collision_accumulator = &0030
-render_mode_or_text_scratch = &0031
-room_area = &0032
-movement_delta_x = &0033
-movement_delta_y = &0034
-player_direction = &0035
-frame_phase = &0036
-saved_level_loop_seed_or_status = &0037
-active_object_index = &0039
-logical_item_slot_index = &003A
-room_tile_column_or_fill_index = &003B
-zp_scratch_3c = &003C
-zp_scratch_3d = &003D
-fire_edge_request = &003E
-input_delta_x = &003F
-input_delta_y = &0040
-bounds_or_outside_flag = &0041
-active_player_shot_count = &0042
-projectile_spook_pause_collision_flag = &0043
-rng_output_byte = &0044
-room_tile_x_index = &0045
-room_tile_y_index = &0046
-room_tile_class_or_pattern = &0047
-target_collect_collision_flag = &004A
-room_gap_column_repeat_counter = &004B
-wait_frame_counter = &004C
-collected_target_count = &004E
-highest_required_target_slot = &006F
-zp_screen_ptr_70_low = &0070
-zp_screen_ptr_70_high = &0071
-zp_calc_ptr_72_low = &0072
-zp_calc_ptr_72_high = &0073
-zp_indirect_74_low = &0074
-zp_indirect_74_high = &0075
-zp_scratch_76 = &0076
-zp_scratch_77 = &0077
-zp_scratch_78 = &0078
-zp_scratch_79 = &0079
-remaining_active_object_count = &0080
-transition_delay = &0082
-temp_player_graphic_id_second = &008B
-temp_player_graphic_id_first = &008C
-saved_visible_player_graphic_id_second = &008D
-saved_visible_player_graphic_id_first = &008E
-text_render_char_limit = &008F
-level_index_and_hazard_gate = &00B8
-current_level_intro_or_loop_flag = &00CF
-polled_frame_tick_byte_0224 = &0224
-initial_screen_room_feature_mask_1ec8_1f19 = &0760
-initial_screen_level_modulo_fill_patterns_0dbf = &07A0
-object_x_by_index = &0A00
-spook_first_cell_x = &0A0E
-player_x_first_cell = &0A10
-item_x_alias_object_14 = &0A14
-object_y_by_index = &0A40
-spook_first_cell_y = &0A4E
-player_y_first_cell = &0A50
-player_y_second_cell = &0A51
-item_y_alias_object_14 = &0A54
-object_screen_low_by_index = &0A80
-player_screen_low_first_cell = &0A90
-player_screen_low_second_cell = &0A91
-object_screen_high_by_index = &0AC0
-player_screen_high_first_cell = &0AD0
-player_screen_high_second_cell = &0AD1
-best_score_counter_chars = &0BB0
-lives_status_count = &0BB4
-level_loop_seed_or_status = &0BB5
-level_units_digit = &0BB6
-level_tens_digit = &0BB7
-active_spawned_hazard_count = &0BB8
-hazard_spawn_source_object_index = &0BB9
-hazard_spawn_direction = &0BBA
-hazard_spawn_slot_index = &0BBB
-spook_pause_counter = &0BBC
-saved_object_y_by_index = &0BC0
-input_scan_index = &0C01
-bootstrap_osbyte81_x_result_flag = &0C03
-player_collision_class_flag = &0C07
-target_collected_status = &0C0D
-target_room_code = &0C14
-object_render_y_or_parity = &0C1B
-shot_screen_low_current = &0C1E
-shot_screen_high_current = &0C26
-shot_screen_low_previous = &0C2E
-shot_screen_high_previous = &0C36
-shot_x_by_slot = &0C3E
-shot_y_by_slot = &0C46
-shot_direction_or_inactive_by_slot = &0C4E
-object_lifecycle_base_for_indexed_refs = &0C53
-shot_visible_flag_by_slot = &0C56
-pending_spinner_count = &0C62
-pending_clone_count = &0C63
-pending_cyberdroid_count = &0C64
-spook_release_timer = &0C66
-item_state_alias_object_14 = &0C67
-item_delta_x_by_slot = &0C86
-palette_cycle_row_index = &0C96
-previous_fire_input_latch = &0C98
-object_movement_success_flag = &0C99
-item_delta_y_by_slot = &0C9E
-text_buffer_20chars = &0CCA
-font_expand_work_bytes = &0CE6
-sound_disabled_flag = &0CEA
-input_mode_keyboard_or_joystick = &0CEB
-score_counter_chars = &0CEC
-renderer_store_vector_low_table = &0CF0
-renderer_store_vector_high_table = &0CF8
-saved_object_screen_low_by_index = &0D00
-saved_player_second_screen_low = &0D11
-saved_object_screen_high_by_index = &0D40
-saved_player_second_screen_high = &0D51
-render_source_operand_low = &1435
-render_source_operand_high = &1436
-MOS_OSWRCH = &FFEE
-MOS_OSWORD = &FFF1
-MOS_OSBYTE = &FFF4
+
+INCLUDE "source_acorn_electron/memory_map.inc"
+
 org runtime_start
 
 ; This is reconstructed source, not original author source.
@@ -5084,4 +4968,4 @@ org runtime_start
     EQUB &C1,&C0,&C3    ; &2FFD
 
 runtime_end = *
-SAVE "CYBRUN", runtime_start, runtime_end, runtime_entry
+SAVE "build/reconstruction/CYBRUN", runtime_start, runtime_end, runtime_entry

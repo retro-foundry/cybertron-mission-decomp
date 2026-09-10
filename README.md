@@ -3,9 +3,10 @@
 This repository contains a complete, byte-exact BeebAsm reconstruction of the
 relocated Acorn Electron `CYBRUN` gameplay runtime from *Cybertron Mission*.
 Executable code, data tables, text, room layouts, and graphics are declared in
-the maintained source file:
+the two maintained source files:
 
 - `source_acorn_electron/cyber1.asm`
+- `source_acorn_electron/memory_map.inc`
 
 The assembly contains no binary fragments and requires no original executable
 or authority binary to build.

@@ -5,6 +5,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $repoRoot = $PSScriptRoot
 $source = Join-Path $repoRoot 'source_acorn_electron\cyber1.asm'
+$memoryMap = Join-Path $repoRoot 'source_acorn_electron\memory_map.inc'
 $payload = Join-Path $repoRoot 'build\reconstruction\CYBRUN'
 $expectedLength = 0x2280
 $expectedSha256 = '29D4BED6A2BF6A3F93302F01B05FE43EC930528EAF702E679B73D2FD2476BEEF'
@@ -14,6 +15,7 @@ $requiredFiles = @(
     'build.ps1'
     'validate.ps1'
     'source_acorn_electron/cyber1.asm'
+    'source_acorn_electron/memory_map.inc'
 )
 foreach ($relativePath in $requiredFiles) {
     $requiredPath = Join-Path $repoRoot $relativePath
@@ -27,6 +29,7 @@ $maintainedFiles = @(
     (Join-Path $repoRoot 'build.ps1')
     (Join-Path $repoRoot 'validate.ps1')
     $source
+    $memoryMap
 )
 foreach ($maintainedFile in $maintainedFiles) {
     $nonAsciiByte = [System.IO.File]::ReadAllBytes($maintainedFile) |
@@ -38,16 +41,20 @@ foreach ($maintainedFile in $maintainedFiles) {
 }
 
 $assemblyText = Get-Content -LiteralPath $source -Raw
-if ($assemblyText -match '(?im)^\s*(?:INCBIN|INCLUDE)\b') {
-    throw 'cyber1.asm must remain standalone and may not include source or binary fragments.'
+$memoryMapText = Get-Content -LiteralPath $memoryMap -Raw
+if ($assemblyText -match '(?im)^\s*INCBIN\b') {
+    throw 'cyber1.asm must remain source-owned and may not include binary fragments.'
 }
-if ($assemblyText -notmatch '(?im)^\s*runtime_start\s*=\s*&0D80\s*$') {
-    throw 'cyber1.asm no longer declares the expected runtime load address $0D80.'
+if ($assemblyText -notmatch '(?im)^\s*INCLUDE\s+"source_acorn_electron/memory_map\.inc"\s*$') {
+    throw 'cyber1.asm must include the maintained source_acorn_electron/memory_map.inc memory map.'
 }
-if ($assemblyText -notmatch '(?im)^\s*runtime_entry\s*=\s*&0E02\s*$') {
-    throw 'cyber1.asm no longer declares the expected runtime entry address $0E02.'
+if ($memoryMapText -notmatch '(?im)^\s*runtime_start\s*=\s*&0D80\s*$') {
+    throw 'memory_map.inc no longer declares the expected runtime load address $0D80.'
 }
-if ($assemblyText -notmatch '(?im)^\s*SAVE\s+"CYBRUN",\s*runtime_start,\s*runtime_end,\s*runtime_entry\s*$') {
+if ($memoryMapText -notmatch '(?im)^\s*runtime_entry\s*=\s*&0E02\s*$') {
+    throw 'memory_map.inc no longer declares the expected runtime entry address $0E02.'
+}
+if ($assemblyText -notmatch '(?im)^\s*SAVE\s+"build/reconstruction/CYBRUN",\s*runtime_start,\s*runtime_end,\s*runtime_entry\s*$') {
     throw 'cyber1.asm no longer saves the expected CYBRUN runtime payload.'
 }
 

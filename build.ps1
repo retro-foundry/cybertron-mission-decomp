@@ -28,7 +28,7 @@ if (-not (Test-Path -LiteralPath $source -PathType Leaf)) {
 New-Item -ItemType Directory -Path $outputDirectory -Force | Out-Null
 Remove-Item -LiteralPath $payload, $labels -Force -ErrorAction SilentlyContinue
 
-Push-Location $outputDirectory
+Push-Location $repoRoot
 try {
     & $BeebAsm -i $source -d -labels $labels
     if ($LASTEXITCODE -ne 0) {
