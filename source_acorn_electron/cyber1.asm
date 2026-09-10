@@ -1899,10 +1899,10 @@ org runtime_start
     CMP      #graphic_id_clone
     BNE      test_active_cyberdroid_object
     TXA
-    AND      #&7
+    AND      #CLONE_FRAME_PHASE_MASK
     STA      zp_indirect_74_low
     LDA      frame_phase
-    AND      #&7
+    AND      #CLONE_FRAME_PHASE_MASK
     CMP      zp_indirect_74_low
     BNE      test_active_cyberdroid_object
     JSR      begin_target_enemy_move_test
@@ -1915,7 +1915,7 @@ org runtime_start
     CMP      #graphic_id_cyberdroid
     BNE      advance_active_moving_object_slot
     TXA
-    AND      #&f
+    AND      #FRAME_PHASE_MASK
     CMP      frame_phase
     BNE      advance_active_moving_object_slot
     JSR      begin_target_enemy_move_test
@@ -1926,52 +1926,52 @@ org runtime_start
 .advance_active_moving_object_slot
     LDX      active_object_index
     INX
-    CPX      #&20
+    CPX      #ITEM_OBJECT_END_EXCLUSIVE
     BNE      scan_next_active_moving_object
     RTS
 
 .player_collision_flash_sequence
-    LDA      #&4
+    LDA      #SOUND_ID_PLAYER_COLLISION
     JSR      play_sound_id_if_enabled
     LDA      player_graphic_id_first_cell
     STA      movement_delta_x
     LDA      player_graphic_id_second_cell
     STA      movement_delta_y
-    LDA      #&32
+    LDA      #PLAYER_COLLISION_FLASH_COUNT
     STA      frame_phase
 
 .player_collision_flash_next_frame
     JSR      wait_one_frame_tick
     LDA      frame_phase
-    AND      #&f
-    LDX      #&8
+    AND      #FRAME_PHASE_MASK
+    LDX      #PLAYER_COLLISION_FLASH_PALETTE_LOGICAL
     JSR      vdu19_set_palette_or_colour
-    LDA      #&30
+    LDA      #PLAYER_COLLISION_FLASH_FIRST_GRAPHIC
     STA      player_graphic_id_first_cell
-    LDA      #&31
+    LDA      #PLAYER_COLLISION_FLASH_SECOND_GRAPHIC
     STA      player_graphic_id_second_cell
-    LDA      #&1
+    LDA      #RENDER_MODE_VISIBLE_PLAYER
     STA      render_mode_or_text_scratch
-    LDX      #&10
+    LDX      #PLAYER_FIRST_OBJECT_INDEX
     JSR      draw_object_using_saved_screen_ptr
-    LDX      #&11
+    LDX      #PLAYER_SECOND_OBJECT_INDEX
     JSR      draw_object_using_saved_screen_ptr
     JSR      wait_one_frame_tick
     LDA      movement_delta_x
     STA      player_graphic_id_first_cell
     LDA      movement_delta_y
     STA      player_graphic_id_second_cell
-    LDX      #&10
+    LDX      #PLAYER_FIRST_OBJECT_INDEX
     JSR      draw_object_using_saved_screen_ptr
-    LDX      #&11
+    LDX      #PLAYER_SECOND_OBJECT_INDEX
     JSR      draw_object_using_saved_screen_ptr
     DEC      frame_phase
     BPL      player_collision_flash_next_frame
-    LDA      #&2
+    LDA      #RENDER_MODE_FINAL_PLAYER_ERASE
     STA      render_mode_or_text_scratch
-    LDX      #&10
+    LDX      #PLAYER_FIRST_OBJECT_INDEX
     JSR      draw_object_using_saved_screen_ptr
-    LDX      #&11
+    LDX      #PLAYER_SECOND_OBJECT_INDEX
     JSR      draw_object_using_saved_screen_ptr
     JSR      lose_life_and_reset_player
     JMP      move_shot_hazard_slots_and_spawn_new
@@ -1979,13 +1979,13 @@ org runtime_start
 .lose_life_and_reset_player
     DEC      lives_status_count
     JSR      draw_lives_or_target_status
-    LDA      #&3
+    LDA      #SOUND_ID_LIFE_LOST
     JSR      play_sound_id_if_enabled
     LDA      #&0
     STA      render_mode_or_text_scratch
     LDA      saved_player_second_screen_low
     SEC
-    SBC      #&8
+    SBC      #PLAYER_RESET_FIRST_SCREEN_LOW_DELTA
     STA      player_screen_low_first_cell
     LDA      saved_player_second_screen_high
     SBC      #&0
@@ -1995,20 +1995,20 @@ org runtime_start
     STA      player_y_second_cell
     LDA      saved_player_second_screen_low
     CLC
-    ADC      #&10
+    ADC      #PLAYER_RESET_SECOND_SCREEN_LOW_DELTA
     STA      player_screen_low_second_cell
     LDA      saved_player_second_screen_high
     ADC      #&0
     STA      player_screen_high_second_cell
-    LDA      #&33
+    LDA      #PLAYER_RESET_FIRST_GRAPHIC
     STA      player_graphic_id_first_cell
-    LDA      #&34
+    LDA      #PLAYER_RESET_SECOND_GRAPHIC
     STA      player_graphic_id_second_cell
-    LDX      #&10
+    LDX      #PLAYER_FIRST_OBJECT_INDEX
     JSR      draw_object_by_index
-    LDX      #&11
+    LDX      #PLAYER_SECOND_OBJECT_INDEX
     JSR      draw_object_by_index
-    LDA      #&96
+    LDA      #PLAYER_RESET_TRANSITION_DELAY
     STA      transition_delay
     RTS
 
@@ -2016,28 +2016,28 @@ org runtime_start
     LDA      #&0
     STA      bounds_or_outside_flag
     LDA      player_x_first_cell
-    CMP      #&2
+    CMP      #PLAYER_LEFT_BOUNDARY
     BPL      test_player_right_boundary
-    LDX      #&1
+    LDX      #AREA_EXIT_LEFT
     JMP      restart_after_area_transition
 
 .test_player_right_boundary
-    CMP      #&4c
+    CMP      #PLAYER_RIGHT_BOUNDARY
     BMI      test_player_vertical_boundaries
-    LDX      #&0
+    LDX      #AREA_EXIT_RIGHT
     JMP      restart_after_area_transition
 
 .test_player_vertical_boundaries
     LDA      player_y_first_cell
-    CMP      #&7
+    CMP      #PLAYER_TOP_BOUNDARY
     BPL      test_player_bottom_boundary
-    LDX      #&2
+    LDX      #AREA_EXIT_TOP
     JMP      restart_after_area_transition
 
 .test_player_bottom_boundary
-    CMP      #&36
+    CMP      #PLAYER_BOTTOM_BOUNDARY
     BMI      return_from_bounds_or_invisible_shot
-    LDX      #&3
+    LDX      #AREA_EXIT_BOTTOM
     JMP      restart_after_area_transition
 
 .return_from_bounds_or_invisible_shot
@@ -2046,7 +2046,7 @@ org runtime_start
 .restart_after_area_transition
     JSR      add_direction_score_or_state_delta
     JSR      clear_all_palette_entries
-    LDA      #&c
+    LDA      #VDU_CLEAR_SCREEN
     JSR      MOS_OSWRCH
     JMP      start_or_reset_player_and_level_objects
 
@@ -2060,11 +2060,11 @@ org runtime_start
     STA      zp_screen_ptr_70_low
     LDA      shot_screen_high_previous,X
     STA      zp_screen_ptr_70_high
-    LDY      #&1
+    LDY      #SHOT_LAST_BITMAP_BYTE
 
 .erase_next_shot_or_hazard_byte
     LDA      (zp_screen_ptr_70_low),Y
-    EOR      #&2a
+    EOR      #SHOT_XOR_BITMAP
     STA      (zp_screen_ptr_70_low),Y
     DEY
     BPL      erase_next_shot_or_hazard_byte
@@ -2081,21 +2081,21 @@ org runtime_start
     STA      renderer_collision_accumulator
     LDA      shot_direction_or_inactive_by_slot,X
     BMI      return_from_bounds_or_invisible_shot
-    LDA      #&1
+    LDA      #SHOT_VISIBLE
     STA      shot_visible_flag_by_slot,X
     LDA      shot_screen_low_current,X
     STA      zp_screen_ptr_70_low
     LDA      shot_screen_high_current,X
     STA      zp_screen_ptr_70_high
-    LDY      #&1
+    LDY      #SHOT_LAST_BITMAP_BYTE
 
 .accumulate_next_shot_collision_byte
     LDA      (zp_screen_ptr_70_low),Y
-    AND      #&aa
+    AND      #SHOT_COLLISION_PIXEL_MASK
     ORA      renderer_collision_accumulator
     STA      renderer_collision_accumulator
     LDA      (zp_screen_ptr_70_low),Y
-    EOR      #&2a
+    EOR      #SHOT_XOR_BITMAP
     STA      (zp_screen_ptr_70_low),Y
     DEY
     BPL      accumulate_next_shot_collision_byte
@@ -2115,18 +2115,18 @@ org runtime_start
     STA      zp_screen_ptr_70_low
     LDA      shot_screen_high_current,X
     STA      zp_screen_ptr_70_high
-    LDY      #&1
+    LDY      #SHOT_LAST_BITMAP_BYTE
 
 .inspect_next_shot_collision_byte
     LDA      (zp_screen_ptr_70_low),Y
-    AND      #&aa
-    CMP      #&a0
+    AND      #SHOT_COLLISION_PIXEL_MASK
+    CMP      #SHOT_COLLISION_SPOOK_PATTERN
     BEQ      mark_projectile_spook_pause_collision
-    CMP      #&80
+    CMP      #SHOT_COLLISION_PLAYER_PATTERN
     BEQ      deactivate_shot_or_hazard_slot
-    CMP      #&82
+    CMP      #SHOT_COLLISION_PLAYER_EDGE_PATTERN
     BEQ      deactivate_shot_or_hazard_slot
-    CMP      #&8a
+    CMP      #SHOT_COLLISION_TARGET_PATTERN
     BEQ      deactivate_shot_or_hazard_slot
     DEY
     BPL      inspect_next_shot_collision_byte
@@ -2139,9 +2139,9 @@ org runtime_start
     INC      projectile_spook_pause_collision_flag
 
 .deactivate_shot_or_hazard_slot
-    LDA      #&ff
+    LDA      #SHOT_HAZARD_INACTIVE_DIRECTION
     STA      shot_direction_or_inactive_by_slot,X
-    CPX      #&4
+    CPX      #FIRST_HAZARD_SLOT
     BPL      decrement_active_hazard_count
     DEC      active_player_shot_count
     RTS
@@ -2178,14 +2178,14 @@ org runtime_start
     BEQ      return_from_shot_screen_pointer_update
     BPL      adjust_even_y_shot_screen_row
     LDA      shot_y_by_slot,X
-    AND      #&1
+    AND      #SHOT_ROW_PARITY_MASK
     BEQ      return_from_shot_screen_pointer_update
     LDA      shot_screen_low_current,X
     SEC
-    SBC      #&78
+    SBC      #SHOT_ODD_ROW_WRAP_LOW
     STA      shot_screen_low_current,X
     LDA      shot_screen_high_current,X
-    SBC      #&2
+    SBC      #SHOT_ODD_ROW_WRAP_HIGH
     STA      shot_screen_high_current,X
 
 .return_from_shot_screen_pointer_update
@@ -2193,36 +2193,36 @@ org runtime_start
 
 .adjust_even_y_shot_screen_row
     LDA      shot_y_by_slot,X
-    AND      #&1
+    AND      #SHOT_ROW_PARITY_MASK
     BNE      return_from_shot_screen_pointer_update
     LDA      shot_screen_low_current,X
     CLC
-    ADC      #&78
+    ADC      #SHOT_ODD_ROW_WRAP_LOW
     STA      shot_screen_low_current,X
     LDA      shot_screen_high_current,X
-    ADC      #&2
+    ADC      #SHOT_ODD_ROW_WRAP_HIGH
     STA      shot_screen_high_current,X
     RTS
 
 .compute_shot_screen_ptr
     STX      zp_indirect_74_low
     LDA      shot_y_by_slot,X
-    AND      #&fe
+    AND      #SHOT_EVEN_Y_MASK
     ASL      A
     ASL      A
     STA      zp_screen_ptr_70_low
     LDA      #&0
     STA      zp_screen_ptr_70_high
     LDA      shot_y_by_slot,X
-    AND      #&fe
+    AND      #SHOT_EVEN_Y_MASK
     JSR      add_a_to_pointer_70
-    LDX      #&6
+    LDX      #SHOT_SCREEN_Y_SHIFT_COUNT
     JSR      shift_pointer_70_left_x_times
     LDX      zp_indirect_74_low
     LDA      shot_y_by_slot,X
-    AND      #&1
+    AND      #SHOT_ROW_PARITY_MASK
     BEQ      add_shot_horizontal_screen_offset
-    LDA      #&4
+    LDA      #SHOT_ODD_SCANLINE_OFFSET
     JSR      add_a_to_pointer_70
 
 .add_shot_horizontal_screen_offset
@@ -2230,9 +2230,9 @@ org runtime_start
     STA      zp_calc_ptr_72_low
     LDA      #&0
     STA      zp_calc_ptr_72_high
-    LDX      #&3
+    LDX      #SHOT_SCREEN_X_SHIFT_COUNT
     JSR      shift_pointer_72_left_x_times
-    LDA      #&30
+    LDA      #BITMAP_SCREEN_BASE_HIGH
     CLC
     ADC      zp_screen_ptr_70_high
     STA      zp_screen_ptr_70_high
