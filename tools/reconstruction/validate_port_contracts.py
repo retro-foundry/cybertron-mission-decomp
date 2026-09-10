@@ -1169,6 +1169,151 @@ def main() -> None:
     if actual_score_add != expected_score_add:
         fail(f"target score increments {actual_score_add}, expected {expected_score_add}")
 
+    # Replay the actual $0FD6 target handler through every required-target
+    # slot, the bonus slot, the incomplete completion gate, and both decimal
+    # level-counter outcomes. Rendering, sound, score, RNG, and delay leaves
+    # are bounded probes; all matching, status, count, movement reversal, life,
+    # level, and room-bank instructions execute from CYBRUN.
+    target_outcome_cpu_replays = 0
+    target_codes = (0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0F)
+    for target_slot in range(1, 6):
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        memory[0x0030] = 0xA5
+        memory[0x0032] = target_codes[target_slot]
+        memory[0x0C14:0x0C1B] = bytes(target_codes)
+        calls = []
+
+        def required_target_handler(cpu: Replay6502, target: int) -> bool:
+            if target in (0x0FCF, 0x21EA):
+                calls.append((target, cpu.a, cpu.x))
+                return True
+            return False
+
+        def required_target_tail(cpu: Replay6502, target: int) -> bool:
+            if target == 0x22E6:
+                calls.append((target, cpu.a, cpu.x))
+                return True
+            return False
+
+        cpu = Replay6502(memory, required_target_handler, required_target_tail)
+        cpu.run_subroutine(0x0FD6)
+        expected_calls = [
+            (0x0FCF, 0x36 + target_slot, 0x36 + target_slot),
+            (0x21EA, 5, 0x36 + target_slot),
+            (0x22E6, actual_score_add[target_slot], target_slot),
+        ]
+        actual = (
+            memory[0x0030],
+            memory[0x0C0D + target_slot],
+            memory[0x0077],
+            calls,
+        )
+        expected = (0, 1, target_slot, expected_calls)
+        if actual != expected:
+            fail(f"required target slot {target_slot}: {actual}, expected {expected}")
+        target_outcome_cpu_replays += 1
+
+    memory = bytearray(0x10000)
+    memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+    memory[0x0032] = target_codes[6]
+    memory[0x0BB4] = 3
+    memory[0x0C14:0x0C1B] = bytes(target_codes)
+    calls = []
+
+    def bonus_target_handler(cpu: Replay6502, target: int) -> bool:
+        calls.append((target, cpu.a, cpu.x))
+        if target == 0x12D8:
+            memory[0x0C14 + 6] = 0x0B
+            memory[0x0C0D + 6] = 0
+        return target in (0x0FCF, 0x21EA, 0x12D8)
+
+    def bonus_target_tail(cpu: Replay6502, target: int) -> bool:
+        if target == 0x2345:
+            calls.append((target, cpu.a, cpu.x))
+            return True
+        return False
+
+    cpu = Replay6502(memory, bonus_target_handler, bonus_target_tail)
+    cpu.run_subroutine(0x0FD6)
+    expected_calls = [
+        (0x0FCF, 0x3C, 0x3C),
+        (0x21EA, 5, 0x3C),
+        (0x12D8, 5, 6),
+        (0x2345, 5, 6),
+    ]
+    actual = (memory[0x0030], memory[0x0C0D + 6], memory[0x0C14 + 6], memory[0x0BB4], calls)
+    expected = (0, 0, 0x0B, 4, expected_calls)
+    if actual != expected:
+        fail(f"bonus target: {actual}, expected {expected}")
+    target_outcome_cpu_replays += 1
+
+    memory = bytearray(0x10000)
+    memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+    memory[0x0032] = target_codes[0]
+    memory[0x003F] = 3
+    memory[0x0040] = 0xFE
+    memory[0x006F] = 3
+    memory[0x0C14:0x0C1B] = bytes(target_codes)
+    memory[0x0C0E] = 1
+    calls = []
+
+    def incomplete_gate_handler(cpu: Replay6502, target: int) -> bool:
+        if target == 0x1718:
+            calls.append((target, memory[0x003F], memory[0x0040]))
+            return True
+        return False
+
+    def incomplete_gate_tail(cpu: Replay6502, target: int) -> bool:
+        if target == 0x1718:
+            calls.append((target, memory[0x003F], memory[0x0040]))
+            return True
+        return False
+
+    cpu = Replay6502(memory, incomplete_gate_handler, incomplete_gate_tail)
+    cpu.run_subroutine(0x0FD6)
+    actual = (bytes(memory[0x0C0E:0x0C11]), memory[0x004E], memory[0x003F], memory[0x0040], calls)
+    expected = (bytes((0xFF, 0, 0)), 1, 0, 0, [(0x1718, 0xFD, 2), (0x1718, 0, 0)])
+    if actual != expected:
+        fail(f"incomplete completion gate: {actual}, expected {expected}")
+    target_outcome_cpu_replays += 1
+
+    for units, tens in ((8, 2), (9, 2)):
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        memory[0x0032] = 0x25
+        memory[0x006F] = 3
+        memory[0x0BB4] = 4
+        memory[0x0BB6] = units
+        memory[0x0BB7] = tens
+        memory[0x0C14:0x0C1B] = bytes(target_codes)
+        memory[0x0C0E:0x0C11] = bytes((1, 1, 1))
+        calls = []
+
+        def complete_gate_handler(cpu: Replay6502, target: int) -> bool:
+            if target in (0x21EA, 0x1307):
+                calls.append((target, cpu.a))
+                return True
+            return False
+
+        cpu = Replay6502(memory, complete_gate_handler)
+        cpu.run_subroutine(0x0FD6, stop_addresses=(0x106A,))
+        expected_units = 0 if units == 9 else units + 1
+        expected_tens = tens + 1 if units == 9 else tens
+        actual = (
+            bytes(memory[0x0C0E:0x0C11]),
+            memory[0x004E],
+            memory[0x0BB4],
+            memory[0x0BB6],
+            memory[0x0BB7],
+            memory[0x0032],
+            calls,
+        )
+        expected = (bytes((0xFF, 0xFF, 0xFF)), 3, 5, expected_units, expected_tens, 0x30, [(0x21EA, 0x12), (0x1307, 0x32)])
+        if actual != expected:
+            fail(f"complete gate units={units}: {actual}, expected {expected}")
+        target_outcome_cpu_replays += 1
+
     def model_score_unit(chars: list[int]) -> tuple[list[int], bool]:
         result = list(chars)
         index = 0
@@ -1528,6 +1673,7 @@ def main() -> None:
         f"{lifecycle_cpu_replays} lifecycle CPU replays, "
         f"{expiry_rows} projectile expiry bytes, "
         f"{projectile_expiry_cpu_replays} projectile expiry CPU replays, "
+        f"{target_outcome_cpu_replays} target-outcome CPU replays, "
         f"{score_replays} score CPU replays"
         f", {sound_cpu_replays} sound-dispatch CPU replays"
         f", {zero_text_cpu_replays} zero-text CPU replays"

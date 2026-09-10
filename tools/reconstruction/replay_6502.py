@@ -93,6 +93,8 @@ class Replay6502:
                 self.x = self._flags(self.memory[self._word()])
             elif opcode == 0xC9:  # CMP #imm
                 self._compare(self.a, self._fetch())
+            elif opcode == 0xDD:  # CMP abs,X
+                self._compare(self.a, self.memory[(self._word() + self.x) & 0xFFFF])
             elif opcode == 0xC0:  # CPY #imm
                 self._compare(self.y, self._fetch())
             elif opcode == 0x90:  # BCC rel
@@ -120,6 +122,8 @@ class Replay6502:
                 self.x = self._flags(self.x - 1)
             elif opcode == 0xE0:  # CPX #imm
                 self._compare(self.x, self._fetch())
+            elif opcode == 0xE4:  # CPX zp
+                self._compare(self.x, self.memory[self._fetch()])
             elif opcode == 0xA0:  # LDY #imm
                 self.y = self._flags(self._fetch())
             elif opcode == 0xAA:  # TAX
@@ -130,6 +134,8 @@ class Replay6502:
                 self.a = self._flags(self.x)
             elif opcode == 0x29:  # AND #imm
                 self.a = self._flags(self.a & self._fetch())
+            elif opcode == 0x49:  # EOR #imm
+                self.a = self._flags(self.a ^ self._fetch())
             elif opcode == 0xB9:  # LDA abs,Y
                 self.a = self._flags(self.memory[(self._word() + self.y) & 0xFFFF])
             elif opcode == 0xB1:  # LDA (zp),Y
