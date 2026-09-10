@@ -605,31 +605,31 @@ org runtime_start
     JMP      draw_20char_buffer_two_rows
 
 .show_controls_and_start_prompt_screen
-    LDA      #&4
+    LDA      #TITLE_TEXT_COLOUR
     STA      text_render_colour_value
-    LDX      #&0
+    LDX      #CONTROL_HELP_TEXT_START
     JSR      oswrch_zero_terminated_text_2600_x
     JSR      copy_current_score_to_best_if_not_lower
     JSR      update_title_score_glyph_tables
-    LDA      #&10
-    LDY      #&30
-    LDX      #&7c
+    LDA      #TITLE_CYBERTRON_SCREEN_LOW
+    LDY      #TITLE_CYBERTRON_SCREEN_HIGH
+    LDX      #TITLE_CYBERTRON_STREAM_OFFSET
     JSR      draw_encoded_text_stream_to_screen
-    LDA      #&80
-    LDY      #&37
-    LDX      #&f2
+    LDA      #TITLE_KEYS_SCREEN_LOW
+    LDY      #TITLE_KEYS_SCREEN_HIGH
+    LDX      #TITLE_KEYS_STREAM_OFFSET
     JSR      draw_encoded_text_stream_to_screen
-    LDA      #&4
+    LDA      #TITLE_TEXT_COLOUR
     STA      text_render_colour_value
-    LDX      #&87
-    LDY      #&6e
-    LDA      #&80
+    LDX      #TITLE_START_STREAM_OFFSET
+    LDY      #TITLE_START_SCREEN_HIGH
+    LDA      #TITLE_START_SCREEN_LOW
     JMP      draw_encoded_text_stream_to_screen
 
 .show_object_legend_screen
-    LDA      #&4
+    LDA      #LEGEND_TEXT_COLOUR
     STA      text_render_colour_value
-    LDX      #&0
+    LDX      #LEGEND_FIRST_OBJECT_INDEX
 
 .draw_next_legend_text
     STX      zp_scratch_79
@@ -641,98 +641,98 @@ org runtime_start
     JSR      draw_encoded_text_stream_to_screen
     LDX      zp_scratch_79
     INX
-    LDA      #&10
+    LDA      #LEGEND_FINAL_TEXT_COLOUR
     STA      text_render_colour_value
-    CPX      #&9
+    CPX      #LEGEND_TEXT_COUNT
     BNE      draw_next_legend_text
-    LDA      #&44
+    LDA      #LEGEND_FIRST_GRAPHIC_SCREEN_HIGH
     STA      object_screen_high_by_index
-    LDA      #&90
+    LDA      #LEGEND_FIRST_GRAPHIC_SCREEN_LOW
     STA      object_screen_low_by_index
     LDA      #&1
     STA      object_y_by_index
-    LDX      #&0
+    LDX      #LEGEND_FIRST_OBJECT_INDEX
     STX      render_mode_or_text_scratch
 
 .draw_next_legend_graphic
     STX      zp_scratch_79
     LDA      object_legend_graphic_ids_1175,X
     STA      object_graphic_id_by_index
-    LDX      #&0
+    LDX      #LEGEND_FIRST_OBJECT_INDEX
     JSR      draw_object_by_index
     LDA      object_screen_low_by_index
     CLC
-    ADC      #&80
+    ADC      #LEGEND_GRAPHIC_SCREEN_LOW_STEP
     STA      object_screen_low_by_index
     LDA      object_screen_high_by_index
-    ADC      #&7
+    ADC      #LEGEND_GRAPHIC_SCREEN_HIGH_CARRY_STEP
     STA      object_screen_high_by_index
     LDX      zp_scratch_79
     INX
-    CPX      #&7
+    CPX      #LEGEND_GRAPHIC_COUNT
     BNE      draw_next_legend_graphic
     LDA      #&0
     STA      object_y_by_index
-    LDA      #&3d
+    LDA      #LEGEND_SPOOK_FIRST_SCREEN_HIGH
     STA      object_screen_high_by_index
-    LDA      #&10
+    LDA      #LEGEND_SPOOK_FIRST_SCREEN_LOW
     STA      object_screen_low_by_index
     LDA      #graphic_id_spook_first_cell
     STA      object_graphic_id_by_index
-    LDX      #&0
+    LDX      #LEGEND_FIRST_OBJECT_INDEX
     JSR      draw_object_by_index
-    LDA      #&3f
+    LDA      #LEGEND_SPOOK_SECOND_SCREEN_HIGH
     STA      object_screen_high_by_index
-    LDA      #&90
+    LDA      #LEGEND_SPOOK_SECOND_SCREEN_LOW
     STA      object_screen_low_by_index
     INC      object_graphic_id_by_index
-    LDX      #&0
+    LDX      #LEGEND_FIRST_OBJECT_INDEX
     JSR      draw_object_by_index
     RTS
 
 .show_level_intro_and_required_targets
-    LDA      #&1
+    LDA      #LEVEL_INTRO_TEXT_COLOUR
     STA      text_render_colour_value
     JSR      seed_required_target_codes
     JSR      apply_level_palette
     LDA      #&0
     STA      collected_target_count
     STA      render_mode_or_text_scratch
-    LDX      #&b8
+    LDX      #LEVEL_INTRO_ENTERING_TEXT_OFFSET
     JSR      oswrch_zero_terminated_text_2600_x
     JSR      clear_20char_text_buffer
-    LDX      #&de
+    LDX      #LEVEL_INTRO_LEVEL_STREAM_OFFSET
     JSR      copy_encoded_text_stream_to_buffer
     LDA      level_tens_digit
     BEQ      write_level_units_digit
     CLC
-    ADC      #&10
+    ADC      #SCORE_GLYPH_CODE_OFFSET
     STA      level_intro_tens_digit_character
 
 .write_level_units_digit
     LDA      level_units_digit
     CLC
-    ADC      #&10
+    ADC      #SCORE_GLYPH_CODE_OFFSET
     STA      level_intro_units_digit_character
     LDA      #&0
     STA      zp_screen_ptr_70_low
-    LDA      #&49
+    LDA      #LEVEL_INTRO_SCREEN_HIGH
     STA      zp_screen_ptr_70_high
     JSR      draw_20char_buffer_two_rows
-    LDX      #&c6
+    LDX      #LEVEL_INTRO_FIND_TEXT_OFFSET
     JSR      oswrch_zero_terminated_text_2600_x
-    LDA      #&b0
+    LDA      #LEVEL_INTRO_TARGET_SCREEN_LOW
     STA      object_screen_low_by_index
-    LDA      #&60
+    LDA      #LEVEL_INTRO_TARGET_SCREEN_HIGH
     STA      object_screen_high_by_index
     LDA      level_tens_digit
     BNE      cap_level_intro_target_count
     LDA      level_units_digit
-    CMP      #&6
+    CMP      #INDEXED_DIFFICULTY_LEVEL_COUNT
     BMI      begin_level_intro_target_loop
 
 .cap_level_intro_target_count
-    LDA      #&5
+    LDA      #LEVEL_INTRO_TARGET_COUNT_CAP
 
 .begin_level_intro_target_loop
     TAX
@@ -742,34 +742,34 @@ org runtime_start
     STX      zp_scratch_79
     LDA      level_intro_required_graphic_table_11fe,X
     STA      object_graphic_id_by_index
-    LDA      #&14
+    LDA      #LEVEL_INTRO_TARGET_DELAY_FRAMES
     JSR      wait_frames_count_a
-    LDX      #&0
+    LDX      #LEGEND_FIRST_OBJECT_INDEX
     JSR      draw_object_by_index
     LDA      object_screen_high_by_index
     CLC
-    ADC      #&5
+    ADC      #LEVEL_INTRO_TARGET_SCREEN_HIGH_STEP
     STA      object_screen_high_by_index
 
 .play_level_intro_required_target_sound
-    LDA      #&d
+    LDA      #SOUND_ID_LEVEL_INTRO_TARGET
     JSR      play_sound_id_if_enabled
     LDX      zp_scratch_79
     DEX
     BPL      level_intro_draw_next_required_target
-    LDA      #&64
+    LDA      #LEVEL_INTRO_FINAL_DELAY_FRAMES
     JSR      wait_frames_count_a
 
 .finish_level_intro_clear_screen
     JMP      oswrch_wrapper_from_a
 
 .read_joystick_axes_and_fire
-    LDA      #&80
-    LDX      #&1
+    LDA      #OSBYTE_READ_ADC_CHANNEL
+    LDX      #JOYSTICK_X_ADC_CHANNEL
     JSR      MOS_OSBYTE
-    CPY      #&40
+    CPY      #JOYSTICK_AXIS_LOW_THRESHOLD
     BCC      joystick_x_axis_positive_1287
-    CPY      #&c0
+    CPY      #JOYSTICK_AXIS_HIGH_THRESHOLD
     BCC      joystick_y_axis_scan_1287
     DEC      input_delta_x
     JMP      joystick_y_axis_scan_1287
@@ -778,12 +778,12 @@ org runtime_start
     INC      input_delta_x
 
 .joystick_y_axis_scan_1287
-    LDA      #&80
-    LDX      #&2
+    LDA      #OSBYTE_READ_ADC_CHANNEL
+    LDX      #JOYSTICK_Y_ADC_CHANNEL
     JSR      MOS_OSBYTE
-    CPY      #&40
+    CPY      #JOYSTICK_AXIS_LOW_THRESHOLD
     BCC      joystick_y_axis_positive_1287
-    CPY      #&c0
+    CPY      #JOYSTICK_AXIS_HIGH_THRESHOLD
     BCC      joystick_fire_scan_1287
     DEC      input_delta_y
     JMP      joystick_fire_scan_1287
@@ -792,11 +792,11 @@ org runtime_start
     INC      input_delta_y
 
 .joystick_fire_scan_1287
-    LDA      #&80
-    LDX      #&0
+    LDA      #OSBYTE_READ_ADC_CHANNEL
+    LDX      #JOYSTICK_FIRE_ADC_CHANNEL
     JSR      MOS_OSBYTE
     TXA
-    AND      #&1
+    AND      #JOYSTICK_FIRE_RESULT_MASK
     TAX
     RTS
 
@@ -804,15 +804,15 @@ org runtime_start
     LDA      level_tens_digit
     BNE      target_code_cap_to_slot5_12bf
     LDX      level_units_digit
-    CPX      #&6
+    CPX      #INDEXED_DIFFICULTY_LEVEL_COUNT
     BMI      store_highest_required_target_slot_12bf
 
 .target_code_cap_to_slot5_12bf
-    LDX      #&5
+    LDX      #TARGET_SLOT_LIMIT
 
 .store_highest_required_target_slot_12bf
     STX      highest_required_target_slot
-    LDX      #&ff
+    LDX      #TARGET_SLOT_BEFORE_FIRST
 
 .seed_required_target_codes_loop_12bf
     JSR      random_unique_target_code
@@ -820,7 +820,7 @@ org runtime_start
     BMI      seed_required_target_codes_loop_12bf
 
 .reroll_bonus_target_code
-    LDX      #&5
+    LDX      #TARGET_SLOT_LIMIT
     JMP      random_unique_target_code
 
 .random_unique_target_code
@@ -830,12 +830,12 @@ org runtime_start
 .random_target_code_reroll_12dd
     JSR      rng_next_byte
     LDA      rng_output_byte
-    AND      #&f
+    AND      #TARGET_CODE_MASK
     LDX      object_x_by_index
     STA      target_room_code,X
     LDA      #&0
     STA      target_collected_status,X
-    LDY      #&ff
+    LDY      #TARGET_SLOT_BEFORE_FIRST
 
 .target_code_uniqueness_scan_loop_12dd
     INY
@@ -872,7 +872,7 @@ org runtime_start
     ADC      #&1
 
 .player_spook_overlap_compare_x_range_1311
-    CMP      #&3
+    CMP      #PLAYER_SPOOK_HORIZONTAL_EXTENT
     BPL      return_from_player_spook_overlap_test_1311
     LDA      player_y_first_cell
     SEC
@@ -883,7 +883,7 @@ org runtime_start
     ADC      #&1
 
 .player_spook_overlap_compare_y_range_1311
-    CMP      #&4
+    CMP      #PLAYER_SPOOK_VERTICAL_EXTENT
     BPL      return_from_player_spook_overlap_test_1311
     INC      renderer_collision_accumulator
 
@@ -892,9 +892,9 @@ org runtime_start
 
 .draw_rotating_wait_text_strip
     LDA      zp_scratch_78
-    CMP      #&18
+    CMP      #WAIT_STRIP_WRAP_POSITION
     BNE      rotating_wait_text_pointer_setup_1341
-    LDX      #&17
+    LDX      #WAIT_STRIP_LAST_EDGE_BYTE
 
 .clear_rotating_wait_text_edge_loop_1341
     LDA      #&0
@@ -904,14 +904,14 @@ org runtime_start
     BPL      clear_rotating_wait_text_edge_loop_1341
 
 .rotating_wait_text_pointer_setup_1341
-    LDY      #&7b
+    LDY      #WAIT_STRIP_SCREEN_HIGH
     STY      zp_screen_ptr_70_high
     LDA      zp_scratch_78
     CLC
-    ADC      #&90
+    ADC      #WAIT_STRIP_SCREEN_LOW_BASE
     STA      zp_screen_ptr_70_low
     JSR      clear_20char_text_buffer
-    LDY      #&0
+    LDY      #WAIT_STRIP_TEXT_START_INDEX
     LDX      zp_scratch_77
 
 .copy_rotating_wait_text_chars_loop_1341
@@ -919,47 +919,47 @@ org runtime_start
     STA      text_buffer_20chars,Y
     INX
     TXA
-    AND      #&3f
+    AND      #WAIT_STRIP_SOURCE_INDEX_MASK
     TAX
     INY
-    CPY      #&a
+    CPY      #WAIT_STRIP_CHARACTER_COUNT
     BNE      copy_rotating_wait_text_chars_loop_1341
     JSR      wait_one_frame_tick
     LDA      #&0
     STA      object_y_by_index
-    LDA      #&b
+    LDA      #WAIT_STRIP_RENDER_CHARACTER_LIMIT
     STA      text_render_char_limit
     JSR      draw_20char_buffer_as_bitmap_text
     INC      zp_screen_ptr_70_high
-    LDA      #&20
+    LDA      #WAIT_STRIP_SECOND_ROW_PTR_STEP
     JSR      add_a_to_pointer_70
     LDA      #&4
     STA      object_y_by_index
     JSR      draw_20char_buffer_as_bitmap_text
     LDA      zp_scratch_78
     SEC
-    SBC      #&8
-    AND      #&1f
+    SBC      #WAIT_STRIP_SCROLL_STEP
+    AND      #WAIT_STRIP_SCROLL_POSITION_MASK
     STA      zp_scratch_78
-    CMP      #&18
+    CMP      #WAIT_STRIP_WRAP_POSITION
     BNE      return_from_rotating_wait_text_1341
     INC      zp_scratch_77
     LDA      zp_scratch_77
-    AND      #&3f
+    AND      #WAIT_STRIP_SOURCE_INDEX_MASK
     STA      zp_scratch_77
 
 .return_from_rotating_wait_text_1341
     RTS
 
 .scan_inkey_x
-    LDA      #&81
-    LDY      #&ff
+    LDA      #OSBYTE_INKEY
+    LDY      #INKEY_TIME_LIMIT
     JSR      MOS_OSBYTE
-    CPX      #&0
+    CPX      #INKEY_NOT_PRESSED
     RTS
 
 .early_init_sub_13b4
-    LDX      #&b
+    LDX      #EARLY_INIT_VDU_LAST_INDEX
 
 .early_init_vdu_byte_loop_13b4
     LDA      early_init_vdu_bytes_13b4,X
