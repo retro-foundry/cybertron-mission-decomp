@@ -1314,6 +1314,72 @@ def main() -> None:
             fail(f"complete gate units={units}: {actual}, expected {expected}")
         target_outcome_cpu_replays += 1
 
+    # Replay the complete $1A59 life-loss reset with saved pointers chosen on
+    # both sides of the low-byte borrow/carry boundaries. Status rendering,
+    # sound dispatch, and object drawing are bounded calls; the original code
+    # performs the life decrement and reconstructs both player cells.
+    life_loss_cpu_replays = 0
+    for saved_pointer, saved_y, initial_lives in (
+        (0x5008, 0x20, 3),
+        (0x5003, 0x21, 1),
+        (0x50F0, 0x2A, 5),
+        (0x50FC, 0x2B, 0),
+    ):
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        memory[0x0BB4] = initial_lives
+        memory[0x0BD1] = saved_y
+        memory[0x0D11] = saved_pointer & 0xFF
+        memory[0x0D51] = saved_pointer >> 8
+        calls = []
+
+        def life_loss_handler(cpu: Replay6502, target: int) -> bool:
+            if target == 0x2345:
+                calls.append((target, cpu.x, cpu.a))
+                return True
+            if target == 0x21EA:
+                calls.append((target, cpu.x, cpu.a))
+                return True
+            if target == 0x13FB:
+                calls.append((target, cpu.x, cpu.a))
+                return True
+            return False
+
+        cpu = Replay6502(memory, life_loss_handler)
+        cpu.run_subroutine(0x1A59)
+        actual_first_pointer = memory[0x0A90] | memory[0x0AD0] << 8
+        actual_second_pointer = memory[0x0A91] | memory[0x0AD1] << 8
+        actual = (
+            memory[0x0BB4],
+            memory[0x0031],
+            actual_first_pointer,
+            actual_second_pointer,
+            memory[0x0A50],
+            memory[0x0A51],
+            memory[0x2F10],
+            memory[0x2F11],
+            memory[0x0082],
+            calls,
+        )
+        expected = (
+            (initial_lives - 1) & 0xFF,
+            0,
+            (saved_pointer - 8) & 0xFFFF,
+            (saved_pointer + 16) & 0xFFFF,
+            saved_y,
+            saved_y,
+            0x33,
+            0x34,
+            0x96,
+            [(0x2345, 0, 0), (0x21EA, 0, 3), (0x13FB, 0x10, 0x34), (0x13FB, 0x11, 0x34)],
+        )
+        if actual != expected:
+            fail(
+                f"life loss pointer=${saved_pointer:04X} lives={initial_lives}: "
+                f"{actual}, expected {expected}"
+            )
+        life_loss_cpu_replays += 1
+
     def model_score_unit(chars: list[int]) -> tuple[list[int], bool]:
         result = list(chars)
         index = 0
@@ -1674,6 +1740,7 @@ def main() -> None:
         f"{expiry_rows} projectile expiry bytes, "
         f"{projectile_expiry_cpu_replays} projectile expiry CPU replays, "
         f"{target_outcome_cpu_replays} target-outcome CPU replays, "
+        f"{life_loss_cpu_replays} life-loss CPU replays, "
         f"{score_replays} score CPU replays"
         f", {sound_cpu_replays} sound-dispatch CPU replays"
         f", {zero_text_cpu_replays} zero-text CPU replays"

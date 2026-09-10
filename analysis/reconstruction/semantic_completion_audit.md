@@ -39,6 +39,7 @@ accepted as evidence for gameplay identity.
 | Hit lifecycle replay | The actual source-built `$1812` erase/retire and `$1876` draw/advance passes are CPU-replayed for all six lifecycle states with renderer calls captured | Port-contract, exhaustive |
 | Projectile expiry replay | The actual source-built `$1B41` routine is CPU-replayed for all 256 screen-byte values in both player-shot and hazard slots, including counter ownership and the `$A0` spook-pause class | Port-contract, exhaustive |
 | Target outcome replay | The actual source-built `$0FD6-$1069` handler is CPU-replayed for required slots 1-5, the bonus target, the incomplete completion gate, and level advance with and without decimal carry; matching, status consumption, movement reversal/cancellation, score/sound dispatch, lives, level digits, and room-bank rotation are checked | Port-contract |
+| Life-loss replay | The complete source-built `$1A59-$1AAA` reset is CPU-replayed across four saved-pointer cases spanning low-byte borrow/carry boundaries; life count, status/sound calls, both restored pointers and Y fields, death graphics, draw order, render mode, and transition delay are checked | Port-contract |
 | Score CPU replay | The actual source-built `$22E6` routine is executed for all 10,000 valid four-character score states and compared with an independent carry/extra-life model | Port-contract, exhaustive |
 | Active-frame edge replay | The actual `$17BF-$195B` frame spine is CPU-replayed for normal, terminal-delay, active-delay, and spook-pause-consumption cases with leaf-call order and state effects checked | Port-contract |
 | Sound dispatch replay | The actual source-built `$21EA` dispatcher is CPU-replayed for all 22 sound IDs with sound enabled and disabled; OSWORD 7 register arguments and gating are checked | Port-contract, exhaustive |
@@ -68,9 +69,8 @@ validation depth is not yet equivalent to the Quest repository. Completion of
 that broader standard requires:
 
 1. Add actual-code replay coverage for player collision outcomes, enemy AI
-   movement decisions, hazard spawning/recycling, and life loss. Current
-   contracts for these areas are static or cover only their setup/lifecycle
-   edges.
+   movement decisions, and hazard spawning/recycling. Current contracts for
+   these areas are static or cover only their setup/lifecycle edges.
 2. Add an active-loop/full-frame comparison that records complete RAM and display
    effects for fixed initial state and input sequences.
 3. Replace the active-frame spine's leaf probes with integrated subsystem
