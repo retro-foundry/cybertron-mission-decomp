@@ -1685,6 +1685,91 @@ def main() -> None:
             fail(f"player collision {name}: {actual}, expected {expected}")
         player_collision_cpu_replays += 1
 
+    # Replay $1964 for every phase modulo four. Phase 3 clears the current
+    # player cells; the other phases redraw the saved visible pair. Both paths
+    # tail-call the already replayed life-loss routine.
+    player_collision_edge_cpu_replays = 0
+    for frame_phase in range(4):
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        memory[0x0036] = frame_phase
+        calls = []
+
+        def direct_hit_handler(cpu: Replay6502, target: int) -> bool:
+            if target == 0x2493:
+                calls.append((target, cpu.x, memory[0x0031]))
+                return True
+            if target == 0x13FB:
+                calls.append((target, cpu.x, memory[0x0031]))
+                return True
+            return False
+
+        def direct_hit_tail(cpu: Replay6502, target: int) -> bool:
+            if target == 0x1A59:
+                calls.append((target, cpu.x, memory[0x0031]))
+                return True
+            return False
+
+        cpu = Replay6502(memory, direct_hit_handler, direct_hit_tail)
+        cpu.run_subroutine(0x1964)
+        expected_calls = (
+            [(0x13FB, 0x10, 0), (0x13FB, 0x11, 0), (0x1A59, 0x11, 0)]
+            if frame_phase == 3
+            else [(0x2493, 0, 0), (0x1A59, 0, 0)]
+        )
+        if calls != expected_calls:
+            fail(f"direct player hit phase {frame_phase}: {calls}, expected {expected_calls}")
+        player_collision_edge_cpu_replays += 1
+
+    # Replay room-boundary routing separately from damage. The original $172A
+    # room delta executes; palette clear, OSWRCH, and setup are bounded calls.
+    room_exit_cases = (
+        ("inside", 0x20, 0x20, None),
+        ("left", 0x01, 0x20, 1),
+        ("right", 0x4C, 0x20, 0),
+        ("top", 0x20, 0x06, 2),
+        ("bottom", 0x20, 0x36, 3),
+    )
+    room_delta_by_exit = (1, -1, -4, 4)
+    for name, player_x, player_y, exit_index in room_exit_cases:
+        memory = bytearray(0x10000)
+        memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+        memory[0x0032] = 0x15
+        memory[0x0A10] = player_x
+        memory[0x0A50] = player_y
+        calls = []
+
+        def room_exit_handler(cpu: Replay6502, target: int) -> bool:
+            if target == 0x1F66:
+                calls.append((target, cpu.a, cpu.x))
+                return True
+            if target == 0xFFEE:
+                calls.append((target, cpu.a, cpu.x))
+                return True
+            return False
+
+        def room_exit_tail(cpu: Replay6502, target: int) -> bool:
+            if target == 0x1735:
+                calls.append((target, cpu.a, cpu.x))
+                return True
+            return False
+
+        cpu = Replay6502(memory, room_exit_handler, room_exit_tail)
+        cpu.run_subroutine(0x1AAC)
+        if exit_index is None:
+            expected = (0x15, 0, 0, [])
+        else:
+            expected = (
+                (0x15 + room_delta_by_exit[exit_index]) & 0xFF,
+                0,
+                exit_index,
+                [(0x1F66, memory[0x0032], exit_index), (0xFFEE, 0x0C, exit_index), (0x1735, 0x0C, exit_index)],
+            )
+        actual = (memory[0x0032], memory[0x0041], memory[0x0037], calls)
+        if actual != expected:
+            fail(f"room exit {name}: {actual}, expected {expected}")
+        player_collision_edge_cpu_replays += 1
+
     # $1B41 recognizes four masked screen-byte classes. Exhaust all byte
     # values so ports cannot accidentally compare unmasked pixels or merge the
     # special $A0 spook-pause outcome with ordinary expiry.
@@ -2335,6 +2420,7 @@ def main() -> None:
         f"{enemy_policy_cpu_replays} enemy-policy CPU replays, "
         f"{enemy_move_validation_cpu_replays} enemy-move-validation CPU replays, "
         f"{player_collision_cpu_replays} player-collision CPU replays, "
+        f"{player_collision_edge_cpu_replays} player-collision-edge CPU replays, "
         f"{expiry_rows} projectile expiry bytes, "
         f"{projectile_expiry_cpu_replays} projectile expiry CPU replays, "
         f"{target_outcome_cpu_replays} target-outcome CPU replays, "
