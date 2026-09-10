@@ -242,7 +242,8 @@ org runtime_start
     JSR      wait_frames_count_a
     JMP      menu_attract_entry_loop_0e05
 
-.byte_decoded_rts_before_tile_generator_0efd
+.unused_return_before_tile_generator
+    ; Unreferenced one-byte routine retained from the original runtime.
     RTS
 
 .draw_24byte_tile_or_sprite
@@ -971,7 +972,8 @@ org runtime_start
     STA      zp_screen_ptr_70_high
     RTS
 
-.byte_decoded_add_a_to_pointer_72_copy
+.unused_add_a_to_pointer_72_copy
+    ; Valid duplicate pointer-add routine with no direct caller in this runtime.
     CLC
     ADC      zp_calc_ptr_72_low
     STA      zp_calc_ptr_72_low
@@ -1366,7 +1368,9 @@ org runtime_start
     LDX      #&9a
     JMP      scan_inkey_current_x
 
-.byte_decoded_code_1637
+.unused_clear_32_screen_rows_from_index
+    ; Unreferenced screen clear: zp_scratch_3d selects an eight-byte column,
+    ; then 32 character rows are cleared at the BBC bitmap row stride.
     LDA      #&0
     STA      zp_screen_ptr_70_high
     LDA      zp_scratch_3d
@@ -1380,14 +1384,14 @@ org runtime_start
     LDA      #&0
     STA      zp_scratch_3c
 
-.byte_decoded_code_1637_loop_164f
+.unused_clear_32_screen_rows_loop
     LDY      #&7
 
-.byte_decoded_code_1637_loop_1651
+.unused_clear_screen_row_bytes_loop
     LDA      #&0
     STA      (zp_screen_ptr_70_low),Y
     DEY
-    BPL      byte_decoded_code_1637_loop_1651
+    BPL      unused_clear_screen_row_bytes_loop
     LDA      #&80
     JSR      add_a_to_pointer_70
     INC      zp_screen_ptr_70_high
@@ -1395,7 +1399,7 @@ org runtime_start
     INC      zp_scratch_3c
     LDA      zp_scratch_3c
     CMP      #&20
-    BNE      byte_decoded_code_1637_loop_164f
+    BNE      unused_clear_32_screen_rows_loop
     RTS
 
 .compute_screen_ptr_for_object
@@ -1829,7 +1833,8 @@ org runtime_start
     BPL      expire_shot_hazard_slots_loop_194e
     JMP      frame_update_continue_or_delay
 
-.byte_decoded_code_195e
+.unused_player_hit_dispatch_bridge
+    ; Unreferenced alternate entry retained byte-for-byte.
     JSR      handle_player_hit_from_active_object
     JMP      move_shot_hazard_slots_and_spawn_new
 
@@ -2679,7 +2684,9 @@ org runtime_start
     LDX      #&8
     JMP      vdu19_set_palette_or_colour
 
-.byte_decoded_code_1f94
+.unused_erase_object_then_restore_entry
+    ; Unreferenced entry that erases the active object, selects render mode 5,
+    ; and falls through to restore_object_position_and_ptr.
     LDA      #&0
     STA      render_mode_or_text_scratch
     JSR      draw_object_by_index
@@ -3706,8 +3713,8 @@ org runtime_start
     ; signed_values +1, +1, +4, -2, +4, +4, -2, -2
     EQUB &01,&01,&04,&FE,&04,&04,&FE,&FE
 
-.unclassified_data_26ee
-    ; raw_printable_view "IN"
+.unused_intertable_bytes_26ee
+    ; Unreferenced source-owned bytes between the hazard offsets and palette.
     EQUB &49,&4E
 
 .base_palette_table_1f71
@@ -3722,8 +3729,8 @@ org runtime_start
 .text_render_colour_value
     EQUB &01
 
-.unclassified_palette_data_2707
-    ; palette data table; values are logical colour/palette bytes
+.unused_intertable_bytes_2707
+    ; Unreferenced source-owned bytes between active palette tables.
     EQUB &04,&05,&10,&11,&14,&15,&00
 
 .palette_cycle_logical15_values_17e4
@@ -3753,8 +3760,8 @@ org runtime_start
     ; score_add_slots slot0=0 slot1=10 slot2=50 slot3=100 slot4=50 slot5=100 slot6=0 slot7=0
     EQUB &00,&0A,&32,&64,&32,&64,&00,&00
 
-.unclassified_level_render_data_273f
-    ; raw_printable_view "Rbprint"
+.unused_intertable_bytes_273f
+    ; Unreferenced source-owned bytes between score and level palette tables.
     EQUB &00,&52,&62,&70,&72,&69,&6E,&74
     EQUB &04,&08,&00,&04,&04,&00,&08,&08
     EQUB &00
@@ -3764,7 +3771,8 @@ org runtime_start
     ; logical colour 8 value selected by current level low three bits after $1F71 base palette setup
     EQUB &07,&07,&04,&05,&01,&02,&01,&04
 
-.unclassified_level_render_data_2758
+.unused_24byte_graphic_record_2758
+    ; Unreferenced 24-byte bitmap-shaped record retained from the original.
     EQUB &1C,&09,&09,&09,&09,&09,&09,&1C
     EQUB &FF,&FF,&FF,&FF,&FF,&FF,&FF,&FF
     EQUB &23,&FF,&FF,&FF,&FF,&FF,&FF,&23
@@ -4876,9 +4884,9 @@ org runtime_start
     EQUB &31,&0D,&0F,&FA,&17,&2E,&6C,&70
     EQUB &73,&31,&20,&43
 
-.unclassified_graphic_id_data_2f2c
-    ; unclassified bytes between logical-slot graphic ids and target-status graphic table
-    ; raw_printable_view "MP#3:BPLlp"
+.unused_object_table_padding_2f2c
+    ; Unreferenced source-owned bytes after the complete 44-entry object
+    ; graphic-id array and before the target-status graphic table.
     EQUB &4D,&50,&23,&33,&3A,&42,&50,&4C
     EQUB &6C,&70
 
@@ -4886,8 +4894,8 @@ org runtime_start
     ; target_status_graphics slot0=$3D:SAFE slot1=$3F:KEY slot2=$3E:RING slot3=$32:POT_OF_GOLD slot4=$3E:RING slot5=$32:POT_OF_GOLD slot6=$2D:bonus_target_status_and_room_fill_probe
     EQUB &3D,&3F,&3E,&32,&3E,&32,&2D
 
-.unclassified_data_2f3d
-    ; raw_printable_view "LDA"
+.unused_pointer_table_alignment_2f3d
+    ; Three unreferenced bytes aligning the pointer tables at $2F40.
     EQUB &4C,&44,&41
 
 .graphic_record_high_pointer_table_1404
