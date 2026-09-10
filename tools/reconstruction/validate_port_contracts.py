@@ -1,11 +1,14 @@
 """Validate reusable Cybertron port preflight contracts against built CYBRUN."""
 
 from pathlib import Path
+import hashlib
+import json
 import sys
 
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_RUNTIME = ROOT / "build" / "reconstruction" / "CYBRUN"
+ROOM_FIXTURE = ROOT / "analysis" / "reconstruction" / "room_render_fixture.json"
 LOAD_ADDRESS = 0x0D80
 
 
@@ -119,13 +122,181 @@ def main() -> None:
                 )
             movement_rows += 1
 
+    # G1: independently reproduce $1516/$0EFE and the two room-fill scans,
+    # then compare every clean-screen result with the preserved original-output
+    # digest. Room bank 0 is read from CYBRUN; banks 1-3 and the fill workspace
+    # are the bounded semantic slices captured in room_render_fixture.json.
+    fixture = json.loads(ROOM_FIXTURE.read_text(encoding="ascii"))
+    if fixture.get("schema") != "cybertron.room_render_fixture.v1":
+        fail(f"unsupported room fixture schema in {ROOM_FIXTURE}")
+
+    room_data = bytearray(block(0x27E0, 0x120))
+    for bank in fixture["external_room_banks"]:
+        packed = bytes.fromhex(bank["packed_bytes"])
+        if len(packed) != 0x120:
+            fail(f"{bank['room_ids']}: external room bank has {len(packed)} bytes")
+        room_data.extend(packed)
+    if len(room_data) != 64 * 0x12:
+        fail(f"room data has {len(room_data)} bytes; expected 1152")
+
+    feature_mask = bytes.fromhex(fixture["feature_mask_0760"])
+    fill_patterns = bytes.fromhex(fixture["fill_patterns_07a0"])
+    if len(feature_mask) != 64 or len(fill_patterns) != 4 * 24:
+        fail("room fixture feature-mask or fill-pattern extent is invalid")
+
+    def runtime_byte(address: int) -> int:
+        return block(address, 1)[0]
+
+    def generated_tile_pattern(tile_class: int) -> bytes:
+        if tile_class == 0:
+            return bytes(24)
+        result = bytearray()
+        outer_index = ((tile_class >> 2) << 1) | (tile_class & 1)
+        middle_index = tile_class >> 2
+        right_index = tile_class >> 1
+        for band in range(3):
+            source = 0x2F00 + runtime_byte(0x2FC8 + band)
+            result.append(runtime_byte(source + runtime_byte(0x2FD7 + outer_index)))
+            result.append(runtime_byte(source + runtime_byte(0x2FCF + outer_index)))
+            while len(result) & 7 < 6:
+                result.append(runtime_byte(source + runtime_byte(0x2FCB + middle_index)))
+            result.append(runtime_byte(source + runtime_byte(0x2FCF + right_index)))
+            result.append(runtime_byte(source + runtime_byte(0x2FD7 + right_index)))
+        if len(result) != 24:
+            fail(f"tile class ${tile_class:X}: generated {len(result)} bytes")
+        return bytes(result)
+
+    tile_patterns = tuple(generated_tile_pattern(tile_class) for tile_class in range(16))
+
+    def tile_destination(x_cell: int, y_cell: int) -> int:
+        return 0x3000 + 0x0280 * y_cell + 0x18 * x_cell + 0x08
+
+    def screen_offset(address: int) -> int:
+        offset = address - 0x3000
+        if not (0 <= offset and offset + 24 <= 0x5000):
+            fail(f"screen cell ${address:04X} is outside $3000-$7FFF")
+        return offset
+
+    expected_variants = {
+        (entry["room"], entry["variant"]): entry for entry in fixture["variants"]
+    }
+    if len(expected_variants) != 256:
+        fail(f"room fixture has {len(expected_variants)} unique variants; expected 256")
+
+    room_rows = 0
+    for room_id in range(64):
+        packed_room = room_data[room_id * 0x12 : (room_id + 1) * 0x12]
+
+        def tile_class_at(row: int, column: int) -> int:
+            value = packed_room[row * 3 + column // 2]
+            return value & 0x0F if not (column & 1) else value >> 4
+
+        for variant in range(4):
+            screen = bytearray(0x5000)
+            draw_calls = 0
+            fill_1f19 = 0
+            fill_1ec8 = 0
+
+            def draw_tile(x_cell: int, y_cell: int, tile_class: int) -> None:
+                nonlocal draw_calls
+                offset = screen_offset(tile_destination(x_cell, y_cell))
+                screen[offset : offset + 24] = tile_patterns[tile_class]
+                draw_calls += 1
+
+            def read_screen(address: int) -> int:
+                offset = address - 0x3000
+                if not 0 <= offset < len(screen):
+                    fail(f"screen read ${address:04X} is outside $3000-$7FFF")
+                return screen[offset]
+
+            def copy_fill(address: int) -> None:
+                offset = screen_offset(address)
+                start = variant * 24
+                screen[offset : offset + 24] = fill_patterns[start : start + 24]
+
+            def fill_major_column(x_cell: int) -> None:
+                nonlocal fill_1f19
+                if not feature_mask[room_id] or x_cell == 0:
+                    return
+                object_x = x_cell * 3 - 2
+                for object_y in range(0x06, 0x3A, 2):
+                    left = object_pointer(object_x, object_y)
+                    if read_screen(left) and not read_screen(left + 0x18):
+                        copy_fill(left + 0x18)
+                        fill_1f19 += 1
+
+            def fill_gap_column(x_cell: int) -> None:
+                nonlocal fill_1ec8
+                if not feature_mask[room_id]:
+                    return
+                object_x = x_cell * 3 + 1
+                between_edges = False
+                for object_y in range(0x06, 0x3A, 2):
+                    address = object_pointer(object_x, object_y)
+                    if read_screen(address):
+                        between_edges = not between_edges
+                    elif between_edges:
+                        copy_fill(address)
+                        fill_1ec8 += 1
+
+            x_cell = 0
+            for column in range(6):
+                horizontal_bridge_bits = []
+                y_cell = 3
+                for row in range(6):
+                    tile_class = tile_class_at(row, column)
+                    horizontal_bridge_bits.append(tile_class & 0x08)
+                    draw_tile(x_cell, y_cell, tile_class)
+                    if row != 5:
+                        bridge_class = 0x03 if tile_class & 0x02 else 0x00
+                        for _ in range(4):
+                            y_cell += 1
+                            draw_tile(x_cell, y_cell, bridge_class)
+                        y_cell += 1
+
+                fill_major_column(x_cell)
+                if column == 5:
+                    break
+
+                for _ in range(4):
+                    x_cell += 1
+                    y_cell = 3
+                    for row in range(6):
+                        draw_tile(x_cell, y_cell, 0x0C if horizontal_bridge_bits[row] else 0x00)
+                        if row != 5:
+                            for _ in range(4):
+                                y_cell += 1
+                                draw_tile(x_cell, y_cell, 0x00)
+                            y_cell += 1
+                    fill_gap_column(x_cell)
+                x_cell += 1
+
+            expected = expected_variants[(room_id, variant)]
+            actual_digest = hashlib.sha256(screen).hexdigest()
+            actual_nonzero = sum(value != 0 for value in screen)
+            actual_fields = (draw_calls, fill_1f19, fill_1ec8, actual_nonzero, actual_digest)
+            expected_fields = (
+                expected["draw_calls"],
+                expected["fill_1f19"],
+                expected["fill_1ec8"],
+                expected["nonzero_bytes"],
+                expected["sha256"],
+            )
+            if actual_fields != expected_fields:
+                fail(
+                    f"room ${room_id:02X} variant {variant}: "
+                    f"actual {actual_fields}, expected {expected_fields}"
+                )
+            room_rows += 1
+
     print(
         "Validated port preflight: "
         "64 graphic pointers, "
         f"{player_selector_rows} player selector rows, "
         "4 player starts, "
         f"{projectile_rows} shot projections, "
-        f"{movement_rows} movement projections"
+        f"{movement_rows} movement projections, "
+        f"{room_rows} room-render digests"
     )
 
 

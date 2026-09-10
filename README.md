@@ -57,7 +57,8 @@ to be exactly `$2280` bytes with SHA-256
 That digest is the byte-exact authority established by the reverse-engineering
 project, so validation requires no copyrighted original media. It also runs
 standalone port preflight contracts for graphic pointers, player animation
-selection, player starts, and projectile address updates.
+selection, player starts, projectile address updates, and all 256 clean room
+render variants.
 
 ## Layout and provenance
 
