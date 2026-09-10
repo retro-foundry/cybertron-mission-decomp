@@ -95,6 +95,25 @@ if ($assemblyText -match '(?im)^\s*\.(?:byte_decoded|unclassified)_[A-Za-z0-9_]+
     throw 'Generic decoded/unclassified labels are not permitted in cyber1.asm; document the proven source role.'
 }
 
+$assemblyLines = Get-Content -LiteralPath $source
+$activeDataOwner = $null
+$instructionPattern = '^\s*(?:ADC|AND|ASL|BCC|BCS|BEQ|BIT|BMI|BNE|BPL|BRK|BVC|BVS|CLC|CLD|CLI|CLV|CMP|CPX|CPY|DEC|DEX|DEY|EOR|INC|INX|INY|JMP|JSR|LDA|LDX|LDY|LSR|NOP|ORA|PHA|PHP|PLA|PLP|ROL|ROR|RTI|RTS|SBC|SEC|SED|SEI|STA|STX|STY|TAX|TAY|TSX|TXA|TXS|TYA)(?:\s|$)'
+for ($assemblyLineIndex = 0; $assemblyLineIndex -lt $assemblyLines.Count; $assemblyLineIndex++) {
+    $assemblyLine = $assemblyLines[$assemblyLineIndex]
+    if ($assemblyLine -match '^\s*ORG\s') {
+        $activeDataOwner = $null
+    }
+    elseif ($assemblyLine -match '^\s*\.([A-Za-z_][A-Za-z0-9_]*)\s*$') {
+        $activeDataOwner = $Matches[1]
+    }
+    elseif ($assemblyLine -match $instructionPattern) {
+        $activeDataOwner = $null
+    }
+    elseif ($assemblyLine -match '^\s*(?:EQUB|EQUW|EQUS)(?:\s|$)' -and $null -eq $activeDataOwner) {
+        throw "Unlabelled emitted data in cyber1.asm at line $($assemblyLineIndex + 1): $($assemblyLine.Trim())"
+    }
+}
+
 & (Join-Path $repoRoot 'build.ps1') -BeebAsm $BeebAsm
 
 $actualLength = (Get-Item -LiteralPath $payload).Length
