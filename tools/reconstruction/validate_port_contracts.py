@@ -112,6 +112,7 @@ def main() -> None:
     pointer_high_delta = block(0x27A8, 8)
     pointer_low_delta = block(0x27B0, 8)
     movement_rows = 0
+    movement_cpu_replays = 0
     for x, y in ((0x20, 0x20), (0x20, 0x21), (0x07, 0x22), (0x45, 0x23)):
         before = projectile_pointer(x, y)
         for direction in range(8):
@@ -132,6 +133,31 @@ def main() -> None:
                     f"pointer ${after:04X}, expected ${expected:04X}"
                 )
             movement_rows += 1
+
+            memory = bytearray(0x10000)
+            memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+            memory[0x0C4E] = direction
+            memory[0x0C3E] = x
+            memory[0x0C46] = y
+            memory[0x0C1E] = before & 0xFF
+            memory[0x0C26] = before >> 8
+            cpu = Replay6502(memory)
+            cpu.x = 0
+            cpu.run_subroutine(0x1B87)
+            actual_pointer = memory[0x0C1E] | memory[0x0C26] << 8
+            actual_previous = memory[0x0C2E] | memory[0x0C36] << 8
+            if (
+                memory[0x0C3E],
+                memory[0x0C46],
+                actual_pointer,
+                actual_previous,
+            ) != (new_x, new_y, expected, before):
+                fail(
+                    f"movement CPU replay {direction} from ({x:02X},{y:02X}): "
+                    f"got {(memory[0x0C3E], memory[0x0C46], actual_pointer, actual_previous)}, "
+                    f"expected {(new_x, new_y, expected, before)}"
+                )
+            movement_cpu_replays += 1
 
     # Exhaust the $1609 keyboard key-mask space and the $2207 direction map.
     # The expected rows are retained separately from the source-built tables.
@@ -1008,6 +1034,7 @@ def main() -> None:
         "4 player starts, "
         f"{projectile_rows} shot projections, "
         f"{movement_rows} movement projections, "
+        f"{movement_cpu_replays} movement CPU replays, "
         f"{keyboard_rows} keyboard masks, "
         f"{keyboard_cpu_replays} keyboard CPU replays, "
         f"{direction_cpu_replays} direction CPU replays, "

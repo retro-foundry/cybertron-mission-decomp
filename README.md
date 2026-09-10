@@ -67,6 +67,8 @@ edges, and every previous/current fire-latch transition. Each keyboard mask is
 also replayed through the actual assembled scanner with a bounded INKEY stub;
 72 X/Y/fire edge combinations replay the assembled joystick scanner, and all
 eight non-idle deltas replay the assembled direction resolver.
+All 32 representative direction/parity projectile movements also execute the
+assembled `$1B87` pointer-update routine and compare every mutated slot field.
 Object validation covers every setup-count row, all 41 render slots in the
 overlapping lifecycle windows, all six hit-animation states, and all 256
 projectile expiry input bytes.

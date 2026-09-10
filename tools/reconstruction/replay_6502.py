@@ -74,6 +74,8 @@ class Replay6502:
                 self.memory[target] = self._flags(self.memory[target] + 1)
             elif opcode == 0xBD:  # LDA abs,X
                 self.a = self._flags(self.memory[(self._word() + self.x) & 0xFFFF])
+            elif opcode == 0xBC:  # LDY abs,X
+                self.y = self._flags(self.memory[(self._word() + self.x) & 0xFFFF])
             elif opcode == 0xA6:  # LDX zp
                 self.x = self._flags(self.memory[self._fetch()])
             elif opcode == 0xC9:  # CMP #imm
@@ -84,6 +86,8 @@ class Replay6502:
                 self._branch(not self.carry)
             elif opcode == 0xF0:  # BEQ rel
                 self._branch(self.zero)
+            elif opcode == 0x30:  # BMI rel
+                self._branch(self.negative)
             elif opcode == 0xD0:  # BNE rel
                 self._branch(not self.zero)
             elif opcode == 0xA9:  # LDA #imm
@@ -121,10 +125,22 @@ class Replay6502:
                     )
             elif opcode == 0x18:  # CLC
                 self.carry = False
+            elif opcode == 0x38:  # SEC
+                self.carry = True
             elif opcode == 0x79:  # ADC abs,Y
                 value = self.memory[(self._word() + self.y) & 0xFFFF]
                 total = self.a + value + int(self.carry)
                 self.carry = total > 0xFF
+                self.a = self._flags(total)
+            elif opcode == 0x69:  # ADC #imm
+                value = self._fetch()
+                total = self.a + value + int(self.carry)
+                self.carry = total > 0xFF
+                self.a = self._flags(total)
+            elif opcode == 0xE9:  # SBC #imm
+                value = self._fetch()
+                total = self.a - value - int(not self.carry)
+                self.carry = total >= 0
                 self.a = self._flags(total)
             elif opcode == 0x4C:  # JMP abs (tail-call handler may end replay)
                 target = self._word()
