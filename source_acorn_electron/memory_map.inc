@@ -26,6 +26,7 @@ graphic_id_spook_second_cell = &2F
 
 object_slot_count = &2C
 
+; Zero-page gameplay and renderer state.
 renderer_collision_accumulator = &0030
 render_mode_or_text_scratch = &0031
 room_area = &0032
@@ -76,9 +77,13 @@ saved_visible_player_graphic_id_first = &008E
 text_render_char_limit = &008F
 level_index_and_hazard_gate = &00B8
 current_level_intro_or_loop_flag = &00CF
+
+; Operating-system workspace and pre-runtime staging data.
 polled_frame_tick_byte_0224 = &0224
 initial_screen_room_feature_mask_1ec8_1f19 = &0760
 initial_screen_level_modulo_fill_patterns_0dbf = &07A0
+
+; Parallel object position and screen-pointer arrays.
 object_x_by_index = &0A00
 spook_first_cell_x = &0A0E
 spook_second_cell_x = &0A0F
@@ -101,6 +106,8 @@ spook_first_cell_screen_high = &0ACE
 spook_second_cell_screen_high = &0ACF
 player_screen_high_first_cell = &0AD0
 player_screen_high_second_cell = &0AD1
+
+; Persistent score, level, object-save, and projectile state.
 best_score_counter_chars = &0BB0
 lives_status_count = &0BB4
 level_loop_seed_or_status = &0BB5
@@ -153,6 +160,8 @@ saved_object_screen_low_by_index = &0D00
 saved_player_second_screen_low = &0D11
 saved_object_screen_high_by_index = &0D40
 saved_player_second_screen_high = &0D51
+
+; Self-modifying renderer operand bytes inside the runtime.
 render_source_operand_low = &1435
 render_source_operand_high = &1436
 
@@ -162,6 +171,7 @@ status_panel_fixed_pixel_left = &34BA
 status_panel_fixed_pixel_right = &34BD
 render_source_address_placeholder = &FFFF
 
+; Acorn MOS entry points.
 MOS_OSWRCH = &FFEE
 MOS_OSWORD = &FFF1
 MOS_OSBYTE = &FFF4
