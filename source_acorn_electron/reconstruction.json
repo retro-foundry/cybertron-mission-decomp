@@ -35,9 +35,9 @@
       "name": "graphic_records",
       "runtime_start": 10496,
       "runtime_end_exclusive": 12032,
-      "meaning_level": "structural",
+      "meaning_level": "behavioral",
       "record_size": 24,
-      "evidence": "Sixty-four fixed-size records selected through the high and low graphic pointer tables and consumed by the object renderer."
+      "evidence": "All sixty-four fixed-size Mode 2 records have source-owned semantic labels, consecutive graphic IDs, and bounded graphic_usage annotations. The player selector at $16E1 proves eight direction families with one upper cell and three lower animation frames; frame-phase groups 0, 1, and 2 select offsets +1, +2, and +3, while group 3 reuses +2. Other records are bounded by status, legend, enemy, collision, target, and animation consumers through the $2F40/$2F80 pointer tables."
     },
     {
       "name": "object_and_status_graphic_ids",

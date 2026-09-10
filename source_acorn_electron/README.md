@@ -31,9 +31,10 @@ Build and validate from the repository root with `./build.ps1` and
 `build/reconstruction/`.
 
 Run `python tools/reconstruction/render_graphic_sheet.py` to regenerate the
-labelled sheet at `analysis/reconstruction/composed_sprite_sheet.png`. Player
-and spook graphics are composed from the record pairs selected and positioned
-by the runtime. Bytes are decoded as two four-bit Mode 2 pixels, proved by the
+labelled sheet at `analysis/reconstruction/composed_sprite_sheet.png`. All
+three lower player animation frames for each of the eight directions, and the
+two-cell spook, are composed exactly as selected and positioned by the runtime.
+Bytes are decoded as two four-bit Mode 2 pixels, proved by the
 80-byte raster pitch and 20 KB screen range used by the address calculations.
 The sheet assigns distinct review colours to all 16 logical indices because
 the game dynamically remaps the upper logical colours during play.

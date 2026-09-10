@@ -57,7 +57,8 @@ def read_records(source: str) -> list[tuple[int, str, list[int]]]:
     records = []
     pattern = (
         r"(?ms)^\.([a-z][a-z0-9_]*)\s*$\n"
-        r"(?=\s*; 24-byte renderer graphic record)(.*?)"
+        r"(?=\s*; graphic_id \$[0-9A-F]{2}\s*$\n"
+        r"\s*; 24-byte renderer graphic record)(.*?)"
         r"(?=^\.[a-z][a-z0-9_]*\s*$|\Z)"
     )
     for record_match in re.finditer(pattern, block):
@@ -97,13 +98,9 @@ def main() -> None:
     for direction, direction_name in enumerate(direction_names):
         base = direction * 4
         upper = decode_record(records[base][2])
-        for lower_offset, frame_name in ((1, "step_a"), (2, "step_b")):
+        for lower_offset in (1, 2, 3):
             lower = decode_record(records[base + lower_offset][2])
-            images.append((f"player_{direction_name}_{frame_name}", upper + lower))
-
-    # The initial runtime bytes select record $03 below record $00 before the
-    # normal direction animation takes over, so preserve that composition too.
-    images.append(("player_down_initial", decode_record(records[0][2]) + decode_record(records[3][2])))
+            images.append((f"player_{direction_name}_frame_{lower_offset}", upper + lower))
 
     # The spook uses adjacent object slots with a two-unit Y difference, the
     # same eight-pixel vertical composition used by the player pair.

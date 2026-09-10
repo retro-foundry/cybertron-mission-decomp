@@ -4136,7 +4136,7 @@ org runtime_start
     EQUB &03,&03,&03,&03,&00,&00,&00,&00
     EQUB &20,&08,&08,&08,&08,&08,&0C,&0C
 
-.player_down_lower_initial_frame_3
+.player_down_lower_frame_3
     ; graphic_id $03
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
@@ -4176,7 +4176,7 @@ org runtime_start
     EQUB &0C,&0C,&00,&00,&00,&00,&00,&00
     EQUB &08,&08,&08,&08,&08,&08,&0C,&0C
 
-.player_up_lower_frame_3_unselected
+.player_up_lower_frame_3
     ; graphic_id $07
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
@@ -4216,7 +4216,7 @@ org runtime_start
     EQUB &21,&21,&08,&08,&08,&08,&0C,&0C
     EQUB &03,&03,&00,&00,&00,&00,&00,&3C
 
-.player_right_lower_frame_3_unselected
+.player_right_lower_frame_3
     ; graphic_id $0B
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
@@ -4256,7 +4256,7 @@ org runtime_start
     EQUB &12,&12,&04,&04,&04,&04,&0C,&0C
     EQUB &30,&30,&08,&08,&08,&08,&08,&08
 
-.player_left_lower_frame_3_unselected
+.player_left_lower_frame_3
     ; graphic_id $0F
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
@@ -4296,7 +4296,7 @@ org runtime_start
     EQUB &0C,&0C,&08,&08,&08,&08,&0C,&0C
     EQUB &00,&00,&00,&00,&00,&00,&00,&3C
 
-.player_up_right_lower_frame_3_unselected
+.player_up_right_lower_frame_3
     ; graphic_id $13
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
@@ -4336,11 +4336,11 @@ org runtime_start
     EQUB &21,&21,&08,&08,&08,&08,&0C,&0C
     EQUB &00,&02,&03,&01,&00,&00,&00,&3C
 
-.player_down_right_lower_frame_3_unselected
+.player_down_right_lower_frame_3
     ; graphic_id $17
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
-    ; graphic_usage status=structural role=player_direction_frame_family sources=family-aligned fourth record; no active selector proved
+    ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 frame-phase group 2 selects direction base plus 3
     ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &30,&04,&04,&04,&04,&04,&0C,&0C
     EQUB &21,&21,&08,&0C,&0C,&04,&04,&00
@@ -4376,11 +4376,11 @@ org runtime_start
     EQUB &0C,&0C,&04,&04,&04,&04,&0C,&0C
     EQUB &30,&08,&08,&08,&08,&08,&08,&08
 
-.player_up_left_lower_frame_3_unselected
+.player_up_left_lower_frame_3
     ; graphic_id $1B
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
-    ; graphic_usage status=structural role=player_direction_frame_family sources=family-aligned fourth record; no active selector proved
+    ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 frame-phase group 2 selects direction base plus 3
     ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&00,&00,&00,&00,&04,&04,&00
     EQUB &0C,&0C,&04,&0C,&0C,&08,&08,&00
@@ -4416,11 +4416,11 @@ org runtime_start
     EQUB &12,&12,&04,&04,&04,&04,&0C,&0C
     EQUB &30,&08,&08,&08,&08,&08,&08,&08
 
-.player_down_left_lower_frame_3_unselected
+.player_down_left_lower_frame_3
     ; graphic_id $1F
     ; 24-byte renderer graphic record consumed through the $2F40/$2F80 pointer tables
     ; graphic_role player_direction_frame_family
-    ; graphic_usage status=structural role=player_direction_frame_family sources=family-aligned fourth record; no active selector proved
+    ; graphic_usage status=assigned role=player_direction_frame_family sources=$16E1 frame-phase group 2 selects direction base plus 3
     ; graphic_record layout: three 8-byte strips used by the Mode 2 renderer
     EQUB &00,&01,&03,&02,&00,&04,&04,&00
     EQUB &12,&12,&04,&0C,&0C,&08,&08,&00
