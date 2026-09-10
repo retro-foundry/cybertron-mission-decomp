@@ -16,6 +16,8 @@ $requiredFiles = @(
     'validate.ps1'
     'source_acorn_electron/cyber1.asm'
     'source_acorn_electron/memory_map.inc'
+    'source_acorn_electron/README.md'
+    'source_acorn_electron/reconstruction.json'
 )
 foreach ($relativePath in $requiredFiles) {
     $requiredPath = Join-Path $repoRoot $relativePath
@@ -30,6 +32,8 @@ $maintainedFiles = @(
     (Join-Path $repoRoot 'validate.ps1')
     $source
     $memoryMap
+    (Join-Path $repoRoot 'source_acorn_electron\README.md')
+    (Join-Path $repoRoot 'source_acorn_electron\reconstruction.json')
 )
 foreach ($maintainedFile in $maintainedFiles) {
     $nonAsciiByte = [System.IO.File]::ReadAllBytes($maintainedFile) |
@@ -42,6 +46,26 @@ foreach ($maintainedFile in $maintainedFiles) {
 
 $assemblyText = Get-Content -LiteralPath $source -Raw
 $memoryMapText = Get-Content -LiteralPath $memoryMap -Raw
+$manifestPath = Join-Path $repoRoot 'source_acorn_electron\reconstruction.json'
+$manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+if ($manifest.authority.load_address -ne 0x0D80 -or
+    $manifest.authority.execution_address -ne 0x0E02 -or
+    $manifest.authority.end_exclusive -ne 0x3000 -or
+    $manifest.source_owned_payload_bytes -ne $expectedLength -or
+    $manifest.authority.sha256.ToUpperInvariant() -ne $expectedSha256) {
+    throw 'reconstruction.json does not match the validated CYBRUN authority contract.'
+}
+$nextManifestAddress = $manifest.authority.load_address
+foreach ($range in $manifest.data_ranges) {
+    if ($range.runtime_start -ne $nextManifestAddress -or
+        $range.runtime_end_exclusive -le $range.runtime_start) {
+        throw "reconstruction.json has a gap, overlap, or empty range at $($range.name)."
+    }
+    $nextManifestAddress = $range.runtime_end_exclusive
+}
+if ($nextManifestAddress -ne $manifest.authority.end_exclusive) {
+    throw 'reconstruction.json ranges do not cover the complete CYBRUN payload.'
+}
 if ($assemblyText -match '(?im)^\s*INCBIN\b') {
     throw 'cyber1.asm must remain source-owned and may not include binary fragments.'
 }

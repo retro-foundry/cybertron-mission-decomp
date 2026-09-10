@@ -7,6 +7,7 @@ the two maintained source files:
 
 - `source_acorn_electron/cyber1.asm`
 - `source_acorn_electron/memory_map.inc`
+- `source_acorn_electron/reconstruction.json`
 
 The assembly contains no binary fragments and requires no original executable
 or authority binary to build.
@@ -61,9 +62,11 @@ project, so validation requires no copyrighted original media.
 addresses, memory aliases, self-modifying operands, Acorn screen-memory layout,
 and 6502 behavior.
 
-Names and comments distinguish proved behavior from unresolved data. Labels
-such as `byte_decoded_*`, `unclassified_*`, and numeric graphic records remain
-conservative where the available evidence does not justify a stronger meaning.
+Names and comments distinguish proved behavior from structural classification.
+Unreferenced original bytes are retained as explicitly named unused code,
+padding, or graphic-shaped records rather than hidden in binary fragments.
+See [`source_acorn_electron/README.md`](source_acorn_electron/README.md) for the
+source conventions and range manifest.
 
 This is reconstructed source, not the original author's source. The original
 game and its assets remain the property of their respective copyright holders.

@@ -1,0 +1,65 @@
+{
+  "schema": "cybertron_mission.6502_reconstruction_manifest.v1",
+  "authority": {
+    "payload": "CYBRUN",
+    "sha256": "29d4bed6a2bf6a3f93302f01b05fe43ec930528eaf702e679b73d2fd2476beef",
+    "load_address": 3456,
+    "execution_address": 3586,
+    "end_exclusive": 12288
+  },
+  "source_owned_payload_bytes": 8832,
+  "data_ranges": [
+    {
+      "name": "runtime_code_and_inline_tables",
+      "runtime_start": 3456,
+      "runtime_end_exclusive": 9433,
+      "meaning_level": "behavioral",
+      "evidence": "Decoded NMOS 6502 control flow from score handling through palette, entity, projectile, room, status, and input systems; inline tables have bounded indexed consumers."
+    },
+    {
+      "name": "runtime_data_tables_and_text",
+      "runtime_start": 9433,
+      "runtime_end_exclusive": 10208,
+      "meaning_level": "behavioral",
+      "evidence": "VDU streams, encoded text, palette values, counts, movement offsets, keyboard mappings, and retained unreferenced source bytes are separated and annotated at their exact boundaries."
+    },
+    {
+      "name": "room_layout_records",
+      "runtime_start": 10208,
+      "runtime_end_exclusive": 10496,
+      "meaning_level": "behavioral",
+      "record_size": 18,
+      "evidence": "Sixteen fixed-size room records consumed by the packed room-tile and area-selection logic."
+    },
+    {
+      "name": "graphic_records",
+      "runtime_start": 10496,
+      "runtime_end_exclusive": 12032,
+      "meaning_level": "structural",
+      "record_size": 24,
+      "evidence": "Sixty-four fixed-size records selected through the high and low graphic pointer tables and consumed by the object renderer."
+    },
+    {
+      "name": "object_and_status_graphic_ids",
+      "runtime_start": 12032,
+      "runtime_end_exclusive": 12096,
+      "meaning_level": "behavioral",
+      "evidence": "Object-indexed graphic IDs, target status IDs, and explicitly bounded unused padding before the pointer tables."
+    },
+    {
+      "name": "graphic_pointer_tables",
+      "runtime_start": 12096,
+      "runtime_end_exclusive": 12224,
+      "meaning_level": "behavioral",
+      "record_size": 64,
+      "evidence": "Parallel high and low byte tables map each graphic ID to its 24-byte source record."
+    },
+    {
+      "name": "tile_generator_tables",
+      "runtime_start": 12224,
+      "runtime_end_exclusive": 12288,
+      "meaning_level": "behavioral",
+      "evidence": "Eight retained bytes followed by indexed tile generator offsets and pattern sources extending exactly to the runtime end."
+    }
+  ]
+}
