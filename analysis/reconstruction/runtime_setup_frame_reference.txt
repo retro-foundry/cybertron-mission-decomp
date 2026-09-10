@@ -38,7 +38,7 @@ port_state_snapshot_after_0eca_0ed9:
     render_slot=$17 graphic=$2a scheduler=spinner phase_gate=$07 moves_on_first_normal_phase_04=no
     render_slot=$18 graphic=$2a scheduler=spinner phase_gate=$08 moves_on_first_normal_phase_04=no
     render_slot=$19 graphic=$2a scheduler=spinner phase_gate=$09 moves_on_first_normal_phase_04=no
-  note=spook pair graphics $2E/$2F are seeded by $1E3A but their release/location lifecycle is covered by runtime_enemy_movement.txt and runtime_special_status_edges.txt.
+  note=spook pair graphics $2E/$2F are seeded by $1E3A; their release, pause, draw, and movement lifecycle is covered by runtime_enemy_movement_contract.txt.
 target_scans:
   slot=1 code=$6 action=skipped_room_mismatch
   slot=0 code=$5 action=skipped_room_mismatch
@@ -81,7 +81,7 @@ port_state_snapshot_after_0eca_0ed9:
     render_slot=$17 graphic=$2a scheduler=spinner phase_gate=$07 moves_on_first_normal_phase_04=no
     render_slot=$18 graphic=$2a scheduler=spinner phase_gate=$08 moves_on_first_normal_phase_04=no
     render_slot=$19 graphic=$2a scheduler=spinner phase_gate=$09 moves_on_first_normal_phase_04=no
-  note=spook pair graphics $2E/$2F are seeded by $1E3A but their release/location lifecycle is covered by runtime_enemy_movement.txt and runtime_special_status_edges.txt.
+  note=spook pair graphics $2E/$2F are seeded by $1E3A; their release, pause, draw, and movement lifecycle is covered by runtime_enemy_movement_contract.txt.
 target_scans:
   slot=1 code=$6 action=skipped_room_mismatch
   slot=0 code=$5 action=placed logical=$22 graphic=$3d
@@ -125,7 +125,7 @@ port_state_snapshot_after_0eca_0ed9:
     render_slot=$17 graphic=$2a scheduler=spinner phase_gate=$07 moves_on_first_normal_phase_04=no
     render_slot=$18 graphic=$2a scheduler=spinner phase_gate=$08 moves_on_first_normal_phase_04=no
     render_slot=$19 graphic=$2a scheduler=spinner phase_gate=$09 moves_on_first_normal_phase_04=no
-  note=spook pair graphics $2E/$2F are seeded by $1E3A but their release/location lifecycle is covered by runtime_enemy_movement.txt and runtime_special_status_edges.txt.
+  note=spook pair graphics $2E/$2F are seeded by $1E3A; their release, pause, draw, and movement lifecycle is covered by runtime_enemy_movement_contract.txt.
 target_scans:
   slot=1 code=$6 action=placed logical=$23 graphic=$3f
   slot=0 code=$5 action=skipped_room_mismatch
@@ -169,7 +169,7 @@ port_state_snapshot_after_0eca_0ed9:
     render_slot=$17 graphic=$2a scheduler=spinner phase_gate=$07 moves_on_first_normal_phase_04=no
     render_slot=$18 graphic=$2a scheduler=spinner phase_gate=$08 moves_on_first_normal_phase_04=no
     render_slot=$19 graphic=$2a scheduler=spinner phase_gate=$09 moves_on_first_normal_phase_04=no
-  note=spook pair graphics $2E/$2F are seeded by $1E3A but their release/location lifecycle is covered by runtime_enemy_movement.txt and runtime_special_status_edges.txt.
+  note=spook pair graphics $2E/$2F are seeded by $1E3A; their release, pause, draw, and movement lifecycle is covered by runtime_enemy_movement_contract.txt.
 target_scans:
   slot=1 code=$6 action=skipped_room_mismatch
   slot=0 code=$5 action=skipped_room_mismatch
@@ -212,7 +212,7 @@ port_state_snapshot_after_0eca_0ed9:
     render_slot=$17 graphic=$2a scheduler=spinner phase_gate=$07 moves_on_first_normal_phase_04=no
     render_slot=$18 graphic=$2a scheduler=spinner phase_gate=$08 moves_on_first_normal_phase_04=no
     render_slot=$19 graphic=$2a scheduler=spinner phase_gate=$09 moves_on_first_normal_phase_04=no
-  note=spook pair graphics $2E/$2F are seeded by $1E3A but their release/location lifecycle is covered by runtime_enemy_movement.txt and runtime_special_status_edges.txt.
+  note=spook pair graphics $2E/$2F are seeded by $1E3A; their release, pause, draw, and movement lifecycle is covered by runtime_enemy_movement_contract.txt.
 target_scans:
   slot=1 code=$7 action=skipped_room_mismatch
   slot=0 code=$1 action=skipped_room_mismatch
@@ -254,7 +254,7 @@ port_state_snapshot_after_0eca_0ed9:
     render_slot=$17 graphic=$2a scheduler=spinner phase_gate=$07 moves_on_first_normal_phase_04=no
     render_slot=$18 graphic=$2a scheduler=spinner phase_gate=$08 moves_on_first_normal_phase_04=no
     render_slot=$19 graphic=$2a scheduler=spinner phase_gate=$09 moves_on_first_normal_phase_04=no
-  note=spook pair graphics $2E/$2F are seeded by $1E3A but their release/location lifecycle is covered by runtime_enemy_movement.txt and runtime_special_status_edges.txt.
+  note=spook pair graphics $2E/$2F are seeded by $1E3A; their release, pause, draw, and movement lifecycle is covered by runtime_enemy_movement_contract.txt.
 target_scans:
   slot=1 code=$9 action=skipped_room_mismatch
   slot=0 code=$8 action=skipped_room_mismatch
@@ -304,7 +304,7 @@ port_state_snapshot_after_0eca_0ed9:
     render_slot=$1b graphic=$2c scheduler=cyberdroid phase_gate=$0b moves_on_first_normal_phase_04=no
     render_slot=$1c graphic=$2c scheduler=cyberdroid phase_gate=$0c moves_on_first_normal_phase_04=no
     render_slot=$1d graphic=$2c scheduler=cyberdroid phase_gate=$0d moves_on_first_normal_phase_04=no
-  note=spook pair graphics $2E/$2F are seeded by $1E3A but their release/location lifecycle is covered by runtime_enemy_movement.txt and runtime_special_status_edges.txt.
+  note=spook pair graphics $2E/$2F are seeded by $1E3A; their release, pause, draw, and movement lifecycle is covered by runtime_enemy_movement_contract.txt.
 target_scans:
   slot=5 code=$8 action=skipped_room_mismatch
   slot=4 code=$e action=skipped_room_mismatch
@@ -324,4 +324,3 @@ placements:
   enemy_cyberdroid logical=$07 render=$1b graphic=$2c x=$2b y=$13 ptr=$47d8 attempts=1 proximity_rejects=0 collision_rejects=0
   enemy_cyberdroid logical=$08 render=$1c graphic=$2c x=$32 y=$1c ptr=$5490 attempts=3 proximity_rejects=0 collision_rejects=2
   enemy_cyberdroid logical=$09 render=$1d graphic=$2c x=$30 y=$17 ptr=$4d00 attempts=1 proximity_rejects=0 collision_rejects=0
-

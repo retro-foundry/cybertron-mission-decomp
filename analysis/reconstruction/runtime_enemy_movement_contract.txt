@@ -1,0 +1,35 @@
+runtime_enemy_movement_contract
+Purpose: port-facing scheduler, movement-policy, spook-pair, and hazard-source contract.
+Authority: source-built CYBRUN routines $198C, $1FDB-$2162, $23A3-$243B, and $2235.
+Port rule: preserve distinct enemy policies and cadence; do not replace them with generic chase or random AI.
+
+active_enemy_scheduler_198c
+slot_window render objects $14-$1F inclusive
+active_state $0C53,X == 1
+graphic cadence movement
+$2A SPINNER (X & $0F) == frame_phase_$0036 $1FF7
+$2B CLONE (X & $07) == (frame_phase_$0036 & $07) $2080
+$2C CYBERDROID (X & $0F) == frame_phase_$0036 $20E0
+dispatch_bracket every admitted movement is ordered $1FDB erase/setup, movement routine, $1FED redraw
+nonmatching_graphic no movement dispatch
+inactive_state no movement dispatch
+
+movement_policies
+SPINNER_$1FF7 derive both axes toward player through $23A3; on collision restore, retry X only; on collision restore, retry Y only; on collision restore original position
+CLONE_$2080 normally retries its stored delta; RNG&7==0 or a blocked stored move selects one new random delta and tries once
+CYBERDROID_$20E0 uses a new random delta only while both stored axes are zero; otherwise it persists, retargeting toward the player on X or adjusted-Y alignment
+validated_move_$205D applies candidate delta, redraw-tests collision, tests bounds, and sets success flag $0C99 only when both tests pass
+random_delta_$20B3 each axis is (second RNG bit)-(first RNG bit), producing -1, 0, or +1
+
+spook_pair
+$23CF decrements release timer $0C66; on zero it clears pause $0BBC and initializes object pair $0E/$0F at pointers $3000/$3280 and Y 0/2
+$2410 moves only on odd frame phases after release and while pause $0BBC is zero
+movement derives one delta from object $0E through $23A3 and applies it identically to both cells
+
+hazard_source
+$2235 requires hazard count below 4, RNG&7 below level gate $00B8, an active source in $19+(RNG&$0F), and a nonzero stored source delta
+the source delta selects one of eight directions; allocation and lifecycle details are in runtime_projectile_lifecycle.txt
+
+port_acceptance
+Scheduler replay must cover every slot $14-$1F, frame phase 0-15, each recognized graphic, inactive state, and an unrecognized graphic.
+Movement-policy promotion requires actual-code replay of success and collision-restoration branches, including deterministic RNG vectors for CLONE and CYBERDROID.

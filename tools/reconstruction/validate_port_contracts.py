@@ -1295,6 +1295,72 @@ def main() -> None:
             fail(f"lifecycle CPU state ${state_before:02X}: erase draw count differs")
         lifecycle_cpu_replays += 1
 
+    # Replay the complete $198C scheduler for every active enemy slot, every
+    # frame phase, and each recognized graphic. Movement internals remain
+    # bounded here so this contract isolates the original cadence and exact
+    # erase/move/redraw dispatch order.
+    enemy_scheduler_cpu_replays = 0
+    scheduler_graphics = ((0x2A, 0x1FF7), (0x2B, 0x2080), (0x2C, 0x20E0))
+    for render_slot in range(0x14, 0x20):
+        for frame_phase in range(16):
+            for graphic_id, movement_target in scheduler_graphics:
+                memory = bytearray(0x10000)
+                memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+                memory[0x0036] = frame_phase
+                memory[0x0C53 + render_slot] = 1
+                memory[0x2F00 + render_slot] = graphic_id
+                calls = []
+
+                def scheduler_handler(cpu: Replay6502, target: int) -> bool:
+                    if target in (0x1FDB, 0x1FED, 0x1FF7, 0x2080, 0x20E0):
+                        calls.append((target, cpu.x, memory[0x0039]))
+                        return True
+                    return False
+
+                cpu = Replay6502(memory, scheduler_handler)
+                cpu.run_subroutine(0x198C)
+                if graphic_id == 0x2B:
+                    admitted = (render_slot & 7) == (frame_phase & 7)
+                else:
+                    admitted = (render_slot & 0x0F) == frame_phase
+                expected_calls = (
+                    [
+                        (0x1FDB, render_slot, render_slot),
+                        (movement_target, render_slot, render_slot),
+                        (0x1FED, render_slot, render_slot),
+                    ]
+                    if admitted
+                    else []
+                )
+                if calls != expected_calls:
+                    fail(
+                        f"enemy scheduler graphic=${graphic_id:02X} slot=${render_slot:02X} "
+                        f"phase={frame_phase}: {calls}, expected {expected_calls}"
+                    )
+                enemy_scheduler_cpu_replays += 1
+
+    for render_slot in range(0x14, 0x20):
+        for state, graphic_id in ((0, 0x2A), (1, 0x39)):
+            memory = bytearray(0x10000)
+            memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+            memory[0x0036] = render_slot & 0x0F
+            memory[0x0C53 + render_slot] = state
+            memory[0x2F00 + render_slot] = graphic_id
+            calls = []
+
+            def scheduler_rejection_handler(cpu: Replay6502, target: int) -> bool:
+                calls.append(target)
+                return True
+
+            cpu = Replay6502(memory, scheduler_rejection_handler)
+            cpu.run_subroutine(0x198C)
+            if calls:
+                fail(
+                    f"enemy scheduler rejection state={state} graphic=${graphic_id:02X} "
+                    f"slot=${render_slot:02X}: calls {calls}"
+                )
+            enemy_scheduler_cpu_replays += 1
+
     # $1B41 recognizes four masked screen-byte classes. Exhaust all byte
     # values so ports cannot accidentally compare unmasked pixels or merge the
     # special $A0 spook-pause outcome with ordinary expiry.
@@ -1940,6 +2006,7 @@ def main() -> None:
         f"{len(window_roles)} object-slot roles, "
         f"{lifecycle_rows} lifecycle states, "
         f"{lifecycle_cpu_replays} lifecycle CPU replays, "
+        f"{enemy_scheduler_cpu_replays} enemy-scheduler CPU replays, "
         f"{expiry_rows} projectile expiry bytes, "
         f"{projectile_expiry_cpu_replays} projectile expiry CPU replays, "
         f"{target_outcome_cpu_replays} target-outcome CPU replays, "

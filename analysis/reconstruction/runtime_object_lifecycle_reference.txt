@@ -1,7 +1,7 @@
 runtime_object_lifecycle_reference
 Purpose: port-facing object lifecycle and slot-window oracle for hit states, hit animation, scheduler eligibility, and hazard recycle targets.
 Original authority: $1812, $1876, $198C, $2163, $22C5/$22D0, and the logical/render alias arrays rooted at $0C53/$0C67.
-Scope: object lifecycle state and slot-window behavior only. Movement AI remains in runtime_enemy_movement.txt; projectile slot lifecycle remains in runtime_projectile_lifecycle.txt.
+Scope: object lifecycle state and slot-window behavior only. Movement AI remains in runtime_enemy_movement_contract.txt; projectile slot lifecycle remains in runtime_projectile_lifecycle.txt.
 
 object_window_matrix
 Authority: $198C, $1812, $1876, $2163, and $22D0 use overlapping but different object/logical slot windows.
