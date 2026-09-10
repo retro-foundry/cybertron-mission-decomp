@@ -237,6 +237,40 @@ def main() -> None:
     for sample, expected_delta in joystick_cases:
         if joystick_axis(sample) != expected_delta:
             fail(f"joystick sample ${sample:02X}: threshold projection differs")
+    joystick_cpu_replays = 0
+    for x_sample, expected_x in joystick_cases:
+        for y_sample, expected_y in joystick_cases:
+            for fire in (0, 1):
+                memory = bytearray(0x10000)
+                memory[LOAD_ADDRESS : LOAD_ADDRESS + len(payload)] = payload
+
+                def osbyte_joystick_handler(cpu: Replay6502, target: int) -> bool:
+                    if target != 0xFFF4:
+                        return False
+                    if cpu.x == 1:
+                        cpu.y = x_sample
+                    elif cpu.x == 2:
+                        cpu.y = y_sample
+                    elif cpu.x == 0:
+                        cpu.x = fire
+                    else:
+                        fail(f"joystick replay requested unexpected ADC channel {cpu.x}")
+                    return True
+
+                cpu = Replay6502(memory, osbyte_joystick_handler)
+                cpu.run_subroutine(0x1287)
+                actual_x = memory[0x003F]
+                actual_y = memory[0x0040]
+                if actual_x >= 0x80:
+                    actual_x -= 0x100
+                if actual_y >= 0x80:
+                    actual_y -= 0x100
+                if (actual_x, actual_y, cpu.x) != (expected_x, expected_y, fire):
+                    fail(
+                        f"joystick CPU replay ${x_sample:02X}/${y_sample:02X}/{fire}: "
+                        f"{(actual_x, actual_y, cpu.x)}, expected {(expected_x, expected_y, fire)}"
+                    )
+                joystick_cpu_replays += 1
     fire_edge_rows = 0
     for previous in (0, 1):
         for current in (0, 1):
@@ -953,6 +987,7 @@ def main() -> None:
         f"{keyboard_rows} keyboard masks, "
         f"{keyboard_cpu_replays} keyboard CPU replays, "
         f"{len(joystick_cases)} joystick thresholds, "
+        f"{joystick_cpu_replays} joystick CPU replays, "
         f"{fire_edge_rows} fire-latch transitions, "
         f"{room_rows} room-render digests, "
         f"{status_rows} status-render digests, "
