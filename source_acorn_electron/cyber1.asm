@@ -252,7 +252,7 @@ org runtime_start
 ; ===============================
 
 .draw_24byte_tile_or_sprite
-    LDA      #&0
+    LDA      #POINTER_HIGH_CLEAR
     STA      zp_screen_ptr_70_high
     STX      zp_screen_ptr_70_low
     TXA
@@ -260,9 +260,9 @@ org runtime_start
     TXA
     JSR      add_a_to_pointer_70
     INC      zp_screen_ptr_70_low
-    LDX      #&3
+    LDX      #TILE_POINTER_X_SHIFT_COUNT
     JSR      shift_tile_pointer_70_left_x_times
-    LDA      #&0
+    LDA      #POINTER_HIGH_CLEAR
     STA      zp_calc_ptr_72_high
     STY      zp_calc_ptr_72_low
     TYA
@@ -273,7 +273,7 @@ org runtime_start
     JSR      add_a_to_pointer_72
     TYA
     JSR      add_a_to_pointer_72
-    LDX      #&7
+    LDX      #TILE_POINTER_Y_SHIFT_COUNT
     JSR      shift_pointer_72_left_x_times
     CLC
     LDA      zp_screen_ptr_70_low
@@ -284,12 +284,12 @@ org runtime_start
     STA      zp_screen_ptr_70_high
     CLC
     LDA      zp_screen_ptr_70_high
-    ADC      #&30
+    ADC      #BITMAP_SCREEN_BASE_HIGH
     STA      zp_screen_ptr_70_high
     LDA      #&0
     STA      zp_indirect_74_low
     STA      zp_scratch_77
-    LDY      #&17
+    LDY      #TILE_RECORD_LAST_BYTE_INDEX
     LDA      room_tile_class_or_pattern
     BEQ      clear_24byte_tile_loop
 
@@ -325,8 +325,8 @@ org runtime_start
     TAY
     JSR      write_compact_tile_pattern_byte
     LDA      zp_scratch_77
-    AND      #&7
-    CMP      #&6
+    AND      #TILE_MIDDLE_POSITION_MASK
+    CMP      #TILE_MIDDLE_END_POSITION
     BMI      generate_compact_tile_middle_bytes
     LDA      room_tile_class_or_pattern
     LSR      A
@@ -342,7 +342,7 @@ org runtime_start
     JSR      write_compact_tile_pattern_byte
     INC      zp_indirect_74_low
     LDA      zp_indirect_74_low
-    CMP      #&3
+    CMP      #TILE_GENERATED_ROW_COUNT
     BNE      generate_next_compact_tile_row
     RTS
 
@@ -369,7 +369,7 @@ org runtime_start
     RTS
 
 .write_compact_tile_pattern_byte
-    LDA      #&2f
+    LDA      #TILE_PATTERN_SOURCE_PAGE_HIGH
     STA      zp_scratch_76
     LDX      zp_indirect_74_low
     LDA      tile_generator_source_low_table_0efe,X
@@ -381,35 +381,35 @@ org runtime_start
     RTS
 
 .draw_object_by_index_0
-    LDA      #&0
+    LDA      #RENDER_MODE_DRAW
     STA      render_mode_or_text_scratch
     JMP      draw_object_by_index
 
 .handle_collected_target_or_level_done
     LDA      #&0
     STA      renderer_collision_accumulator
-    LDX      #&ff
+    LDX      #TARGET_SLOT_SEARCH_BEFORE_FIRST
 
 .find_collected_target_slot
     INX
     LDA      room_area
-    AND      #&f
+    AND      #ROOM_AREA_LOW_NIBBLE_MASK
     CMP      target_room_code,X
     BNE      find_collected_target_slot
     CPX      #&0
     BEQ      begin_required_target_completion_scan
-    LDA      #&1
+    LDA      #TARGET_STATUS_COLLECTED
     STA      target_collected_status,X
     STX      zp_scratch_77
     TXA
     CLC
-    ADC      #&36
+    ADC      #TARGET_STATUS_OBJECT_INDEX_BASE
     TAX
     JSR      draw_object_by_index_0
-    LDA      #&5
+    LDA      #SOUND_ID_TARGET_COLLECTED
     JSR      play_sound_id_if_enabled
     LDX      zp_scratch_77
-    CPX      #&6
+    CPX      #BONUS_TARGET_SLOT
     BEQ      award_bonus_target_life
     LDA      target_collection_score_add_table_0fd6,X
     JMP      increment_four_char_score_or_counter
@@ -420,14 +420,14 @@ org runtime_start
     JMP      draw_lives_or_target_status
 
 .begin_required_target_completion_scan
-    LDX      #&0
+    LDX      #REQUIRED_TARGET_SCAN_BEFORE_FIRST
 
 .scan_next_required_target_status
     INX
     LDA      target_collected_status,X
-    CMP      #&1
+    CMP      #TARGET_STATUS_COLLECTED
     BNE      test_required_target_scan_complete
-    LDA      #&ff
+    LDA      #TARGET_STATUS_CONSUMED
     STA      target_collected_status,X
     INC      collected_target_count
 
@@ -451,7 +451,7 @@ org runtime_start
     INC      lives_status_count
     INC      level_units_digit
     LDA      level_units_digit
-    CMP      #&a
+    CMP      #LEVEL_DECIMAL_RADIX
     BNE      enter_next_level_area
     LDA      #&0
     STA      level_units_digit
@@ -460,12 +460,12 @@ org runtime_start
 .enter_next_level_area
     LDA      room_area
     CLC
-    ADC      #&10
-    AND      #&30
+    ADC      #ROOM_AREA_LEVEL_STEP
+    AND      #ROOM_AREA_LEVEL_MASK
     STA      room_area
-    LDA      #&12
+    LDA      #SOUND_ID_LEVEL_COMPLETE
     JSR      play_sound_id_if_enabled
-    LDA      #&32
+    LDA      #LEVEL_COMPLETE_DELAY_FRAMES
     JSR      wait_frames_count_a
     PLA
     PLA
@@ -474,7 +474,7 @@ org runtime_start
     JMP      begin_level_intro_setup_path_0e85
 
 .draw_20char_buffer_as_bitmap_text
-    LDA      #&0
+    LDA      #TEXT_FIRST_CHARACTER_INDEX
     STA      object_x_by_index
 
 .draw_next_text_character
@@ -483,23 +483,23 @@ org runtime_start
     STA      zp_calc_ptr_72_low
     LDA      #&0
     STA      zp_calc_ptr_72_high
-    LDX      #&3
+    LDX      #FONT_GLYPH_SHIFT_COUNT
     JSR      shift_pointer_72_left_x_times
     LDA      zp_calc_ptr_72_high
     CLC
-    ADC      #&c0
+    ADC      #FONT_BITMAP_PAGE_HIGH
     STA      zp_calc_ptr_72_high
     LDY      object_y_by_index
 
 .load_character_font_quartet
     TYA
-    AND      #&3
+    AND      #FONT_QUARTET_INDEX_MASK
     TAX
     LDA      (zp_calc_ptr_72_low),Y
     STA      font_expand_work_bytes,X
     INY
     TYA
-    AND      #&3
+    AND      #FONT_QUARTET_INDEX_MASK
     BNE      load_character_font_quartet
     LDA      #&0
     STA      movement_delta_x
@@ -514,7 +514,7 @@ org runtime_start
     STA      render_mode_or_text_scratch
     LDX      input_delta_y
     LDA      font_expand_work_bytes,X
-    AND      #&80
+    AND      #FONT_FIRST_PIXEL_MASK
     BEQ      test_second_pixel_colour
     LDA      text_render_colour_value
     ASL      A
@@ -522,7 +522,7 @@ org runtime_start
 
 .test_second_pixel_colour
     LDA      font_expand_work_bytes,X
-    AND      #&40
+    AND      #FONT_SECOND_PIXEL_MASK
     BEQ      store_expanded_pixel_pair
     LDA      text_render_colour_value
     ORA      render_mode_or_text_scratch
@@ -537,13 +537,13 @@ org runtime_start
     STA      (zp_screen_ptr_70_low),Y
     INC      input_delta_y
     INY
-    CPY      #&8
+    CPY      #FONT_EXPANDED_PAIR_BYTE_COUNT
     BNE      draw_next_character_pixel_pair
-    LDA      #&8
+    LDA      #FONT_EXPANDED_PAIR_BYTE_COUNT
     JSR      add_a_to_pointer_70
     INC      movement_delta_x
     LDA      movement_delta_x
-    CMP      #&4
+    CMP      #FONT_QUARTER_COUNT
     BNE      draw_next_character_quarter
     INC      object_x_by_index
     LDA      object_x_by_index
@@ -555,12 +555,12 @@ org runtime_start
     JMP      draw_next_text_character
 
 .draw_20char_buffer_two_rows
-    LDA      #&14
+    LDA      #TEXT_BUFFER_CHARACTER_COUNT
     STA      text_render_char_limit
     LDA      #&0
     STA      object_y_by_index
     JSR      draw_20char_buffer_as_bitmap_text
-    LDA      #&4
+    LDA      #TEXT_SECOND_ROW_FONT_OFFSET
     STA      object_y_by_index
     JMP      draw_20char_buffer_as_bitmap_text
 
@@ -588,7 +588,7 @@ org runtime_start
     JMP      copy_next_encoded_text_byte
 
 .clear_20char_text_buffer
-    LDY      #&13
+    LDY      #TEXT_BUFFER_LAST_CHARACTER_INDEX
     LDA      #&0
 
 .clear_next_text_buffer_byte
