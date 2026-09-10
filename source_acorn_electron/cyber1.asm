@@ -2707,11 +2707,11 @@ org runtime_start
 .unused_erase_object_then_restore_entry
     ; Unreferenced entry that erases the active object, selects render mode 5,
     ; and falls through to restore_object_position_and_ptr.
-    LDA      #&0
+    LDA      #RENDER_MODE_ERASE_OBJECT
     STA      render_mode_or_text_scratch
     JSR      draw_object_by_index
     LDX      active_object_index
-    LDA      #&5
+    LDA      #RENDER_MODE_OBJECT_COLLISION_TEST
     STA      render_mode_or_text_scratch
 
 .restore_object_position_and_ptr
@@ -2728,17 +2728,17 @@ org runtime_start
     RTS
 
 .test_object_inside_playfield
-    LDA      #&0
+    LDA      #OBJECT_MOVEMENT_FAILED
     STA      bounds_or_outside_flag
     LDA      object_x_by_index,X
-    CMP      #&4
+    CMP      #OBJECT_LEFT_BOUNDARY
     BMI      mark_object_outside_playfield
-    CMP      #&4a
+    CMP      #OBJECT_RIGHT_BOUNDARY
     BPL      mark_object_outside_playfield
     LDA      object_y_by_index,X
-    CMP      #&8
+    CMP      #OBJECT_TOP_BOUNDARY
     BMI      mark_object_outside_playfield
-    CMP      #&37
+    CMP      #OBJECT_BOTTOM_BOUNDARY
     BPL      mark_object_outside_playfield
     RTS
 
@@ -2747,19 +2747,19 @@ org runtime_start
     RTS
 
 .begin_target_enemy_move_test
-    LDA      #&0
+    LDA      #RENDER_MODE_ERASE_OBJECT
     STA      render_mode_or_text_scratch
     STA      movement_delta_x
     STA      movement_delta_y
     JSR      draw_object_by_index
     LDX      active_object_index
-    LDA      #&5
+    LDA      #RENDER_MODE_OBJECT_COLLISION_TEST
     STA      render_mode_or_text_scratch
     RTS
 
 .end_target_enemy_move_test
     LDX      active_object_index
-    LDA      #&0
+    LDA      #RENDER_MODE_ERASE_OBJECT
     STA      render_mode_or_text_scratch
     JSR      draw_object_by_index
     RTS
@@ -2774,19 +2774,19 @@ org runtime_start
 .retry_spinner_move_on_horizontal_axis
     LDX      active_object_index
     JSR      restore_object_position_and_ptr
-    LDA      #&0
+    LDA      #MOVEMENT_DELTA_NONE
     STA      movement_delta_x
     STA      movement_delta_y
     LDA      player_x_first_cell
     CMP      object_x_by_index,X
     BEQ      try_spinner_horizontal_move
     BMI      set_spinner_horizontal_delta_negative
-    LDA      #&1
+    LDA      #MOVEMENT_DELTA_POSITIVE
     STA      movement_delta_x
     JMP      try_spinner_horizontal_move
 
 .set_spinner_horizontal_delta_negative
-    LDA      #&ff
+    LDA      #MOVEMENT_DELTA_NEGATIVE
     STA      movement_delta_x
 
 .try_spinner_horizontal_move
@@ -2798,21 +2798,21 @@ org runtime_start
 .retry_spinner_move_on_vertical_axis
     LDX      active_object_index
     JSR      restore_object_position_and_ptr
-    LDA      #&0
+    LDA      #MOVEMENT_DELTA_NONE
     STA      movement_delta_x
     STA      movement_delta_y
     LDA      player_y_first_cell
     CLC
-    ADC      #&1
+    ADC      #PLAYER_TO_OBJECT_Y_BIAS
     CMP      object_y_by_index,X
     BEQ      try_spinner_vertical_move
     BMI      set_spinner_vertical_delta_negative
-    LDA      #&1
+    LDA      #MOVEMENT_DELTA_POSITIVE
     STA      movement_delta_y
     JMP      try_spinner_vertical_move
 
 .set_spinner_vertical_delta_negative
-    LDA      #&ff
+    LDA      #MOVEMENT_DELTA_NEGATIVE
     STA      movement_delta_y
 
 .try_spinner_vertical_move
@@ -2826,7 +2826,7 @@ org runtime_start
     JMP      restore_object_position_and_ptr
 
 .try_move_object_with_collision
-    LDA      #&0
+    LDA      #OBJECT_MOVEMENT_FAILED
     STA      object_movement_success_flag
     STA      renderer_collision_accumulator
     JSR      move_object_and_update_screen_ptr
@@ -2838,7 +2838,7 @@ org runtime_start
     JSR      test_object_inside_playfield
     LDA      bounds_or_outside_flag
     BNE      return_from_object_move_collision_test
-    LDA      #&1
+    LDA      #OBJECT_MOVEMENT_SUCCEEDED
     STA      object_movement_success_flag
     RTS
 
@@ -2847,7 +2847,7 @@ org runtime_start
 
 .move_clone_continue_or_random
     JSR      rng_next_byte
-    AND      #&7
+    AND      #CLONE_RANDOM_TURN_MASK
     BEQ      try_clone_random_direction
     LDX      active_object_index
     LDA      item_delta_x_by_slot,X
@@ -2877,20 +2877,20 @@ org runtime_start
 
 .random_direction_delta
     JSR      rng_next_byte
-    AND      #&1
+    AND      #RANDOM_DIRECTION_BIT_MASK
     STA      movement_delta_x
     JSR      rng_next_byte
-    AND      #&1
+    AND      #RANDOM_DIRECTION_BIT_MASK
     SEC
     SBC      movement_delta_x
     STA      movement_delta_x
     LDX      active_object_index
     STA      item_delta_x_by_slot,X
     JSR      rng_next_byte
-    AND      #&1
+    AND      #RANDOM_DIRECTION_BIT_MASK
     STA      movement_delta_y
     JSR      rng_next_byte
-    AND      #&1
+    AND      #RANDOM_DIRECTION_BIT_MASK
     SEC
     SBC      movement_delta_y
     STA      movement_delta_y
@@ -2912,7 +2912,7 @@ org runtime_start
 .reset_cyberdroid_direction_after_block
     LDX      active_object_index
     JSR      restore_object_position_and_ptr
-    LDA      #&0
+    LDA      #MOVEMENT_DELTA_NONE
     STA      item_delta_x_by_slot,X
     STA      item_delta_y_by_slot,X
     RTS
@@ -2923,7 +2923,7 @@ org runtime_start
     BEQ      set_cyberdroid_vertical_direction
     LDA      player_y_first_cell
     CLC
-    ADC      #&1
+    ADC      #PLAYER_TO_OBJECT_Y_BIAS
     CMP      object_y_by_index,X
     BEQ      set_cyberdroid_horizontal_direction
     JMP      try_cyberdroid_persistent_move
@@ -2931,15 +2931,15 @@ org runtime_start
 .set_cyberdroid_vertical_direction
     LDA      player_y_first_cell
     CLC
-    ADC      #&1
+    ADC      #PLAYER_TO_OBJECT_Y_BIAS
     CMP      object_y_by_index,X
     BMI      set_cyberdroid_vertical_delta_negative
-    LDA      #&1
+    LDA      #MOVEMENT_DELTA_POSITIVE
     STA      movement_delta_y
     JMP      store_cyberdroid_direction
 
 .set_cyberdroid_vertical_delta_negative
-    LDA      #&ff
+    LDA      #MOVEMENT_DELTA_NEGATIVE
     STA      movement_delta_y
     JMP      store_cyberdroid_direction
 
@@ -2947,12 +2947,12 @@ org runtime_start
     LDA      player_x_first_cell
     CMP      object_x_by_index,X
     BMI      set_cyberdroid_horizontal_delta_negative
-    LDA      #&1
+    LDA      #MOVEMENT_DELTA_POSITIVE
     STA      movement_delta_x
     JMP      store_cyberdroid_direction
 
 .set_cyberdroid_horizontal_delta_negative
-    LDA      #&ff
+    LDA      #MOVEMENT_DELTA_NEGATIVE
     STA      movement_delta_x
 
 .store_cyberdroid_direction
@@ -2978,43 +2978,43 @@ org runtime_start
     SEC
     SBC      player_x_first_cell
     BMI      scan_shot_or_hazard_object_overlaps
-    CMP      #&3
+    CMP      #SHOT_PLAYER_HORIZONTAL_EXTENT
     BPL      scan_shot_or_hazard_object_overlaps
     LDA      shot_y_by_slot,X
     SEC
     SBC      player_y_first_cell
     BMI      scan_shot_or_hazard_object_overlaps
-    CMP      #&4
+    CMP      #SHOT_PLAYER_VERTICAL_EXTENT
     BPL      scan_shot_or_hazard_object_overlaps
     JSR      deactivate_and_erase_shot_or_hazard
     JMP      handle_player_hit_from_active_object
 
 .scan_shot_or_hazard_object_overlaps
-    LDY      #&14
+    LDY      #FIRST_ITEM_OBJECT_INDEX
 
 .test_next_object_for_shot_or_hazard_overlap
     LDA      object_lifecycle_base_for_indexed_refs,Y
-    CMP      #&1
+    CMP      #OBJECT_LIFECYCLE_ACTIVE
     BNE      advance_shot_or_hazard_object_scan
     LDA      shot_x_by_slot,X
     SEC
     SBC      object_x_by_index,Y
     BMI      advance_shot_or_hazard_object_scan
-    CMP      #&3
+    CMP      #SHOT_OBJECT_HORIZONTAL_EXTENT
     BPL      advance_shot_or_hazard_object_scan
     LDA      shot_y_by_slot,X
     SEC
     SBC      object_y_by_index,Y
     BMI      advance_shot_or_hazard_object_scan
-    CMP      #&2
+    CMP      #SHOT_OBJECT_VERTICAL_EXTENT
     BPL      advance_shot_or_hazard_object_scan
-    LDA      #&2
+    LDA      #OBJECT_LIFECYCLE_HIT
     STA      object_lifecycle_base_for_indexed_refs,Y
-    CPX      #&4
+    CPX      #FIRST_HAZARD_SLOT
     BPL      convert_hazard_hit_object_to_item
     LDA      object_graphic_id_by_index,Y
     SEC
-    SBC      #&29
+    SBC      #ENEMY_SCORE_GRAPHIC_ID_BIAS
     ASL      A
     JSR      increment_four_char_score_or_counter
     DEC      remaining_active_object_count
@@ -3027,7 +3027,7 @@ org runtime_start
 .finish_shot_or_hazard_object_hit
     LDX      active_object_index
     JSR      deactivate_and_erase_shot_or_hazard
-    LDA      #&2
+    LDA      #SOUND_ID_OBJECT_HIT
     JMP      play_sound_id_if_enabled
 
 .advance_shot_or_hazard_object_scan
@@ -3051,22 +3051,22 @@ org runtime_start
     RTS
 
 .issue_sound_osword
-    LDA      #&0
+    LDA      #POINTER_HIGH_CLEAR
     STA      zp_screen_ptr_70_high
-    LDX      #&3
+    LDX      #SOUND_ID_POINTER_SHIFT_COUNT
     JSR      shift_pointer_70_left_x_times
     LDX      zp_screen_ptr_70_low
-    LDA      #&b
+    LDA      #SOUND_TABLE_PAGE_HIGH_BASE
     ADC      zp_screen_ptr_70_high
     TAY
-    LDA      #&7
+    LDA      #OSWORD_SOUND
     JMP      MOS_OSWORD
 
 .direction_from_delta_xy
-    CPX      #&0
+    CPX      #DELTA_ZERO
     BEQ      return_vertical_direction_from_delta
     BPL      return_rightward_direction_from_delta
-    CPY      #&0
+    CPY      #DELTA_ZERO
     BNE      return_left_diagonal_direction_from_delta
     LDA      #direction_left
     RTS
@@ -3081,7 +3081,7 @@ org runtime_start
     RTS
 
 .return_rightward_direction_from_delta
-    CPY      #&0
+    CPY      #DELTA_ZERO
     BNE      return_right_diagonal_direction_from_delta
     LDA      #direction_right
     RTS
@@ -3096,7 +3096,7 @@ org runtime_start
     RTS
 
 .return_vertical_direction_from_delta
-    CPY      #&0
+    CPY      #DELTA_ZERO
     BPL      return_down_direction
     LDA      #direction_up
     RTS
@@ -3107,20 +3107,20 @@ org runtime_start
 
 .maybe_spawn_hazard_from_moving_object
     LDA      active_spawned_hazard_count
-    CMP      #&4
+    CMP      #HAZARD_LIMIT
     BPL      return_without_hazard_spawn
     JSR      rng_next_byte
-    AND      #&7
+    AND      #HAZARD_LEVEL_RNG_MASK
     CMP      level_index_and_hazard_gate
     BPL      return_without_hazard_spawn
     JSR      rng_next_byte
-    AND      #&f
+    AND      #HAZARD_SOURCE_RNG_MASK
     CLC
-    ADC      #&19
+    ADC      #HAZARD_SOURCE_OBJECT_INDEX_BASE
     STA      hazard_spawn_source_object_index
     TAX
     LDA      object_lifecycle_base_for_indexed_refs,X
-    CMP      #&1
+    CMP      #OBJECT_LIFECYCLE_ACTIVE
     BNE      return_without_hazard_spawn
     LDA      item_delta_x_by_slot,X
     BNE      spawn_hazard_from_object_delta
@@ -3135,7 +3135,7 @@ org runtime_start
     TAX
     JSR      direction_from_delta_xy
     STA      hazard_spawn_direction
-    LDY      #&3
+    LDY      #HAZARD_SLOT_BEFORE_FIRST
 
 .find_inactive_hazard_slot
     INY
@@ -3171,19 +3171,19 @@ org runtime_start
     BNE      play_hazard_spawn_sound
 
 .hazard_spawn_set_escape_condition
-    LDA      #&7d
+    LDA      #OSBYTE_ESCAPE_CONDITION_SET
     JSR      MOS_OSBYTE
 
 .hazard_spawn_acknowledge_escape_condition
-    LDA      #&7e
+    LDA      #OSBYTE_ESCAPE_CONDITION_ACKNOWLEDGE
     JSR      MOS_OSBYTE
 
 .play_hazard_spawn_sound
-    LDA      #&b
+    LDA      #SOUND_ID_HAZARD_SPAWN
     JMP      play_sound_id_if_enabled
 
 .find_free_item_slot
-    LDX      #&ff
+    LDX      #FREE_ITEM_SLOT_BEFORE_FIRST
 
 .find_free_item_slot_scan_loop_22c5
     INX
@@ -3197,11 +3197,11 @@ org runtime_start
 .place_graphic_in_free_item_slot
     TAY
     JSR      find_free_item_slot
-    CPX      #&c
+    CPX      #PLACED_ITEM_SLOT_LIMIT
     BPL      return_from_find_or_place_item_slot_22c5
     TYA
     STA      item_graphic_id_alias_object_14,X
-    LDA      #&1
+    LDA      #ITEM_STATE_ACTIVE
     STA      item_state_alias_object_14,X
     STX      logical_item_slot_index
     JMP      random_place_item
@@ -3210,29 +3210,29 @@ org runtime_start
     STA      zp_scratch_76
 
 .score_increment_outer_loop_22e6
-    LDX      #&0
+    LDX      #SCORE_FIRST_DIGIT_INDEX
 
 .score_increment_digit_carry_loop_22e6
     INC      score_counter_chars,X
     LDA      score_counter_chars,X
-    CMP      #&2a
+    CMP      #SCORE_DIGIT_WRAP
     BNE      score_upper_wrap_check_setup_22e6
-    LDA      #&20
+    LDA      #SCORE_BLANK_CHARACTER
     STA      score_counter_chars,X
     INX
-    CPX      #&4
+    CPX      #SCORE_DIGIT_COUNT
     BNE      score_increment_digit_carry_loop_22e6
 
 .score_upper_wrap_check_setup_22e6
-    LDY      #&2
+    LDY      #SCORE_UPPER_WRAP_FIRST_INDEX
 
 .score_upper_wrap_check_loop_22e6
     LDA      score_counter_chars,Y
-    CMP      #&20
+    CMP      #SCORE_BLANK_CHARACTER
     BNE      score_increment_next_unit_22e6
     DEY
     BPL      score_upper_wrap_check_loop_22e6
-    LDA      #&15
+    LDA      #SOUND_ID_SCORE_LIFE_BONUS
     JSR      play_sound_id_if_enabled
     INC      lives_status_count
     JSR      draw_lives_or_target_status
@@ -3242,12 +3242,12 @@ org runtime_start
     BNE      score_increment_outer_loop_22e6
 
 .draw_score_counter_digits
-    LDA      #&33
+    LDA      #SCORE_SCREEN_HIGH
     STA      object_screen_high_by_index
-    LDA      #&18
+    LDA      #SCORE_SCREEN_LOW
     STA      object_screen_low_by_index
     STA      object_y_by_index
-    LDX      #&3
+    LDX      #SCORE_LAST_DIGIT_INDEX
 
 .draw_score_digits_loop_2319
     STX      zp_scratch_76
@@ -3256,7 +3256,7 @@ org runtime_start
     LDX      zp_scratch_76
     DEX
     BPL      draw_score_digits_loop_2319
-    LDA      #&20
+    LDA      #SCORE_BLANK_CHARACTER
     JMP      draw_status_glyph_at_current_ptr
 
 .load_object_screen_ptr
@@ -3267,9 +3267,9 @@ org runtime_start
     RTS
 
 .draw_lives_or_target_status
-    LDA      #&7b
+    LDA      #LIVES_STATUS_SCREEN_HIGH
     STA      object_screen_high_by_index
-    LDA      #&8
+    LDA      #LIVES_STATUS_SCREEN_LOW
     STA      object_screen_low_by_index
     STA      object_y_by_index
     LDX      lives_status_count
@@ -3278,7 +3278,7 @@ org runtime_start
 
 .draw_life_status_marker_loop_2345
     STX      zp_scratch_76
-    LDA      #&39
+    LDA      #LIFE_STATUS_GRAPHIC
     JSR      draw_status_glyph_at_current_ptr
     LDX      zp_scratch_76
     DEX
@@ -3286,7 +3286,7 @@ org runtime_start
 
 .clear_empty_life_status_cell_2345
     JSR      load_object_screen_ptr
-    LDY      #&17
+    LDY      #STATUS_CELL_LAST_BYTE
     LDA      #&0
 
 .clear_status_cell_byte_loop_2345
@@ -3295,11 +3295,11 @@ org runtime_start
     BPL      clear_status_cell_byte_loop_2345
 
 .target_status_scan_setup_2345
-    LDA      #&7d
+    LDA      #TARGET_STATUS_SCREEN_HIGH
     STA      object_screen_high_by_index
-    LDA      #&60
+    LDA      #TARGET_STATUS_SCREEN_LOW
     STA      object_screen_low_by_index
-    LDX      #&0
+    LDX      #TARGET_STATUS_FIRST_SLOT
 
 .target_status_scan_loop_2345
     INX
@@ -3310,7 +3310,7 @@ org runtime_start
     JSR      draw_status_glyph_at_current_ptr
     SEC
     LDA      object_screen_low_by_index
-    SBC      #&38
+    SBC      #TARGET_STATUS_SCREEN_REWIND
     STA      object_screen_low_by_index
     LDA      object_screen_high_by_index
     SBC      #&0
@@ -3327,27 +3327,27 @@ org runtime_start
     CMP      object_x_by_index,X
     BEQ      delta_towards_player_compare_y_23a3
     BMI      delta_towards_player_set_x_negative_23a3
-    LDA      #&1
+    LDA      #MOVEMENT_DELTA_POSITIVE
     STA      movement_delta_x
     JMP      delta_towards_player_compare_y_23a3
 
 .delta_towards_player_set_x_negative_23a3
-    LDA      #&ff
+    LDA      #MOVEMENT_DELTA_NEGATIVE
     STA      movement_delta_x
 
 .delta_towards_player_compare_y_23a3
     LDA      player_y_first_cell
     CLC
-    ADC      #&1
+    ADC      #PLAYER_TO_OBJECT_Y_BIAS
     CMP      object_y_by_index,X
     BEQ      return_from_delta_towards_player_23a3
     BMI      delta_towards_player_set_y_negative_23a3
-    LDA      #&1
+    LDA      #MOVEMENT_DELTA_POSITIVE
     STA      movement_delta_y
     RTS
 
 .delta_towards_player_set_y_negative_23a3
-    LDA      #&ff
+    LDA      #MOVEMENT_DELTA_NEGATIVE
     STA      movement_delta_y
 
 .return_from_delta_towards_player_23a3
@@ -3362,13 +3362,13 @@ org runtime_start
     STA      spook_first_cell_y
     STA      spook_first_cell_screen_low
     STA      spook_second_cell_x
-    LDA      #&30
+    LDA      #SPOOK_FIRST_SCREEN_HIGH_INITIAL
     STA      spook_first_cell_screen_high
-    LDA      #&32
+    LDA      #SPOOK_SECOND_SCREEN_HIGH_INITIAL
     STA      spook_second_cell_screen_high
-    LDA      #&80
+    LDA      #SPOOK_SECOND_SCREEN_LOW_INITIAL
     STA      spook_second_cell_screen_low
-    LDA      #&2
+    LDA      #SPOOK_SECOND_CELL_Y_OFFSET
     STA      spook_second_cell_y
     JSR      draw_spook_pair_if_released
 
@@ -3380,14 +3380,14 @@ org runtime_start
     BNE      return_from_spook_release_or_draw_23cf
     LDA      #&0
     STA      render_mode_or_text_scratch
-    LDX      #&e
+    LDX      #SPOOK_FIRST_OBJECT_INDEX
     JSR      draw_object_by_index
-    LDX      #&f
+    LDX      #SPOOK_SECOND_OBJECT_INDEX
     JMP      draw_object_by_index
 
 .move_spook_pair_towards_player
     LDA      frame_phase
-    AND      #&1
+    AND      #SPOOK_MOVEMENT_PHASE_MASK
     BEQ      return_from_spook_release_or_draw_23cf
     LDA      spook_release_timer
     BNE      return_from_spook_release_or_draw_23cf
@@ -3397,14 +3397,14 @@ org runtime_start
     RTS
 
 .move_spook_pair_active_step_2410
-    LDA      #&7
-    LDX      #&c
+    LDA      #SPOOK_ACTIVE_PALETTE_VALUE
+    LDX      #SPOOK_ACTIVE_PALETTE_LOGICAL
     JSR      vdu19_set_palette_or_colour
     JSR      draw_spook_pair_if_released
-    LDX      #&e
+    LDX      #SPOOK_FIRST_OBJECT_INDEX
     JSR      delta_towards_player_for_object_x
     JSR      move_object_and_update_screen_ptr
-    LDX      #&f
+    LDX      #SPOOK_SECOND_OBJECT_INDEX
     JSR      move_object_and_update_screen_ptr
     JMP      draw_spook_pair_if_released
 
@@ -3416,19 +3416,19 @@ org runtime_start
     LDX      active_object_index
     DEX
     BPL      place_target_code_object_scan_loop_243e
-    LDX      #&6
+    LDX      #BONUS_TARGET_OBJECT_SLOT
 
 .place_one_target_code_object_if_due
     STX      active_object_index
     LDA      room_area
-    AND      #&f
+    AND      #ROOM_AREA_LOW_NIBBLE_MASK
     CMP      target_room_code,X
     BNE      return_from_place_target_code_object_244a
     LDA      target_collected_status,X
     BNE      return_from_place_target_code_object_244a
     TXA
     CLC
-    ADC      #&22
+    ADC      #TARGET_SLOT_TO_LOGICAL_ITEM_BIAS
     STA      logical_item_slot_index
     JMP      random_place_item
 
@@ -3436,31 +3436,31 @@ org runtime_start
     RTS
 
 .scan_escape_key
-    LDX      #&8f
+    LDX      #INKEY_ESCAPE
 
 .scan_inkey_current_x
-    LDA      #&81
-    LDY      #&ff
+    LDA      #OSBYTE_INKEY
+    LDY      #INKEY_TIME_LIMIT
     JSR      MOS_OSBYTE
-    CPX      #&0
+    CPX      #INKEY_NOT_PRESSED
     RTS
 
 .handle_sound_on_off_keys
-    LDX      #&ae
+    LDX      #INKEY_SOUND_ON
     JSR      scan_inkey_current_x
     BEQ      sound_toggle_check_sound_off_key_2470
-    LDA      #&0
+    LDA      #SOUND_ENABLED
     STA      sound_disabled_flag
 
 .sound_toggle_check_sound_off_key_2470
-    LDX      #&ef
+    LDX      #INKEY_SOUND_OFF
     JSR      scan_inkey_current_x
     BEQ      return_from_sound_toggle_2470
-    LDA      #&c
+    LDA      #SOUND_ID_ATTRACT_FIRST
     JSR      play_sound_id_if_enabled
-    LDA      #&10
+    LDA      #SOUND_ID_ATTRACT_SECOND
     JSR      play_sound_id_if_enabled
-    LDA      #&1
+    LDA      #SOUND_DISABLED
     STA      sound_disabled_flag
 
 .return_from_sound_toggle_2470
@@ -3477,9 +3477,9 @@ org runtime_start
     STA      player_graphic_id_first_cell
     LDA      #&0
     STA      render_mode_or_text_scratch
-    LDX      #&10
+    LDX      #PLAYER_FIRST_OBJECT_INDEX
     JSR      draw_object_using_saved_screen_ptr
-    LDX      #&11
+    LDX      #PLAYER_SECOND_OBJECT_INDEX
     JSR      draw_object_using_saved_screen_ptr
     LDA      temp_player_graphic_id_first
     STA      player_graphic_id_first_cell
@@ -3489,13 +3489,13 @@ org runtime_start
 
 .vdu19_set_palette_or_colour
     PHA
-    LDA      #&13
+    LDA      #VDU_DEFINE_LOGICAL_COLOUR
     JSR      MOS_OSWRCH
     TXA
     JSR      MOS_OSWRCH
     PLA
     JSR      MOS_OSWRCH
-    LDA      #&0
+    LDA      #VDU_PALETTE_MODE_DEFAULT
     JSR      MOS_OSWRCH
     JSR      MOS_OSWRCH
     JMP      MOS_OSWRCH
