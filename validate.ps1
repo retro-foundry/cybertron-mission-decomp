@@ -18,6 +18,7 @@ $requiredFiles = @(
     'source_acorn_electron/memory_map.inc'
     'source_acorn_electron/README.md'
     'source_acorn_electron/reconstruction.json'
+    'analysis/reconstruction/semantic_completion_audit.md'
     'tools/reconstruction/render_graphic_sheet.py'
     'analysis/reconstruction/composed_sprite_sheet.png'
 )
@@ -36,6 +37,7 @@ $maintainedFiles = @(
     $memoryMap
     (Join-Path $repoRoot 'source_acorn_electron\README.md')
     (Join-Path $repoRoot 'source_acorn_electron\reconstruction.json')
+    (Join-Path $repoRoot 'analysis\reconstruction\semantic_completion_audit.md')
     (Join-Path $repoRoot 'tools\reconstruction\render_graphic_sheet.py')
 )
 foreach ($maintainedFile in $maintainedFiles) {

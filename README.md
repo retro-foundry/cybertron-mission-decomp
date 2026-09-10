@@ -68,7 +68,9 @@ Names and comments distinguish proved behavior from structural classification.
 Unreferenced original bytes are retained as explicitly named unused code,
 padding, or graphic-shaped records rather than hidden in binary fragments.
 See [`source_acorn_electron/README.md`](source_acorn_electron/README.md) for the
-source conventions and range manifest.
+source conventions and range manifest. The
+[semantic completion audit](analysis/reconstruction/semantic_completion_audit.md)
+records what is proved and the remaining Quest-level runtime validation gaps.
 
 The decoded 24-byte artwork can be reviewed in the
 [composed sprite and graphic sheet](analysis/reconstruction/composed_sprite_sheet.png).
