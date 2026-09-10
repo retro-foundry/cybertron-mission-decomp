@@ -25,6 +25,8 @@ Join the project discussion on [Discord](https://discord.gg/QjARJ67V9U).
 - PowerShell 7 or Windows PowerShell 5.1
 - [BeebAsm](https://github.com/stardot/beebasm), either on `PATH` or supplied
   with `-BeebAsm`
+- Python 3 for validation of the bundled analysis tool
+- Pillow to regenerate the optional labelled graphic sheet
 
 ## Build
 
@@ -67,6 +69,9 @@ Unreferenced original bytes are retained as explicitly named unused code,
 padding, or graphic-shaped records rather than hidden in binary fragments.
 See [`source_acorn_electron/README.md`](source_acorn_electron/README.md) for the
 source conventions and range manifest.
+
+The decoded 24-byte artwork can be reviewed in the
+[complete labelled graphic sheet](analysis/reconstruction/all_graphic_records.png).
 
 This is reconstructed source, not the original author's source. The original
 game and its assets remain the property of their respective copyright holders.

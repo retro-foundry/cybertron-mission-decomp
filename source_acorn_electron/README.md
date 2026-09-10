@@ -29,3 +29,8 @@ the expected length and SHA-256 in `validate.ps1`.
 Build and validate from the repository root with `./build.ps1` and
 `./validate.ps1`. Generated output is written below ignored
 `build/reconstruction/`.
+
+Run `python tools/reconstruction/render_graphic_sheet.py` to regenerate the
+labelled sheet at `analysis/reconstruction/all_graphic_records.png`. The sheet
+uses each record's source annotation and leaves unproved artwork numerically
+named rather than inferring gameplay identity from appearance alone.

@@ -18,6 +18,8 @@ $requiredFiles = @(
     'source_acorn_electron/memory_map.inc'
     'source_acorn_electron/README.md'
     'source_acorn_electron/reconstruction.json'
+    'tools/reconstruction/render_graphic_sheet.py'
+    'analysis/reconstruction/all_graphic_records.png'
 )
 foreach ($relativePath in $requiredFiles) {
     $requiredPath = Join-Path $repoRoot $relativePath
@@ -34,6 +36,7 @@ $maintainedFiles = @(
     $memoryMap
     (Join-Path $repoRoot 'source_acorn_electron\README.md')
     (Join-Path $repoRoot 'source_acorn_electron\reconstruction.json')
+    (Join-Path $repoRoot 'tools\reconstruction\render_graphic_sheet.py')
 )
 foreach ($maintainedFile in $maintainedFiles) {
     $nonAsciiByte = [System.IO.File]::ReadAllBytes($maintainedFile) |
@@ -42,6 +45,16 @@ foreach ($maintainedFile in $maintainedFiles) {
     if ($null -ne $nonAsciiByte) {
         throw "Standalone maintained file is not ASCII-only: $maintainedFile"
     }
+}
+
+$rendererScript = Join-Path $repoRoot 'tools\reconstruction\render_graphic_sheet.py'
+$pythonCommand = Get-Command python -ErrorAction SilentlyContinue
+if ($null -eq $pythonCommand) {
+    throw 'Python 3 is required to syntax-check the bundled reconstruction tool.'
+}
+& $pythonCommand.Source -c 'import ast, pathlib, sys; ast.parse(pathlib.Path(sys.argv[1]).read_bytes())' $rendererScript
+if ($LASTEXITCODE -ne 0) {
+    throw 'The bundled graphic-sheet renderer does not parse as Python.'
 }
 
 $assemblyText = Get-Content -LiteralPath $source -Raw
